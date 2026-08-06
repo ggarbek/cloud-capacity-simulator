@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- v3 substrate (S24 Pilot #1.7) — IBM Plex web-font load removed.
+         The app renders on the Apple/system sans + system mono stack; the
+         Plex families were dead weight (the only consumer, the .chip mono
+         font, was dropped in the typography pass). Removing the load drops
+         a render-blocking external request. -->
+    <title>VM Capacity Simulator</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

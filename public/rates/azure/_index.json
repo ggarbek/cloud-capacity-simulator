@@ -1,0 +1,310 @@
+{
+  "provider": "azure",
+  "generatedAt": "2026-08-03T10:44:26.884Z",
+  "regions": [
+    {
+      "region": "attatlanta1",
+      "skuCount": 168
+    },
+    {
+      "region": "attdallas1",
+      "skuCount": 165
+    },
+    {
+      "region": "attdetroit1",
+      "skuCount": 80
+    },
+    {
+      "region": "attnewyork1",
+      "skuCount": 81
+    },
+    {
+      "region": "australiacentral",
+      "skuCount": 899
+    },
+    {
+      "region": "australiacentral2",
+      "skuCount": 850
+    },
+    {
+      "region": "australiaeast",
+      "skuCount": 1533
+    },
+    {
+      "region": "australiasoutheast",
+      "skuCount": 1025
+    },
+    {
+      "region": "austriaeast",
+      "skuCount": 790
+    },
+    {
+      "region": "belgiumcentral",
+      "skuCount": 767
+    },
+    {
+      "region": "brazilsouth",
+      "skuCount": 1393
+    },
+    {
+      "region": "brazilsoutheast",
+      "skuCount": 882
+    },
+    {
+      "region": "canadacentral",
+      "skuCount": 1456
+    },
+    {
+      "region": "canadaeast",
+      "skuCount": 962
+    },
+    {
+      "region": "centralindia",
+      "skuCount": 1445
+    },
+    {
+      "region": "centralus",
+      "skuCount": 1563
+    },
+    {
+      "region": "chilecentral",
+      "skuCount": 671
+    },
+    {
+      "region": "denmarkeast",
+      "skuCount": 566
+    },
+    {
+      "region": "eastasia",
+      "skuCount": 1326
+    },
+    {
+      "region": "eastus",
+      "skuCount": 1775
+    },
+    {
+      "region": "eastus2",
+      "skuCount": 1703
+    },
+    {
+      "region": "eastus3",
+      "skuCount": 48
+    },
+    {
+      "region": "francecentral",
+      "skuCount": 1281
+    },
+    {
+      "region": "francesouth",
+      "skuCount": 831
+    },
+    {
+      "region": "germanynorth",
+      "skuCount": 915
+    },
+    {
+      "region": "germanywestcentral",
+      "skuCount": 1534
+    },
+    {
+      "region": "Global",
+      "skuCount": 23
+    },
+    {
+      "region": "indiasouthcentral",
+      "skuCount": 588
+    },
+    {
+      "region": "indonesiacentral",
+      "skuCount": 966
+    },
+    {
+      "region": "israelcentral",
+      "skuCount": 844
+    },
+    {
+      "region": "israelnorthwest",
+      "skuCount": 924
+    },
+    {
+      "region": "italynorth",
+      "skuCount": 1296
+    },
+    {
+      "region": "japaneast",
+      "skuCount": 1508
+    },
+    {
+      "region": "japanwest",
+      "skuCount": 1227
+    },
+    {
+      "region": "jioindiacentral",
+      "skuCount": 1010
+    },
+    {
+      "region": "jioindiawest",
+      "skuCount": 1190
+    },
+    {
+      "region": "koreacentral",
+      "skuCount": 1388
+    },
+    {
+      "region": "koreasouth",
+      "skuCount": 866
+    },
+    {
+      "region": "malaysiawest",
+      "skuCount": 795
+    },
+    {
+      "region": "mexicocentral",
+      "skuCount": 1165
+    },
+    {
+      "region": "newzealandnorth",
+      "skuCount": 889
+    },
+    {
+      "region": "northcentralus",
+      "skuCount": 1374
+    },
+    {
+      "region": "northeurope",
+      "skuCount": 1662
+    },
+    {
+      "region": "norwayeast",
+      "skuCount": 1168
+    },
+    {
+      "region": "norwaywest",
+      "skuCount": 815
+    },
+    {
+      "region": "polandcentral",
+      "skuCount": 1234
+    },
+    {
+      "region": "portland",
+      "skuCount": 2
+    },
+    {
+      "region": "qatarcentral",
+      "skuCount": 925
+    },
+    {
+      "region": "sgxsingapore1",
+      "skuCount": 7
+    },
+    {
+      "region": "southafricanorth",
+      "skuCount": 1286
+    },
+    {
+      "region": "southafricawest",
+      "skuCount": 929
+    },
+    {
+      "region": "southcentralus",
+      "skuCount": 1590
+    },
+    {
+      "region": "southcentralus2",
+      "skuCount": 1
+    },
+    {
+      "region": "southeastasia",
+      "skuCount": 1503
+    },
+    {
+      "region": "southeastus",
+      "skuCount": 4
+    },
+    {
+      "region": "southindia",
+      "skuCount": 1080
+    },
+    {
+      "region": "southwestus",
+      "skuCount": 99
+    },
+    {
+      "region": "spaincentral",
+      "skuCount": 1230
+    },
+    {
+      "region": "swedencentral",
+      "skuCount": 1467
+    },
+    {
+      "region": "swedensouth",
+      "skuCount": 757
+    },
+    {
+      "region": "switzerlandnorth",
+      "skuCount": 1382
+    },
+    {
+      "region": "switzerlandwest",
+      "skuCount": 891
+    },
+    {
+      "region": "uaecentral",
+      "skuCount": 912
+    },
+    {
+      "region": "uaenorth",
+      "skuCount": 1345
+    },
+    {
+      "region": "uksouth",
+      "skuCount": 1545
+    },
+    {
+      "region": "ukwest",
+      "skuCount": 997
+    },
+    {
+      "region": "usgovarizona",
+      "skuCount": 1036
+    },
+    {
+      "region": "usgoviowa",
+      "skuCount": 8
+    },
+    {
+      "region": "usgovtexas",
+      "skuCount": 823
+    },
+    {
+      "region": "usgovvirginia",
+      "skuCount": 1291
+    },
+    {
+      "region": "westcentralus",
+      "skuCount": 970
+    },
+    {
+      "region": "westeurope",
+      "skuCount": 1766
+    },
+    {
+      "region": "westindia",
+      "skuCount": 806
+    },
+    {
+      "region": "westus",
+      "skuCount": 1577
+    },
+    {
+      "region": "westus2",
+      "skuCount": 1578
+    },
+    {
+      "region": "westus3",
+      "skuCount": 1517
+    }
+  ]
+}

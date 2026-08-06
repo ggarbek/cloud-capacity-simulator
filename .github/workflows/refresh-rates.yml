@@ -1,0 +1,160 @@
+name: Refresh rates
+
+# Scheduled (and on-demand) refresh of the cloud rate/spec shards under
+# public/rates/<provider>/. Those shards are TRACKED in git (un-ignored), so this
+# job regenerates them and commits the diff back to main.
+#
+# Keyless pulls run unconditionally (no secrets needed): Azure rates+network, all
+# AWS, GCP specs. Keyed pulls (Azure specs via a service principal, GCP rates via
+# an API key) run ONLY when their secrets are present — the job NEVER fails just
+# because those secrets are absent; it simply skips them and the keyless data
+# still refreshes. See scripts/ingest/AUTOMATION.md for secret setup.
+
+on:
+  # Weekly — Mondays 07:00 UTC.
+  schedule:
+    - cron: '0 7 * * 1'
+  # Manual button: Actions tab -> Refresh rates -> Run workflow.
+  workflow_dispatch:
+
+# Needed so the final step can commit the refreshed shards back to main.
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    name: Pull rates and commit refreshed shards
+    runs-on: ubuntu-latest
+
+    # `secrets` can't be read in a step `if:`, but it CAN be read in `env`.
+    # So resolve presence to booleans here, then gate the keyed steps on env.
+    env:
+      HAS_AZURE_SP: ${{ secrets.AZURE_TENANT_ID != '' && secrets.AZURE_CLIENT_ID != '' && secrets.AZURE_CLIENT_SECRET != '' && secrets.AZURE_SUBSCRIPTION_ID != '' }}
+      HAS_GCP_KEY: ${{ secrets.GCP_API_KEY != '' }}
+      # Auto-provided token — authenticates azure-network.mjs's GitHub API calls
+      # so the shared-CI-IP 60/hr unauthenticated limit (403) is avoided.
+      GITHUB_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          # The ingest scripts use global fetch + top-level await — any current
+          # LTS works. Pinned to 22 (a generally-available LTS), not 26.
+          node-version: '22'
+
+      # --- KEYLESS pulls (always run, no secrets) ----------------------------
+
+      - name: Azure network (keyless)
+        run: node scripts/ingest/azure-network.mjs
+
+      - name: Azure rates (keyless, ALL regions)
+        # No args = every Azure region (one paginated query).
+        run: node scripts/ingest/azure-prices.mjs
+
+      - name: AWS specs + network (keyless)
+        run: node scripts/ingest/aws-specs.mjs
+
+      - name: AWS rates (keyless, ALL regions)
+        # No args = every region in the AWS Price List region index.
+        run: node scripts/ingest/aws-prices.mjs
+
+      - name: GCP specs + network (keyless)
+        run: node scripts/ingest/gcp-specs.mjs
+
+      # --- KEYED pulls (run ONLY when their secrets exist) -------------------
+      # Secrets can't be read directly in an `if:` value, so each guard checks
+      # the secret against '' (empty when unset). If absent, the step is skipped
+      # and the workflow continues — keyless data still refreshed above.
+
+      - name: Azure specs (service principal — skipped if secrets absent)
+        if: env.HAS_AZURE_SP == 'true'
+        env:
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        run: node scripts/ingest/azure-specs.mjs
+
+      - name: GCP rates (API key — skipped if secret absent, ALL regions)
+        if: env.HAS_GCP_KEY == 'true'
+        env:
+          GCP_API_KEY: ${{ secrets.GCP_API_KEY }}
+        # No args = every GCP region.
+        run: node scripts/ingest/gcp-prices.mjs
+
+      # --- Report keyed-step staleness (always runs, never fails) ------------
+      # When a keyed secret is absent the step above is SKIPPED and its last-good
+      # shard ages silently. This report prints a ::warning:: + a job-summary
+      # block when a keyed shard is >30d old with no secret, so the gap is
+      # visible. It is a report, not a gate — always exits 0.
+
+      - name: Keyed-step staleness report
+        run: node scripts/ingest/report-keyed-staleness.mjs
+
+      # --- Keep the availability tables in lockstep with the vendor docs -----
+      # Region availability is injected from src/data/{aws,gcp}RegionAvailability.ts
+      # (decoupled from pricing). Regenerate them from the docs so a doc update
+      # never leaves a family silently missing from availability. No-op when the
+      # docs are unchanged; a vitest guard also fails CI if they ever drift.
+
+      - name: Regenerate region-availability tables from docs
+        run: node scripts/ingest/gen-region-availability.mjs
+
+      # --- Derive the Azure M-series seed from the refreshed shards -----------
+      # The hand-built M-series seed used to ship in 6 hard-coded regions; it
+      # now expands across the true ~52-region footprint with real rates read
+      # from the Azure shards. Re-run here so the seed never drifts from the
+      # shards. Depends only on public/rates/azure/ (the Azure steps above).
+
+      - name: Rebuild Azure M-series seed from shards
+        run: node scripts/ingest/build-azure-mseries-seed.mjs
+
+      # --- Bake the full live catalog (all regions/clouds/sizes) -------------
+      # Consolidates every shard into src/data/liveCatalog.generated.json, the
+      # bundled artifact the dashboard ships as its DEFAULT catalog (so every
+      # region is fresh out of the box, no manual load). Re-run here so the
+      # baked catalog never drifts from the shards. Depends on all the pulls
+      # above.
+
+      - name: Rebuild bundled live catalog from shards
+        run: node scripts/ingest/build-live-catalog.mjs
+
+      # --- Describe the refreshed shards (shape / coverage / join health) -----
+      # Scans public/rates/** post-hoc into public/rates/_manifest.json — works
+      # even when a keyed step was skipped (each shard's own generatedAt carries
+      # truth). The manifest is the input to the integrity gate below and is
+      # embedded in the baked catalog for the app's data-health line.
+
+      - name: Build shard manifests
+        run: node scripts/ingest/build-manifests.mjs
+
+      # --- Integrity gate — MUST run BEFORE the commit step -------------------
+      # Compares the fresh manifest against the one committed at HEAD and fails
+      # the job on a row-count cliff, coverage regression, spec-join floor breach
+      # or schema break. Placed before the commit so a bad pull fails HERE and
+      # the good committed shards survive untouched. First run (no committed
+      # manifest) passes with only the absolute checks.
+
+      - name: Validate shards
+        run: node scripts/ingest/validate-shards.mjs
+
+      # --- Commit the refreshed shards + derived artifacts back to main ------
+
+      - name: Commit and push refreshed shards
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Guard against an empty commit: only commit + push when the shards
+          # OR a derived artifact (M-series seed / baked live catalog) changed.
+          ARTIFACTS="public/rates public/rates/_manifest.json src/data/azureMSeriesSeedRates.json src/data/liveCatalog.generated.json src/data/awsRegionAvailability.ts src/data/gcpRegionAvailability.ts"
+          if git diff --quiet -- $ARTIFACTS; then
+            echo "No rate changes to commit."
+          else
+            git add $ARTIFACTS
+            git commit -m "chore(rates): scheduled refresh [skip ci]"
+            git push
+          fi

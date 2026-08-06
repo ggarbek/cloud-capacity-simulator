@@ -1,0 +1,41 @@
+{
+  "version": "1.2",
+  "categories": [
+    {
+      "id": "mm",
+      "displayName": "Medium Memory",
+      "shortName": "MM",
+      "ramRangeMin": 0,
+      "ramRangeMax": 4096,
+      "vmGenerations": ["Mv1", "Mv2", "Mv3"],
+      "hardwareGroups": ["gen-legacy-mm", "gen-a-mm", "gen-c-mm", "gen-d-mm"],
+      "isolated": false,
+      "color": "#BBF7D0",
+      "glow": "rgba(187, 247, 208, 0.40)"
+    },
+    {
+      "id": "hm",
+      "displayName": "High Memory",
+      "shortName": "HM",
+      "ramRangeMin": 6144,
+      "ramRangeMax": 16384,
+      "vmGenerations": ["Mv2", "Mv3"],
+      "hardwareGroups": ["gen-legacy0-hm", "gen-legacy-hm", "gen-b-hm-mixed", "gen-c-hm", "gen-d-hm"],
+      "isolated": false,
+      "color": "#22C55E",
+      "glow": "rgba(34, 197, 94, 0.40)"
+    },
+    {
+      "id": "vhm",
+      "displayName": "Very High Memory",
+      "shortName": "VHM",
+      "ramRangeMin": 24576,
+      "ramRangeMax": 32768,
+      "vmGenerations": ["Mv3"],
+      "hardwareGroups": ["gen-a-vhm"],
+      "isolated": true,
+      "color": "#14532D",
+      "glow": "rgba(20, 83, 45, 0.55)"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "version": "2.0",
+  "note": "Built-in hardware groups are intentionally empty in v2.0+. Users populate this list by uploading the Excel template from the Hardware tab. The current Microsoft M-Series catalog ships separately in public/hardware-template.xlsx as the worked-example seed rows.",
+  "groups": []
+}

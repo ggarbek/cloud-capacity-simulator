@@ -1,0 +1,190 @@
+{
+  "provider": "gcp",
+  "generatedAt": "2026-08-03T10:47:50.105Z",
+  "regions": [
+    {
+      "region": "africa-south1",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "asia-east1",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "asia-east2",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "asia-northeast1",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "asia-northeast2",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "asia-northeast3",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "asia-south1",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "asia-south2",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "asia-southeast1",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "asia-southeast2",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "asia-southeast3",
+      "machineTypeCount": 63
+    },
+    {
+      "region": "australia-southeast1",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "australia-southeast2",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "europe-central2",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "europe-north1",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "europe-north2",
+      "machineTypeCount": 114
+    },
+    {
+      "region": "europe-southwest1",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "europe-west1",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "europe-west10",
+      "machineTypeCount": 188
+    },
+    {
+      "region": "europe-west12",
+      "machineTypeCount": 188
+    },
+    {
+      "region": "europe-west2",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "europe-west3",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "europe-west4",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "europe-west5",
+      "machineTypeCount": 17
+    },
+    {
+      "region": "europe-west6",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "europe-west8",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "europe-west9",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "me-central1",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "me-central2",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "me-west1",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "northamerica-northeast1",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "northamerica-northeast2",
+      "machineTypeCount": 207
+    },
+    {
+      "region": "northamerica-south1",
+      "machineTypeCount": 114
+    },
+    {
+      "region": "southamerica-east1",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "southamerica-west1",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "us-central1",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "us-east1",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "us-east4",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "us-east5",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "us-east7",
+      "machineTypeCount": 34
+    },
+    {
+      "region": "us-south1",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "us-west1",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "us-west2",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "us-west3",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "us-west4",
+      "machineTypeCount": 212
+    },
+    {
+      "region": "us-west8",
+      "machineTypeCount": 212
+    }
+  ]
+}

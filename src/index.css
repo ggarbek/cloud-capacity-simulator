@@ -1,0 +1,459 @@
+@import './styles/tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  /* Apple SF system font stack — matches macOS / iOS native UI */
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+    'Inter', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg-deep);
+  letter-spacing: -0.005em;
+}
+
+/* v3 substrate (S24 Pilot #1.2) — ambient canvas tint calmed. The green +
+   cyan radial spots tinted the entire page green, reinforcing the
+   "everything is brand-colored" feel. Executive register wants a near-
+   neutral canvas; the accent lives on interactive elements, not the
+   backdrop. Dark mode keeps a barely-there cool depth gradient; light
+   mode goes effectively flat. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% -10%, rgba(148, 163, 184, 0.05), transparent 65%);
+  pointer-events: none;
+  z-index: 0;
+}
+:root[data-theme='light'] body::before {
+  background:
+    radial-gradient(ellipse 90% 70% at 50% -10%, rgba(15, 23, 42, 0.025), transparent 65%);
+}
+
+#root { position: relative; z-index: 1; }
+
+input, select, textarea, button, option {
+  color: var(--text-primary);
+  font-family: inherit;
+}
+input::placeholder, textarea::placeholder { color: var(--text-muted); }
+/* v2.19.46 — color-scheme is now theme-adaptive so native UA-styled
+   controls (scrollbars, calendar pickers, default option lists) match
+   the active theme instead of always being dark. */
+input, select, textarea { color-scheme: dark; }
+option { background-color: #0a0a0c; color: #F8FAFC; }
+:root[data-theme='light'] input,
+:root[data-theme='light'] select,
+:root[data-theme='light'] textarea {
+  color-scheme: light;
+}
+:root[data-theme='light'] option {
+  background-color: #FFFFFF;
+  color: var(--text-primary);
+}
+
+*:focus-visible {
+  outline: 2px solid var(--interactive);
+  outline-offset: 2px;
+}
+
+/* v3 substrate (S24 Pilot #1.2) — neutral scrollbar. The green thumb
+   reinforced the brand-everywhere feel; a neutral track is the executive
+   default (the accent belongs on interactive elements, not chrome). */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.28); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.45); }
+:root[data-theme='light'] ::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.22);
+}
+:root[data-theme='light'] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.38);
+}
+
+/* ───────── Card surfaces (v3 substrate · S24 Pilot #1.1) ─────────
+   The `.glass` / `.glass-strong` classes are the most common card
+   surface across the app — every HW Library row, BoM row, Fleet
+   Builder cluster, Insights section, NodeDetailPanel, and many
+   inline composers consume them. Previously these carried a
+   `backdrop-filter: blur(40-50px) saturate(180-200%)` which made
+   the whole app feel glassmorphic by default.
+
+   v3 substrate retires glassmorphism-as-default (executive premium
+   register · impeccable bans default-glass · "shadow shouldn't be
+   the first thing you notice"). The classes now resolve to a flat
+   surface + neutral border + subtle inset highlight + a neutral
+   bottom-edge drop shadow. `.glass-strong` survives as the slightly
+   elevated overlay treatment (for popovers, modals if added).
+
+   Class names retained for callsite compatibility — every existing
+   `className="glass"` reads the new look automatically. */
+.glass {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    var(--shadow-card);
+}
+
+.glass-strong {
+  background: var(--surface-2);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    var(--shadow-elevated);
+}
+
+:root[data-theme='light'] .glass {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    var(--shadow-card);
+}
+:root[data-theme='light'] .glass-strong {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    var(--shadow-elevated);
+}
+
+/* Terminal (data assistant) floating panel — must be OPAQUE so page content
+   scrolling behind it never bleeds through and hurts legibility. The .glass
+   surfaces are intentionally translucent for cards over a blurred backdrop;
+   this panel floats over live content, so it gets its own solid backing. */
+.terminal-panel {
+  background: rgba(16, 20, 26, 0.97);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+:root[data-theme='light'] .terminal-panel {
+  background: rgba(248, 250, 252, 0.98);
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border-radius: var(--radius-pill);
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+.glass-input:hover { background: rgba(255, 255, 255, 0.08); }
+.glass-input:focus {
+  outline: none;
+  border-color: var(--interactive);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.30);
+}
+/* v2.19.52 — Light-mode inputs sit on slate-100 cards, so an input
+ *  background needs to be lighter than its container OR have a visible
+ *  border. We go solid white with a stronger border for crisp data-entry
+ *  affordance against the gray card. */
+:root[data-theme='light'] .glass-input {
+  background: #FFFFFF;
+  border-color: rgba(15, 23, 42, 0.22);
+}
+:root[data-theme='light'] .glass-input:hover {
+  background: #FFFFFF;
+  border-color: rgba(15, 23, 42, 0.36);
+}
+:root[data-theme='light'] .glass-input:focus {
+  background: #FFFFFF;
+  border-color: var(--interactive);
+}
+
+/* ───────── Buttons ───────── */
+
+/* v3 substrate (S24 Pilot #1) — primary CTA without the neon glow halo.
+   Neutral drop shadow + inset highlight; the saturated brand color
+   carries the affordance, not the halo. Press feedback is scale-down per
+   Emil (scale also scales children — icon + label compress together).
+   Hover gated behind hover-capable + fine-pointer media query so touch
+   devices don't fire false-positive hover on tap. */
+.btn-primary {
+  background: linear-gradient(180deg, var(--interactive), var(--interactive-hover));
+  color: #FFFFFF;
+  font-weight: 600;
+  border: 1px solid rgba(129, 140, 248, 0.6);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    var(--shadow-card);
+  transition:
+    transform 160ms var(--ease-out),
+    filter 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease,
+    background 200ms ease;
+  border-radius: var(--radius-pill);
+}
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover {
+    filter: brightness(1.04);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      var(--shadow-elevated);
+  }
+}
+.btn-primary:active { transform: scale(0.97); }
+.btn-primary:disabled {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-dim);
+  border-color: var(--border);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* v3 substrate (S24 Pilot #1) — ghost button without the glow halo on
+   hover. Press feedback added. Hover gated. The interactive border-color
+   shift + soft tint already carry the affordance. */
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  border-radius: var(--radius-pill);
+  transition:
+    transform 160ms var(--ease-out),
+    border-color 200ms ease,
+    color 200ms ease,
+    background 200ms ease,
+    box-shadow 200ms ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+@media (hover: hover) and (pointer: fine) {
+  .btn-ghost:hover {
+    border-color: var(--interactive);
+    color: var(--text-primary);
+    background: rgba(129, 140, 248, 0.08);
+  }
+}
+.btn-ghost:active { transform: scale(0.97); }
+
+/* ───────── Chips ───────── */
+
+/* v3 substrate (S24 Pilot #1.4) — chips de-shouted: uppercase + wide
+   tracking dropped, mono font dropped (the app's system sans carries
+   them), backdrop blur dropped (glassmorphism retire). Reads as a clean
+   label pill instead of a tracked-mono code tag. */
+.chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 999px;
+  font-size: 11px; letter-spacing: 0; font-weight: 500;
+  border: 1px solid currentColor;
+  background: var(--tint-soft);
+}
+
+/* ───────── Patterns ───────── */
+
+.pattern-stripes-white {
+  background-image: repeating-linear-gradient(
+    45deg, transparent, transparent 4px,
+    rgba(255, 255, 255, 0.18) 4px, rgba(255, 255, 255, 0.18) 6px
+  );
+}
+.pattern-crosshatch {
+  background-image:
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.18) 0 1px, transparent 1px 6px),
+    repeating-linear-gradient(-45deg, rgba(255,255,255,0.18) 0 1px, transparent 1px 6px);
+}
+
+/* ───────── Text helpers ───────── */
+
+/* v3 substrate (S24 Pilot #1) — `.text-gradient` retired. Gradient text
+   is on impeccable's bans list (decorative, never meaningful) and the
+   class had no remaining callsites in the codebase. */
+
+/* `.ease-spring` retained as a callsite-compatibility shim so existing
+   class usages (GlassToggle) automatically inherit the new restrained
+   ease-out curve. No code change in the consuming components — the
+   bounce-vs-ease swap is purely token-driven. */
+.ease-spring { transition-timing-function: var(--ease-out); }
+
+/* Node tile hover — quick visual response distinct from selected state.
+   v3 substrate: hover gated behind hover-capable + fine-pointer so taps
+   on touch devices don't fire false-positive hover. Scale 1.05 → 1.02
+   per the executive register; bounce curve → ease-out. */
+@media (hover: hover) and (pointer: fine) {
+  .node-tile:hover:not(:disabled) {
+    transform: scale(1.02);
+    filter: brightness(1.12) saturate(1.05);
+    transition: transform 120ms var(--ease-out), filter 120ms ease;
+  }
+}
+.node-tile {
+  transition: transform 160ms var(--ease-out), filter 160ms ease;
+}
+
+/* ───── v2.21.1 — Fleet map (three-altitude visualization) ─────
+   .fm-shelf  = one server shelf (node) in a rack elevation.
+   .fm-card   = clickable drill cards (region capacity card, cluster aisle).
+   Hover gated to hover-capable fine pointers, same as .node-tile; the
+   global prefers-reduced-motion block below neutralizes the transitions. */
+.fm-shelf {
+  transition: filter 140ms var(--ease-out), box-shadow 140ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .fm-shelf:hover:not(:disabled) {
+    filter: brightness(1.22) saturate(1.08);
+  }
+  .fm-card:hover {
+    border-color: var(--border-glow) !important;
+    box-shadow: var(--shadow-elevated) !important;
+  }
+}
+.fm-card {
+  transition: border-color 140ms var(--ease-out), box-shadow 140ms var(--ease-out);
+}
+
+/* ───── Section heading reused across panels ─────
+   v3 substrate (S24 Pilot #1.2) — the neon-green uppercase tracked pill
+   ("the AI scaffold eyebrow" per impeccable) retired in favor of a clean
+   executive section header: sentence-case, ink-colored, tighter tracking,
+   anchored by a single bottom hairline instead of a glass pill. This is
+   the loudest repeated element in the app — de-neoning it shifts the whole
+   register from "Blade Runner dashboard" toward "executive premium."
+
+   The JSX labels are already authored sentence-case ("Bill of Materials",
+   "Bulk add VMs"), so dropping text-transform reads correctly. Green is
+   retained as a single ACCENT (CTAs, active states, chips) but removed
+   from STRUCTURE — that's restraint done right. */
+.section-h {
+  /* v2.7 — Headers always stretch to fill their pane. Action chips
+     (Clear, Template, etc.) sit INSIDE this header on the right edge,
+     not as flex siblings outside it. */
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 4px 2px 8px;
+  box-shadow: none;
+}
+:root[data-theme='light'] .section-h {
+  background: transparent;
+}
+
+/* ───────── v2.19.46 — Light mode contrast pass ─────────
+   Many components were authored against the dark theme with inline
+   styles like `background: 'rgba(255,255,255,0.02)'` for hover/surface
+   tints. Those tints are invisible on a light bg. Rather than rewriting
+   every callsite, we explicitly target the light theme and shift the
+   most common patterns to dark-tint equivalents that read as a soft
+   slate wash on white. */
+
+/* Tailwind hover utilities used throughout the app */
+:root[data-theme='light'] .hover\:bg-white\/\[0\.02\]:hover {
+  background-color: rgba(15, 23, 42, 0.04) !important;
+}
+:root[data-theme='light'] .hover\:bg-white\/\[0\.03\]:hover {
+  background-color: rgba(15, 23, 42, 0.05) !important;
+}
+:root[data-theme='light'] .hover\:bg-white\/\[0\.04\]:hover {
+  background-color: rgba(15, 23, 42, 0.06) !important;
+}
+:root[data-theme='light'] .hover\:bg-white\/\[0\.06\]:hover {
+  background-color: rgba(15, 23, 42, 0.08) !important;
+}
+:root[data-theme='light'] .hover\:bg-white\/\[0\.08\]:hover {
+  background-color: rgba(15, 23, 42, 0.10) !important;
+}
+:root[data-theme='light'] .bg-white\/\[0\.02\] {
+  background-color: rgba(15, 23, 42, 0.04) !important;
+}
+:root[data-theme='light'] .bg-white\/\[0\.03\] {
+  background-color: rgba(15, 23, 42, 0.05) !important;
+}
+:root[data-theme='light'] .bg-white\/\[0\.04\] {
+  background-color: rgba(15, 23, 42, 0.06) !important;
+}
+:root[data-theme='light'] .bg-white\/\[0\.06\] {
+  background-color: rgba(15, 23, 42, 0.08) !important;
+}
+:root[data-theme='light'] .bg-white\/\[0\.08\] {
+  background-color: rgba(15, 23, 42, 0.10) !important;
+}
+
+/* Body letter-spacing slightly reduced in light mode — tightly tracked
+   small text reads slightly heavier on light bg. */
+:root[data-theme='light'] body {
+  letter-spacing: -0.003em;
+}
+
+/* Glass-input gets a slate-tinted border in light mode so the field
+   edge is visible against a white card. */
+:root[data-theme='light'] .glass-input {
+  border-color: rgba(15, 23, 42, 0.18);
+}
+:root[data-theme='light'] .glass-input:focus {
+  border-color: var(--interactive);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.30);
+}
+
+/* Patterns (hatch fills for stranded/overhead annotations) used to use
+   white. In light mode they invert to slate so they remain visible. */
+:root[data-theme='light'] .pattern-stripes-white {
+  background-image: repeating-linear-gradient(
+    45deg, transparent, transparent 4px,
+    rgba(15, 23, 42, 0.16) 4px, rgba(15, 23, 42, 0.16) 6px
+  );
+}
+:root[data-theme='light'] .pattern-crosshatch {
+  background-image:
+    repeating-linear-gradient(45deg, rgba(15,23,42,0.16) 0 1px, transparent 1px 6px),
+    repeating-linear-gradient(-45deg, rgba(15,23,42,0.16) 0 1px, transparent 1px 6px);
+}
+
+/* Chip default white tint inverted to a slate wash in light mode. */
+:root[data-theme='light'] .chip {
+  background: rgba(15, 23, 42, 0.05);
+}
+
+/* btn-ghost background was a white-tint that disappears on light bg. */
+:root[data-theme='light'] .btn-ghost {
+  background: rgba(15, 23, 42, 0.04);
+}
+:root[data-theme='light'] .btn-ghost:hover {
+  background: rgba(99, 102, 241, 0.10);
+}
+
+/* ───────── v3 substrate (S24 Pilot #1) — reduced-motion fallback ─────────
+   Locked into PRODUCT.md A11y: every animation has a reduced-motion
+   alternative. We keep opacity/color transitions (they aid comprehension)
+   and disable transforms + scale + filter motion (they cause motion
+   sickness). Bar fills snap to their target value instantly. Press
+   feedback drops to none — clicks still register, just without the
+   scale animation. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .btn-primary:active,
+  .btn-ghost:active,
+  .node-tile:hover:not(:disabled),
+  .fm-shelf:hover:not(:disabled) {
+    transform: none !important;
+    filter: none !important;
+  }
+}

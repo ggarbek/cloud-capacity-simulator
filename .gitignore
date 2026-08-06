@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+node_modules.nosync/
+
+# Build output
+dist/
+build/
+.next/
+.vite/
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+*.local
+
+# Coverage / cache
+coverage/
+.cache/
+.parcel-cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# iCloud placeholder stubs (files not yet downloaded from iCloud)
+*.icloud
+.icloud
+
+
+# TS-compiled artifacts from tsc -b on vite.config.ts
+vite.config.js
+vite.config.d.ts
+
+# Rate shards under public/rates/ are now TRACKED + deployed (served to the
+# lazy loader) and refreshed by the scheduled GitHub Action (.github/workflows/
+# refresh-rates.yml). Regenerate locally with scripts/ingest/*; don't hand-edit.
+.claude/worktrees/

@@ -1,0 +1,190 @@
+/* Design tokens — v3 "executive premium" identity (S24 revamp).
+ * Flat surfaces, refined indigo brand (#818CF8 dark / #4F46E5 light),
+ * green/amber/red reserved for SEMANTIC status only, neutral chrome
+ * shadows (no colored halos), everything rounded. Supersedes the
+ * inherited "Blade Runner × Apple Liquid Glass" neon-green-glass look.
+ * Node-state + memory-category colors stay multi-hue (data viz). */
+
+:root {
+  /* Surfaces — frosted glass, more translucency, heavier blur */
+  --bg: #050507;
+  --bg-deep: #000000;
+  --surface: rgba(18, 22, 28, 0.28);
+  --surface-2: rgba(26, 32, 40, 0.38);
+  --surface-3: rgba(36, 42, 52, 0.45);
+  --glass: rgba(16, 20, 28, 0.20);
+  --glass-2: rgba(24, 30, 42, 0.30);
+  --glass-strong: rgba(8, 10, 14, 0.55);
+  --canvas: #050507;
+
+  /* Borders — soft white glass edges */
+  --border-dark: rgba(255, 255, 255, 0.06);
+  --border: rgba(255, 255, 255, 0.10);
+  --border-light: rgba(255, 255, 255, 0.16);
+  --border-strong: rgba(255, 255, 255, 0.24);
+  --border-glow: rgba(129, 140, 248, 0.45);
+
+  /* Interactive — refined indigo (v3 · S24 Pilot #1.3).
+   * Brand migrated off neon green. Green is now reserved for SEMANTIC
+   * status only (good / up / deployable). Separating brand from
+   * semantic resolves the "brand green == status green" collision and
+   * reads executive-premium (Linear / Stripe / Vercel register). */
+  --interactive: #818CF8;
+  --interactive-hover: #6366F1;
+  --interactive-pressed: #4F46E5;
+  --interactive-muted: rgba(129, 140, 248, 0.15);
+
+  /* Memory category — three clear distinct steps */
+  --cat-mm: #BBF7D0;              /* mint pastel — smallest memory */
+  --cat-mm-glow: rgba(187, 247, 208, 0.40);
+  --cat-hm: #22C55E;              /* vibrant green — mid */
+  --cat-hm-glow: rgba(34, 197, 94, 0.40);
+  --cat-vhm: #14532D;             /* deep forest — largest memory */
+  --cat-vhm-glow: rgba(20, 83, 45, 0.55);
+
+  --accent-cyan: #22D3EE;
+  --accent-amber: #FBBF24;
+  --accent-violet: #A78BFA;
+
+  /* Text */
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-body: #F8FAFC;
+  --text-muted: #94A3B8;
+  --text-dim: #64748B;
+
+  /* Node state (multi-color, distinct from category green) */
+  --node-deployable: #22C55E;     /* green — empty */
+  --node-deployable-glow: rgba(34, 197, 94, 0.4);
+  --node-partial: #3B82F6;        /* blue — partial */
+  --node-partial-glow: rgba(59, 130, 246, 0.45);
+  --node-full: #EF4444;           /* red — full */
+  --node-full-glow: rgba(239, 68, 68, 0.5);
+  --node-reserved: #6B7280;       /* grey — overhead */
+  --node-reserved-glow: rgba(107, 114, 128, 0.35);
+  --node-isolated: #A78BFA;       /* violet — VHM isolated */
+  --node-isolated-glow: rgba(167, 139, 250, 0.45);
+  --node-ofr: #4B0E0E;
+
+  /* Selection ring — v3 (S24 Pilot #2): crisp 2px ring + a restrained
+     8px bloom (was 24px halo). Outline over halo per the substrate. */
+  --select-ring: #22D3EE;
+  --select-glow: 0 0 0 2px rgba(34, 211, 238, 0.9),
+                 0 0 8px rgba(34, 211, 238, 0.28);
+
+  /* Status */
+  --status-good: #22C55E;
+  --status-warn: #FBBF24;
+  --status-bad: #EF4444;
+
+  /* Radii — everything rounded */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  /* v3 substrate (S24 Pilot #1) — premium ease curves.
+   * Replaces the Material standard curve and the bouncy spring curve
+   * previously used by .ease-spring. Per Emil: built-in CSS easings
+   * are too weak; use strong custom curves. ease-out for entering
+   * and interactive feedback; ease-in-out for on-screen movement.
+   * Bounce retired (executive register). */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* v3 substrate — neutral chrome shadows.
+   * Replaces colored glow halos on CTAs, section headers, and
+   * banners with calm drop shadows + an outline-driven focus
+   * treatment. Bias toward bottom-edge lift; almost-no chroma. */
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-elevated: 0 4px 12px -2px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04);
+  --shadow-focus: 0 0 0 3px rgba(99, 102, 241, 0.30);
+}
+
+/* ───────── Light mode overrides ─────────
+   v2.19.52 — Inverted contrast model. Previously the canvas was slate-200
+   and surfaces were near-white, which left cards blending into the page.
+   User flagged "white boxes are illegible." New model:
+     • Canvas / body  → white (so the page reads as the clean default).
+     • Surfaces / glass → light slate (slate-100/-150), so every authored
+       card POPS off the canvas with a clear gray fill.
+     • Borders → slate-400 alpha so the card edges read at a glance.
+     • Text stays high-contrast slate-900 / slate-700. */
+:root[data-theme='light'] {
+  /* v2.23.5 contrast pass — page is a faint slate (not pure white) so the
+   *  three surface tiers read as distinct: page (slate-50ish) < cards
+   *  (slate-100) < inputs (white). Pure-white page made white inputs and
+   *  the page itself the same value, flattening the hierarchy. */
+  --bg: #F4F7FB;                                  /* faint slate page bg */
+  --bg-deep: #E9EEF5;                             /* deeper outer canvas */
+  --surface: #F1F5F9;                             /* slate-100 cards */
+  --surface-2: #E2E8F0;                           /* slate-200 elevated */
+  --surface-3: #CBD5E1;                           /* slate-300 strongly elevated */
+  --glass: #F1F5F9;                               /* slate-100 — cards pop off page */
+  --glass-2: #E8EDF3;                             /* between slate-100/200 */
+  --glass-strong: #E2E8F0;                        /* slate-200 — strongest gray */
+  --canvas: #F4F7FB;
+
+  /* Borders strengthened so card + input edges read at a glance on a light
+   *  page (was 0.10/0.18/0.28/0.42 — too faint, cards melted together). */
+  --border-dark: rgba(15, 23, 42, 0.12);
+  --border: rgba(15, 23, 42, 0.24);               /* slate-900 @ 24% — clear edge */
+  --border-light: rgba(15, 23, 42, 0.34);
+  --border-strong: rgba(15, 23, 42, 0.48);
+  --border-glow: rgba(79, 70, 229, 0.55);
+
+  --interactive: #4F46E5;
+  --interactive-hover: #4338CA;
+  --interactive-pressed: #3730A3;
+  --interactive-muted: rgba(79, 70, 229, 0.12);
+
+  /* Text ramp darkened on the low end — slate-600 small labels read washed
+   *  even at a passing ratio (the "elegant light gray" trap). Muted +
+   *  dim each drop ~one step so secondary text carries authority at 10-12px. */
+  --text-primary: #0F172A;                        /* slate-900 */
+  --text-secondary: #1E293B;                      /* slate-800 */
+  --text-body: #0F172A;
+  --text-muted: #293548;                          /* ~slate-750 (was 700) */
+  --text-dim: #3A475C;                            /* darker slate-600 (was #475569) */
+
+  --node-deployable: #16A34A;
+  --node-deployable-glow: rgba(22, 163, 74, 0.40);
+  --node-partial: #2563EB;
+  --node-partial-glow: rgba(37, 99, 235, 0.45);
+  --node-full: #B91C1C;
+  --node-full-glow: rgba(185, 28, 28, 0.50);
+  --node-reserved: #64748B;
+  --node-reserved-glow: rgba(100, 116, 139, 0.35);
+  --node-isolated: #6D28D9;
+  --node-isolated-glow: rgba(109, 40, 217, 0.45);
+
+  --select-ring: #0891B2;
+  --select-glow: 0 0 0 2px rgba(8, 145, 178, 0.9),
+                 0 0 8px rgba(8, 145, 178, 0.25);
+
+  --status-good: #15803D;
+  --status-warn: #B45309;
+  --status-bad: #B91C1C;
+
+  /* Card lift — the shared shadows (slate @ 4-8%) are nearly invisible on a
+   *  light page, so cards read as flat washes. Deepen them here so every
+   *  surface separates from the page with a real, soft drop shadow. */
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.10);
+  --shadow-elevated: 0 6px 16px -4px rgba(15, 23, 42, 0.14), 0 2px 6px rgba(15, 23, 42, 0.08);
+}
+
+/* v2.19.46 — Theme-adaptive subtle tint for inline hover / surface
+   backgrounds. Dark mode = soft white wash; light mode = soft slate wash.
+   New components should use these vars instead of inline rgba(255,255,255,X)
+   so the surface pops in both themes. */
+:root {
+  --tint-soft: rgba(255, 255, 255, 0.03);
+  --tint-soft-2: rgba(255, 255, 255, 0.05);
+  --tint-soft-3: rgba(255, 255, 255, 0.08);
+}
+:root[data-theme='light'] {
+  --tint-soft: rgba(15, 23, 42, 0.05);
+  --tint-soft-2: rgba(15, 23, 42, 0.08);
+  --tint-soft-3: rgba(15, 23, 42, 0.12);
+}
