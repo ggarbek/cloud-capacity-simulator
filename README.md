@@ -4,6 +4,8 @@
 
 That is the question this tool exists to answer. Not "do we have enough memory," not "what's our average utilization," but the real one: does every VM in a committed bill of materials find a node where **memory and vCPU and network bandwidth and storage throughput all clear at the same time** — and when one doesn't, exactly which of those four blocked it, on which node, by how much.
 
+The app has two halves. The **Capacity Simulator** packs committed demand onto owned hardware and diagnoses every failure. **[Cloud Market Analytics](#cloud-market-analytics)** takes the demand that has to go elsewhere and prices it across Azure, AWS and GCP against the closest real equivalent, with the spec compromise stated rather than hidden.
+
 **▶ [Try the live demo](https://capacity-simulator-lemon.vercel.app/)** — click *Try Demo* in the header to load a worked fleet, then *Run simulation*. Runs entirely in your browser; nothing is uploaded.
 
 ---
@@ -134,11 +136,13 @@ The practical effect is that the tool sometimes answers "I can't tell you that y
 
 ---
 
-## Cross-cloud market analytics
+## Cloud Market Analytics
 
-The other half of the tool. Feasibility answers *"will this land on the fleet we own?"* — this answers the sourcing question that follows: **what should run where, on which cloud, in which region, at what cost, and what do we give up by moving it?**
+**Cloud Market Analytics** is the other half of the tool, and it ships in the same app. The simulator answers *"will this land on the fleet we own?"* — Cloud Market Analytics answers the sourcing question that follows: **what should run where, on which cloud, in which region, at what cost, and what do we give up by moving it?**
 
-![Cloud market analytics](docs/images/market-analytics.png)
+Those are two views of one decision. Demand that will not fit the owned fleet has to go somewhere, and "somewhere" carries a price, a region footprint and a spec compromise. Answering feasibility without answering sourcing leaves the planner where they started.
+
+![Cloud Market Analytics](docs/images/market-analytics.png)
 
 ### Equivalency matching
 
