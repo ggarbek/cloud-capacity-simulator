@@ -80,10 +80,6 @@ Setup is workflow-ordered — **Cluster Builder → VM Fungibility → Fleet Bui
 
 ![Fleet map with per-node drill-down](docs/images/fleet-map.png)
 
-![Cloud market analytics](docs/images/market-analytics.png)
-
-![Executive summary](docs/images/exec-summary.png)
-
 ---
 
 ## Engine rules
@@ -140,11 +136,38 @@ The practical effect is that the tool sometimes answers "I can't tell you that y
 
 ## Cross-cloud market analytics
 
-A secondary surface, for the case where the answer to "will it land here" is no and something has to be sourced elsewhere.
+The other half of the tool. Feasibility answers *"will this land on the fleet we own?"* — this answers the sourcing question that follows: **what should run where, on which cloud, in which region, at what cost, and what do we give up by moving it?**
 
-Pick a base VM size and the equivalency engine finds the closest peer on each other cloud computed from live catalog specs, not a hand-curated lookup table. Product category is a hard gate; within it, distance is a weighted blend over log-ratios of vCPU, memory and memory-per-vCPU, with preference for matching CPU architecture and accelerator count. Log-ratios mean 4↔8 vCPU is penalized the same as 64↔128 — proportional, not absolute. Region equivalency ranks by country first (data residency is the dominant constraint), then great-circle distance; sovereign regions match only other sovereign regions.
+![Cloud market analytics](docs/images/market-analytics.png)
 
-Views: **Executive Summary** (verdict-first), **Specs**, **Pricing** (PAYG and 1yr/3yr reserved), **Region Availability**, and a per-region **Rate Library**. Executive summaries export to PPTX and DOCX with the caveats carried through.
+### Equivalency matching
+
+There is no canonical mapping between an Azure size, an AWS instance and a GCP machine type — vendors publish no cross-reference, and the shapes genuinely differ. So the engine computes one, from live catalog specs rather than a hand-curated lookup table.
+
+Product category is a hard gate. Within it, distance is a weighted blend over **log-ratios** of vCPU, memory and memory-per-vCPU, with preference for matching CPU architecture and accelerator count. Log-ratios matter: 4↔8 vCPU is penalized the same as 64↔128, because proportional error is what a planner actually cares about. The result is a **% match**, and every match that isn't a true peer carries an explicit caveat — cross-architecture (Arm↔x86), burstable-vs-standard, cross-category fallback, unknown GPU specs, stretch sizing. A 62% match labeled *"closest alternative, different category"* is a fundamentally different answer than a 96% match, and the tool never lets those look alike.
+
+**Region equivalency** ranks by country first — data residency is usually the binding constraint, not latency — then by great-circle distance. Sovereign regions match only other sovereign regions.
+
+### Two modes
+
+Everything renders in either mode from a single toggle:
+
+- **Comparison** — one VM size against its equivalents on the other clouds.
+- **VM Bill of Materials** — an entire fleet demand ported across clouds line by line, then totalled. This is the mode that matches real planning work: *here is the actual demand, what does it cost on each cloud, which lines have no acceptable equivalent, and what is the all-in total?*
+
+### Views
+
+| View | Answers |
+|---|---|
+| **Executive Summary** | The verdict, first: cheapest viable target, delta vs. the baseline, average spec match, coverage gaps |
+| **Specs** | Side-by-side hardware: vCPU, memory, network, local NVMe, processor, GPU, with match % and caveats |
+| **Pricing** | Cost over time — PAYG vs 1yr vs 3yr reserved, commitment step-down, cumulative curves |
+| **Region Availability** | Where each cloud actually offers the equivalent, and the metros where none does |
+| **Rate Library** | Per-region rate detail for auditing any number above |
+
+![Executive summary](docs/images/exec-summary.png)
+
+Executive summaries export to **PPTX and DOCX** with every caveat carried through, so the deck a stakeholder receives says exactly what the screen said — including what could not be priced.
 
 ---
 
