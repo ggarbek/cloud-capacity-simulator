@@ -47,7 +47,7 @@ export function buildLiveCatalog(): UserVm[] {
   const out: UserVm[] = [];
   // Per-provider join-loss accounting — priced SKUs the specs shard can't
   // describe (so they're dropped, unpackable). Surfaced in dev so a missing /
-  // stale specs ingest is visible, not silent. See B2.
+  // stale specs ingest is visible, not silent. See B2 (S64).
   const lossByProvider: Record<string, JoinStats> = {};
   for (const [provider, pd] of Object.entries(G.providers)) {
     const specsShard = { specs: pd.specs as never };

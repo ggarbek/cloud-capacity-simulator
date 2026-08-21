@@ -1,4 +1,4 @@
-# Packing engine — validated rules (engine spec-of-record)
+# Packing engine — validated rules
 
 ## Packing engine — validated rules
 

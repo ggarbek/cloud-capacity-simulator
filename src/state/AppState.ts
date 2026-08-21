@@ -24,7 +24,15 @@ export interface UiState {
   clusterCardsOpen: Record<string, boolean>;
   /** v2.20.1 — 'quickstart' is the fewest-clicks guided flow (server →
    *  where → demand → Build & run); the numbered tabs stay the deep path. */
-  activeSidebarTab: 'quickstart' | 'configure' | 'fleet' | 'hardware' | 'vms' | 'fungibility';
+  activeSidebarTab:
+    | 'start-here'
+    | 'quickstart'
+    | 'configure'
+    | 'fleet'
+    | 'hardware'
+    | 'vms'
+    | 'fungibility'
+    | 'glossary';
   /** v2.21 — Advanced shell split: SETUP (the authoring surfaces, one at a
    *  time, routed by activeSidebarTab) vs RESULTS ('overview' = the
    *  five-answers dashboard; 'fleetmap' = rack visualization + Insights
@@ -41,7 +49,7 @@ export interface UiState {
   activeRightPanelTab?: 'detail' | 'finance';
   fleetUsePreset: boolean;
   theme: Theme;
-  /** v3 — Simple / Advanced two-track presentation. 'simple' lands the
+  /** v3 (S25) — Simple / Advanced two-track presentation. 'simple' lands the
    *  user on the five-questions Answers surface; 'advanced' is the full
    *  Configure → Visualize → Insights workspace. Both read the same state +
    *  engine. Persisted; defaults 'simple' (v3 S26 — first-time users land on
@@ -77,16 +85,15 @@ export interface UiState {
    *  the full canvas width. Toggled from the header alongside the other
    *  pane toggles. */
   detailPaneCollapsed: boolean;
-  /** v2.8 — Top-level page nav. The app is now multi-page: the Simulator is
-   *  page 1, Competitive Offering page 2, Capacity Planning page 3 (stub).
+  /** v2.8 — Top-level page nav. S68 trimmed it to the two finished halves:
+   *  the Simulator and Cloud Market Analytics. ('region-availability' remains
+   *  a valid deep-link route into CMA, but is not a menu item.)
    *  Switched via the hamburger menu in AppHeader; persisted in localStorage. */
   activePage:
-    | 'getting-started'
     | 'simulator'
     | 'competitive'
-    | 'region-availability'
-    | 'capacity-planning';
-  /** v2.23.11 — Deep-link target for the Getting started page's Concepts
+    | 'region-availability';
+  /** v2.23.11 — Deep-link target for the Glossary's Concepts
    *  view. A setup page's "Learn about X" link sets this + flips activePage
    *  to 'getting-started'; the page opens Concepts on that id, then clears
    *  it. Null = no pending target. */
@@ -196,7 +203,7 @@ export interface AppState {
    *  HardwareGroup (HardwareGroup.buffer) and resolved live via
    *  effectiveBuffer() / bufferFor(). This field remains as the **slot-3
    *  fallback constant** used only when a fleet's HW group has been deleted
-   *  from the library —
+   *  from the library —.
    *  It is no longer mutable from the UI (BUFFER_SET action removed). */
   buffer: BufferSpec;
   packingMode: PackingMode;
@@ -330,7 +337,7 @@ export const defaultUi: UiState = {
   // v2.20.1 — New users land on the guided Quick start flow (fewest
   // clicks to a result). The numbered deep tabs (Hardware = step 1 …)
   // stay one click away; returning users keep their persisted tab.
-  activeSidebarTab: 'quickstart',
+  activeSidebarTab: 'start-here',
   // v2.21 — Advanced opens on Setup (Quick start) until the first run;
   // RUN_COMPLETE flips the shell to the Results overview.
   workspaceView: 'setup',
@@ -420,7 +427,7 @@ export type Action =
   | { type: 'FLEET_BULK_RETAG'; fleetIds: string[]; next: { region?: string | null; zone?: string | null } }
   | { type: 'CLUSTER_CARD_TOGGLE'; id: string }
   // v2.18 — BUFFER_SET removed. Buffer is per-HW-group now (see
-  // HardwareGroup.buffer +. `state.buffer`
+  // HardwareGroup.buffer + the design notes). `state.buffer`
   // remains in state as a slot-3 fallback constant for clusters whose HW group
   // has been deleted; it is no longer mutable from the UI.
   | { type: 'PACKING_MODE_SET'; mode: PackingMode }

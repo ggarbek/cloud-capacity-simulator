@@ -81,6 +81,27 @@ export function QuickStartTab() {
   }, [state.fleetRegions]);
   const effectiveRegion = region === CUSTOM ? customRegion.trim() : region;
 
+  // S68 — pre-fill the server and the region so a first-time visitor has
+  // exactly ONE decision to make (step 3: what to place). The form used to
+  // open with every dropdown empty, which reads as a wall of questions to
+  // someone who does not yet know what a rack or a zone is for. Both stay
+  // fully editable; this only fills a blank, never overrides a pick.
+  useEffect(() => {
+    if (hwId || serverOptions.length === 0) return;
+    setHwId(serverOptions[0].value);
+  }, [hwId, serverOptions]);
+
+  useEffect(() => {
+    if (region || !hardware) return;
+    // Prefer a region already authored in this fleet, then one belonging to
+    // the chosen server's provider, then simply the first real option.
+    const real = regionOptions.filter((o) => o.value !== CUSTOM);
+    if (real.length === 0) return;
+    const authored = real.find((o) => o.meta === 'already authored');
+    const sameProvider = real.find((o) => o.meta === hardware.provider);
+    setRegion((authored ?? sameProvider ?? real[0]).value);
+  }, [region, hardware, regionOptions]);
+
   // ── Demand picker — a simpler version of the VM-demand BoM add: a
   //    Cloud Provider → VM Category → VM Family filter cascade scoping a
   //    pickable list of sizes, with a search box that narrows further.
@@ -219,7 +240,11 @@ export function QuickStartTab() {
       </section>
 
       {/* ── 1 · Server ──────────────────────────────────────────────────── */}
-      <Card step={1} title="Pick a server">
+      <Card
+        step={1}
+        title="Pick a server"
+        subtitle="The machine your fleet is built from — how much memory and CPU one node has. Racks of this server are what your VMs will land on."
+      >
         <GlassDropdown
           value={hwId}
           options={serverOptions}
@@ -242,7 +267,11 @@ export function QuickStartTab() {
       </Card>
 
       {/* ── 2 · Where ───────────────────────────────────────────────────── */}
-      <Card step={2} title="Where it goes">
+      <Card
+        step={2}
+        title="Where it goes"
+        subtitle="A region is a location; zones are the independent failure domains inside it. One identical cluster is placed in each zone you pick, so two zones means two copies."
+      >
         <div className="space-y-3">
           <Field label="Region">
             <GlassDropdown
@@ -309,7 +338,11 @@ export function QuickStartTab() {
       </Card>
 
       {/* ── 3 · Demand ──────────────────────────────────────────────────── */}
-      <Card step={3} title="What you need to place">
+      <Card
+        step={3}
+        title="What you need to place"
+        subtitle="Your demand — the VM sizes you have committed to run, and how many of each. This is the only thing you have to choose; everything above is already filled in."
+      >
         <div className="space-y-2">
           {/* Filter cascade — a simpler version of the VM-demand BoM add. */}
           <div className="flex flex-col" style={{ gap: 8 }}>
@@ -507,7 +540,19 @@ export function QuickStartTab() {
   );
 }
 
-function Card({ step, title, children }: { step: number; title: string; children: React.ReactNode }) {
+function Card({
+  step,
+  title,
+  subtitle,
+  children,
+}: {
+  step: number;
+  title: string;
+  /** What this choice MEANS, in a sentence — not what the field is called.
+   *  A first-time reader does not know what a rack or a zone is for. */
+  subtitle?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="glass p-3 space-y-2.5" style={{ borderRadius: 'var(--radius-md)' }}>
       <div className="flex items-center gap-2">
@@ -527,6 +572,11 @@ function Card({ step, title, children }: { step: number; title: string; children
         </span>
         <span className="text-[12px] font-semibold text-text-primary">{title}</span>
       </div>
+      {subtitle && (
+        <div className="text-[11px] text-text-muted leading-snug" style={{ marginTop: -2 }}>
+          {subtitle}
+        </div>
+      )}
       {children}
     </div>
   );

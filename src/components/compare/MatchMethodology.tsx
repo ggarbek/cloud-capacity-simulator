@@ -173,7 +173,7 @@ export interface MatchMethodologyProps {
   /** The picked analogs — one per non-base cloud. */
   matches: { provider: string; vm: CatalogEntry }[];
   /** 'strip' — full-width header. 'footer' — same content, quieter framing for
-   *  the BOTTOM of the page: a muted one-liner + a collapsed "Details".
+   *  the BOTTOM of the page (S65): a muted one-liner + a collapsed "Details".
    *  'inline' — a single BoM-line pairing expander. */
   variant?: 'strip' | 'inline' | 'footer';
   /** Optional per-pairing caveats. Undefined (default) → nothing extra. */

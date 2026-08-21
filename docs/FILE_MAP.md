@@ -1,4 +1,4 @@
-# File structure (source map — verify against src/ before trusting)
+# File structure (Phase-1 era map; verify against src/ before trusting)
 
 ## File structure
 

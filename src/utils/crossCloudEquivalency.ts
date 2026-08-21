@@ -819,7 +819,7 @@ export function rankedFamiliesPerBase(
   // rankedFamiliesVsBase). Defaults to `filteredVms` → non-confidential byte-identical.
   fullVms: CatalogEntry[] = filteredVms,
 ): Record<string, Record<Provider, RankedFamily[]>> {
-  // PERF — the naive form calls `rankedFamiliesVsBase` once per base family,
+  // PERF (S65) — the naive form calls `rankedFamiliesVsBase` once per base family,
   // and EACH call re-derives `distinctSpecs(filteredVms, p)`, re-classifies every
   // candidate's category, and re-groups the candidate families for every provider
   // — pure work that depends ONLY on (provider, the base family's CATEGORY), not

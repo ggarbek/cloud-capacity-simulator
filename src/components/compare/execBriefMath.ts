@@ -28,7 +28,7 @@ import { termLabelLong } from './ui/tokens';
 export type BriefTerm = 'payg' | '1y' | '3y';
 
 /** Human label for a commitment term. Delegates to the shared ui/tokens
- *  formatter so the exec brief, Pricing and exports all phrase terms
+ *  formatter (S66) so the exec brief, Pricing and exports all phrase terms
  *  identically. */
 export function termLabel(term: BriefTerm): string {
   return termLabelLong(term);

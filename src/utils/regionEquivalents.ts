@@ -1,5 +1,5 @@
 /**
- * Region equivalency clustering — the pure engine behind the Region
+ * Region equivalency clustering  — the pure engine behind the Region
  * Availability tab's integrated cross-cloud equivalents table.
  *
  * Every region a provider actually offers is clustered into a cross-cloud

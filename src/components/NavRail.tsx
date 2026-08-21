@@ -23,7 +23,15 @@ import type { TabAlerts } from '../utils/tabAlerts';
  * glance. Collapses to a 56px icon strip (persisted ui.navCollapsed).
  */
 
-type SetupTab = 'quickstart' | 'hardware' | 'fleet' | 'fungibility' | 'configure' | 'vms';
+type SetupTab =
+  | 'start-here'
+  | 'quickstart'
+  | 'hardware'
+  | 'fleet'
+  | 'fungibility'
+  | 'configure'
+  | 'vms'
+  | 'glossary';
 
 interface NavItem {
   icon: React.ReactNode;
@@ -115,6 +123,18 @@ const IconScenario = ( // sliders — the "what-if" tuner
     <circle cx="8" cy="17" r="2" />
   </Svg>
 );
+const IconStartHere = ( // compass — the front door
+  <Svg>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="m14.8 9.2-1.6 4.2-4.2 1.6 1.6-4.2 4.2-1.6Z" />
+  </Svg>
+);
+const IconGlossary = ( // open book
+  <Svg>
+    <path d="M12 6.5S10.2 5 7 5H3.5v13H7c3.2 0 5 1.5 5 1.5s1.8-1.5 5-1.5h3.5V5H17c-3.2 0-5 1.5-5 1.5Z" />
+    <path d="M12 6.5v13" />
+  </Svg>
+);
 const IconCatalog = ( // cloud
   <Svg>
     <path d="M7 18.5a4 4 0 0 1-.4-7.98 5.5 5.5 0 0 1 10.6-1.5A3.75 3.75 0 0 1 17 18.5H7Z" />
@@ -151,6 +171,14 @@ const RESULT_ITEMS: { view: ResultView; item: NavItem }[] = [
 ];
 
 const SETUP_ITEMS: { tab: SetupTab; item: NavItem }[] = [
+  {
+    tab: 'start-here',
+    item: {
+      icon: IconStartHere,
+      label: 'Start Here',
+      hint: 'What this tool answers, what each page does, and a one-click worked example',
+    },
+  },
   {
     tab: 'quickstart',
     item: {
@@ -208,6 +236,15 @@ const CATALOG_ITEM: { tab: SetupTab; item: NavItem } = {
     label: 'VM Catalog',
     hint: 'Browse the seeded VM library — optional; sizes are pre-loaded',
     alertKey: 'vmLibrary',
+  },
+};
+
+const GLOSSARY_ITEM: { tab: SetupTab; item: NavItem } = {
+  tab: 'glossary',
+  item: {
+    icon: IconGlossary,
+    label: 'Glossary',
+    hint: 'Every concept the tool uses, plus the common questions',
   },
 };
 
@@ -278,6 +315,14 @@ export function NavRail() {
           onClick={() => goTab('vms')}
           alert={alerts.vmLibrary.alert}
           alertReason={alerts.vmLibrary.reason}
+        />
+        <RailButton
+          item={GLOSSARY_ITEM.item}
+          collapsed={collapsed}
+          active={view === 'setup' && tab === 'glossary'}
+          onClick={() => goTab('glossary')}
+          alert={false}
+          alertReason=""
         />
         <button
           type="button"

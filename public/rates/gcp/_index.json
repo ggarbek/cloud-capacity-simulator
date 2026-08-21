@@ -1,6 +1,6 @@
 {
   "provider": "gcp",
-  "generatedAt": "2026-08-03T10:47:50.105Z",
+  "generatedAt": "2026-08-17T08:00:20.715Z",
   "regions": [
     {
       "region": "africa-south1",
@@ -64,7 +64,7 @@
     },
     {
       "region": "europe-north2",
-      "machineTypeCount": 114
+      "machineTypeCount": 132
     },
     {
       "region": "europe-southwest1",

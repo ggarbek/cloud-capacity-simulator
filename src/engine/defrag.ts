@@ -5,7 +5,7 @@
  * that ended up unplaceable. DISTINCT from spillover/cascade (which
  * finishes a never-landed VM's tier walk and never displaces a placed
  * one) — defrag is an active intervention with real customer-visible
- * migration cost.
+ * migration cost..
  *
  * Doctrine:
  *  - Strictly net-positive: every accepted migration must produce a

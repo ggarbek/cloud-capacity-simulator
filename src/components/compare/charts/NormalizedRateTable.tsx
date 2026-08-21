@@ -60,7 +60,7 @@ export function NormalizedRateTable({
   rows: NormalizedRow[];
   note?: ReactNode;
   /** Optional slim heading — used when the table is shown as an always-visible
-   *  price-performance strip rather than the stretch-gated fallback. */
+   *  price-performance strip (S65) rather than the stretch-gated fallback. */
   caption?: ReactNode;
 }) {
   const hasMatch = rows.some((r) => r.matchPct != null);

@@ -1,11 +1,11 @@
 /**
- * Availability reconciliation — pure helpers that diff a cloud's PUBLISHED
+ * Availability reconciliation (S62) — pure helpers that diff a cloud's PUBLISHED
  * per-region family availability (parsed from the vendor docs) against the
  * curated tables the live catalog injects from (AWS_REGION_FAMILIES /
  * GCP_REGION_FAMILIES).
  *
  * WHY THIS EXISTS: region availability is decoupled from pricing
- * the catalog injects an
+ * (feedback engine region availability decoupled) — the catalog injects an
  * availability row for every (region, family) the curated tables list. That's
  * only correct while the curated tables stay in sync with the docs. If a weekly
  * doc refresh adds a family/region and the table isn't updated, the family goes

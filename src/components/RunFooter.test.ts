@@ -243,7 +243,7 @@ describe('runMulti — iterative spillover-when-full (v2.4.2)', () => {
     // No matrix provided — fallback to fleet.homeFor / spilloverFrom check.
     const fleet1 = makeFleet('hw-1', 'Gen-A MM');
     fleet1.homeFor = ['Mv3'];
-    const fleet2 = makeFleet('hw-2', 'Gen-Legacy0 HM');
+    const fleet2 = makeFleet('hw-2', 'Gen-Legacy HM');
     fleet2.homeFor = ['Mv1'];
     const bom: BomEntry[] = [{ vmSizeName: 'Test_M_small', quantity: 1 }];
 

@@ -1,5 +1,5 @@
 /**
- * SpecShowdown — the at-a-glance HERO of the Compare → Specs page.
+ * SpecShowdown (S65) — the at-a-glance HERO of the Compare → Specs page.
  *
  * A single side-by-side table: columns are clouds (base first, provider-toned
  * header carrying SKU + family + match% + worst-caveat), rows are the spec

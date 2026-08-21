@@ -104,7 +104,7 @@ describe('guardrails — out of silo', () => {
       'check my email',
       'what is on my calendar?',
       'pull data from my other project',
-      'open my personal notes',
+      'open my Notion notes',
     ]) {
       expect(isOutOfSiloQuestion(q), q).toBe(true);
     }
@@ -153,7 +153,7 @@ describe('mock answers — data only', () => {
     const reply = mockAnswer({
       question: 'how current are the rates?',
       history: [],
-      context: ctxAt('getting-started'),
+      context: ctxAt('simulator'),
       catalog: VMS,
     });
     expect(reply.content).toMatch(/Monday/);
@@ -195,13 +195,7 @@ describe('mock answers — data only', () => {
 
 describe('page context + prompt', () => {
   it('builds a context for every page with a catalog fact', () => {
-    for (const p of [
-      'getting-started',
-      'simulator',
-      'competitive',
-      'region-availability',
-      'capacity-planning',
-    ] as const) {
+    for (const p of ['simulator', 'competitive', 'region-availability'] as const) {
       const ctx = ctxAt(p);
       expect(ctx.facts.length).toBeGreaterThan(0);
       expect(ctx.facts.some((f) => f.label === 'Catalog')).toBe(true);

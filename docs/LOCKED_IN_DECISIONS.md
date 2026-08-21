@@ -1,6 +1,6 @@
-# Locked-in design decisions (engine spec-of-record)
+# Locked-in design decisions
 
-> Canonical UI rule routing now lives in the project docs (the master index).
+> Canonical UI rule routing now lives in the design notes (the master index).
 > This file preserves the full locked-in ledger text. Treat every entry as final unless the user overrides.
 
 ## UI preservation across versions — **read first**
@@ -11,7 +11,7 @@ The Phase-1 UI is the cumulative output of many sessions and explicit user decis
 - Mechanical refactors (renames, state-shape changes, new-phase plumbing) must leave the rendered output identical. v2.0's `state.fleet` → `state.fleets` migration is the template: structural change underneath, zero pixel-level diff above.
 - When *new* visuals or interactions get locked in during a session, add them to §"Locked-in design decisions" so they survive the next refactor. That section is the canonical UI ledger.
 - New phases (multi-silo, financial layer, Cloud Intel, BOM import, etc.) **add** UI; they never replace Phase-1 UI.
-- If a UI change ships unlogged, a later refactor will probably undo it. Log promptly.
+- If work ends with an unlogged UI change, a later pass will probably undo it. Log promptly.
 
 ### Every UI critique = log + fix, never just fix
 
@@ -30,14 +30,14 @@ Silent fixes are a regression vector. Both the in-repo doc and auto-memory must 
 
 Treat these as final unless the user explicitly asks to change them. Do NOT revisit these during refactor work.
 
-> **v3 visual supersession:** the *visual* locks below — neon-green accent, glass-everywhere, section-pill eyebrow, bounce easing — are **superseded by the v3 indigo "executive premium" substrate**. The **structural / spacing / behavioral** locks below still hold in full. When a visual rule here conflicts with v3, v3 wins.
+> **v3 visual supersession :** the *visual* locks below — neon-green accent, glass-everywhere, section-pill eyebrow, bounce easing — are **superseded by the v3 indigo "executive premium" substrate** (the v3 design addendum). The **structural / spacing / behavioral** locks below still hold in full. When a visual rule here conflicts with v3, v3 wins.
 
 ### Visual language
 - **Apple Liquid Glass × Blade Runner.** Dark green-on-black or light-on-white. SF system font.
 - All surfaces use `.glass` or `.glass-strong` classes — never inline `rgba(0,0,0,X)` for panels.
 - All corners rounded — `--radius-md` (14px), `--radius-lg` (18px), `--radius-pill` (999px). No square corners.
 - Theme is reactive — read `state.ui.theme` from `useApp()`, never `document.documentElement.getAttribute('data-theme')` in components (that doesn't trigger re-render).
-- **Section headers are glassy green pills — EVERYWHERE.** `.section-h` in [index.css](src/index.css) renders an 11px uppercase 0.15em-tracked label with `var(--interactive)` text on a `rgba(74, 222, 128, 0.10)` background, `border-glow` outline, soft glow shadow, and backdrop blur. Applied uniformly across `BILL OF MATERIALS`, `FLEET COMPOSITION`, `BUFFER / OVERHEAD`, `CLUSTER VISUALIZATION`, Hardware/VM tab section headings (v2.10), and dropdown grouping section headers (v2.16.1 `DropdownOption.section?` field). The Mv-generation sub-headers in BomSection are the visual reference. **Do not introduce a second "section header" style.** No bright/blocky/saturated variants — see the project docs.
+- **Section headers are glassy green pills — EVERYWHERE.** `.section-h` in [index.css](src/index.css) renders an 11px uppercase 0.15em-tracked label with `var(--interactive)` text on a `rgba(74, 222, 128, 0.10)` background, `border-glow` outline, soft glow shadow, and backdrop blur. Applied uniformly across `BILL OF MATERIALS`, `FLEET COMPOSITION`, `BUFFER / OVERHEAD`, `CLUSTER VISUALIZATION`, Hardware/VM tab section headings (v2.10), and dropdown grouping section headers (v2.16.1 `DropdownOption.section?` field). The Mv-generation sub-headers in BomSection are the visual reference. **Do not introduce a second "section header" style.** No bright/blocky/saturated variants —.
 
 ### Spacing & padding
 - **Interior padding ≥ corner radius — always.** `--radius-lg` (18px) → use `p-5` (20px) minimum on the panel. `--radius-md` (14px) → `p-4` (16px) minimum. Content must never visually crowd the curve.
@@ -69,7 +69,7 @@ Treat these as final unless the user explicitly asks to change them. Do NOT revi
 
 - **"Cluster" is the user-facing term** for a group of nodes + racks. Internally we call them `fleets` (keyed map `state.fleets: Record<string, FleetSpec>`) or "silos" (engine routing) — in UI text always say "cluster".
 - **Every cluster MUST be visually wrapped in a bordered glass box** in the rack visualization, with a banner showing the hardware-group name + node count. Single-cluster Phase 1 also gets the box.
-- **Multi-cluster pack:** **horizontally first** (`flex flex-wrap`), 24 px gap, wrap to next row when out of pane width.  One zoom level applies uniformly.
+- **Multi-cluster pack:** **horizontally first** (`flex flex-wrap`), 24 px gap, wrap to next row when out of pane width. (Original PRD §19.1 said vertical; user refined to horizontal-first.) One zoom level applies uniformly.
 - **Sidebar Hardware Group section mirrors the BOM collapsible-section pattern.** A top-level `FLEET HARDWARE` section heading (green glassy pill). Each cluster is a collapsible glass card with a green left-bordered header showing `▾ CLUSTER N · {hardwareGroupName} · {total} nodes` + ✕ remove (only when more than one cluster). Card body contains the FleetForm controls (toggles, dropdowns, num fields, readouts) all scoped to that fleet via the `fleetId` dispatch parameter.
 - **`+ Add Cluster` pill** sits at the BOTTOM of the cluster list — green-bordered ghost button, mirrors BomSection's `+ MM` / `+ HM` / `+ VHM` placement. NOT in the section header.
 - **Multi-cluster engine routing (`runMulti` in `RunFooter.tsx`):** for each cluster in `fleetList` order, claim BOM rows whose VM `homeHardwareGroup` matches the cluster's hardware-group (normalized via `normalizeGroupName`: "Gen-A MM-Std" ↔ "Gen-A MM" family) — first cluster wins. Each cluster runs the existing single-fleet `runSimulation` on its claimed BOM; results merged via summed counts + concatenated `nodeDetail`. Every node gets a `clusterId` tag and its `nodeId` is namespaced as `f-N:R1N3` to keep selections / stat highlights unique across clusters. Unclaimed BOM rows surface as `NO_ELIGIBLE_NODES` unplaceables. Spillover and same-HW-group load-balancing are not yet modeled.
@@ -86,13 +86,13 @@ Treat these as final unless the user explicitly asks to change them. Do NOT revi
 - **Zoom control is mandatory** and expressed in **percentages**. The rack banner includes a `−  [pct%]  +` glass-pill cluster (right-aligned, `ml-auto`). Stored as `state.ui.rackTilePct`, default **100%**, clamped **100–200%** in **5% steps** (`RACK_TILE_PCT_MIN/MAX/STEP` exported from `AppState.ts`). 100% = 32 px tile (`RACK_TILE_BASE_PX`); use `rackTilePxFromPct(pct)` to compute the rendered tile px. Persists via localStorage. One zoom level applies uniformly across all clusters (no per-cluster zoom).
 - **VM-count font scales with tile:** `fontSize = Math.round(tilePx * 0.24)`.
 - **Vertical scroll is mandatory.** When tile size or fleet size makes content exceed the viewport, the rack pane scrolls — never silently clips. See "Layout & scroll" below.
-- **Cluster boxes pack horizontally first.** The cluster stack uses `flex flex-wrap` with 24 px gap — boxes sit side-by-side until they overflow pane width, then wrap to a new row. (An earlier revision specified vertical stacking; refined to horizontal-first packing.)
+- **Cluster boxes pack horizontally first.** The cluster stack uses `flex flex-wrap` with 24 px gap — boxes sit side-by-side until they overflow pane width, then wrap to a new row. (Original PRD §19.1 said "vertically stacked"; user refined this to horizontal-first packing in session 3.)
 - **Cluster box is tight-fit but padded.** `width: fit-content` with `maxWidth: 100%` so the box wraps exactly its rack grid. Interior padding `20px 24px` (inline, not Tailwind — `px-5` doesn't generate here) so the leftmost/rightmost tiles never touch the box edge. Rack grid centered inside the box (`justify-content: center`).
 - **`Cluster Visualization · N CLUSTERS`** section heading appears above the cluster stack. Use the global `.section-h` style (green glassy pill).
 
 ### Layout & scroll
 - **Every scrollable region must actually scroll under overflow.** Test by forcing overflow (max tile size, many nodes selected, long BOM) and confirming `scrollHeight > clientHeight` on the scroller.
-- **Many Tailwind sizing utilities are NOT generated in this project's built CSS.** Verified missing: `h-2`, `h-4`, `h-6`, `h-8`, `h-10`, `h-12`, `w-2`, `w-4`, `w-6`, `w-12`, `min-h-0`. Verified present: `h-2.5`, `h-3`, `h-3.5`, `h-5`, `h-7`, `h-full`, `w-8`, `w-10`, `w-16`, `min-w-0`. Suspected symlink/JIT-scanning issue. Symptoms: bar fills 0-px tall, columns misaligned, indicator dots invisible, flex containers ballooning past viewport. **Use inline `style={{ height: N, width: N, minHeight: 0 }}` for any sizing that must render reliably** — do not rely on Tailwind `h-N`/`w-N`/`min-*` classes here. If you must use a Tailwind class, verify it's in the built CSS first.
+- **Many Tailwind sizing utilities are NOT generated in this project's built CSS.** Verified missing: `h-2`, `h-4`, `h-6`, `h-8`, `h-10`, `h-12`, `w-2`, `w-4`, `w-6`, `w-12`, `min-h-0`. Verified present: `h-2.5`, `h-3`, `h-3.5`, `h-5`, `h-7`, `h-full`, `w-8`, `w-10`, `w-16`, `min-w-0`. Suspected iCloud-symlink JIT-scanning issue. Symptoms: bar fills 0-px tall, columns misaligned, indicator dots invisible, flex containers ballooning past viewport. **Use inline `style={{ height: N, width: N, minHeight: 0 }}` for any sizing that must render reliably** — do not rely on Tailwind `h-N`/`w-N`/`min-*` classes here. If you must use a Tailwind class, verify it's in the built CSS first.
 - Current load-bearing inline-styled layers: `App.tsx` main row + canvas column + rack-row; `RackMap` outer; `NodeDetailPanel` body; `StatDetailPanel` body. Do not strip these styles.
 - Heavy aggregate displays (e.g. NodeDetailPanel's multi-select Aggregate) belong **inside the scroll body**, not in the sticky header — keeping the header thin so the body can scroll all content.
 
@@ -141,7 +141,7 @@ Treat these as final unless the user explicitly asks to change them. Do NOT revi
 
 ### Multi-page shell + top-level nav (v2.8+)
 - **Three pages**: Simulator / Competitive Offering / Capacity Planning. Activated via the hamburger menu in `AppHeader`. `UiState.activePage` persisted.
-- **Hamburger menu z-index = 1000** with **opaque** `var(--bg)` background. NOT translucent `--glass-strong`. Drop shadow + glow border for floating feel without transparency. 
+- **Hamburger menu z-index = 1000** with **opaque** `var(--bg)` background. NOT translucent `--glass-strong`. Drop shadow + glow border for floating feel without transparency. See session 12 fix.
 - **Page label appears in app subtitle** (v2.8). Subtitle string no longer mentions "M-Series".
 
 ### Insights pane (v2.11+ — replaces Detail · Finance)
@@ -161,7 +161,7 @@ Treat these as final unless the user explicitly asks to change them. Do NOT revi
 - **Auto-prefill twins / equivalents**: picking one auto-fills the other clouds' empty slots; never overwrites manual picks.
 - **Equivalency-availability dots**: every VM in every dropdown shows tiny brand-color dots for OTHER clouds that publish an analog.
 - **Page section order** (locked v2.16): KPI hero → Map → Equivalents (bar grid + full specs) → Pricing (time-horizon + rate detail) → Region matrix → Recommendation → Spec deltas. Visualization-first.
-- **Recommendation framing**: NO single "Top pick". Per-contender `★ Best at X` situational tags only for dims actually won + 1-sentence "why pick this" plain-language summary.
+- **Recommendation framing**: NO single "Top pick". Per-contender `★ Best at X` situational tags only for dims actually won + 1-sentence "why pick this" plain-language summary..
 - **Map**: react-simple-maps + world-atlas TopoJSON (`src/data/world-countries-110m.json`). Per-super-geo Mercator. Max width 720px, centered with 48px padded flex container so users can scroll past without panning. Hover label + click pin + Cmd/Ctrl-click multi-pin.
 
 ### Engine — Network as 3rd packing constraint (v2.9+)

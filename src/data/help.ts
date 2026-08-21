@@ -1,7 +1,7 @@
 /**
- * Help content — Getting started · Concepts · FAQ (v2.23).
+ * Help content — Start Here · Concepts · FAQ (v2.23 → S68).
  *
- * Curated, static, high-level copy for the Getting Started page. It explains
+ * Curated, static, high-level copy for the Start Here pages and the Glossary. It explains
  * WHAT the dashboard does and WHY each concept matters — deliberately NOT how
  * the engine works internally (no packing algorithm, tier cascade, or
  * thresholds). Keep additions at the same altitude.
@@ -12,12 +12,6 @@ export type HelpBlock =
   | { kind: 'heading'; text: string }
   | { kind: 'list'; items: string[] }
   | { kind: 'note'; text: string };
-
-export interface StartStep {
-  n: number;
-  title: string;
-  body: string;
-}
 
 export interface Concept {
   id: string;
@@ -34,46 +28,6 @@ export interface Faq {
   table?: { caption?: string; headers: string[]; rows: string[][] };
 }
 
-// ── Getting started — the workflow, in order ──────────────────────────────
-export const GETTING_STARTED_STEPS: StartStep[] = [
-  {
-    n: 0,
-    title: 'See it work first',
-    body: 'Load the worked demo for a finished, populated result, or use Quick start to stand up your own fleet in a single form — server, region, zones, and demand — then run it. Everything below is the manual path.',
-  },
-  {
-    n: 1,
-    title: 'Cluster builder — define your servers',
-    body: 'Describe the server types your fleet runs on: memory, cores, nodes per rack, network, and cost. Start from a ready-made template and edit. These are the building blocks everything else places and packs onto.',
-  },
-  {
-    n: 2,
-    title: 'VM fungibility — set the routing policy',
-    body: 'Decide which VM families may land on which hardware, and in what order: a Home tier and one or more Spillover tiers. This is what lets demand flow across mixed hardware instead of being stuck on one server type.',
-  },
-  {
-    n: 3,
-    title: 'Fleet builder — place the racks',
-    body: 'Put racks of those servers into regions and availability zones. This is the physical shape of your fleet — how much capacity sits where.',
-  },
-  {
-    n: 4,
-    title: 'VM demand — build the Bill of Materials',
-    body: 'List the VMs you want to deploy: which sizes, how many, and where — spread across a region or pinned to specific zones for resilience.',
-  },
-  {
-    n: 5,
-    title: 'Run the simulation',
-    body: 'Use the Run button in the top bar to pack the demand onto the fleet. The run is the payoff — it lands you on the Results.',
-  },
-  {
-    n: 6,
-    title: 'Read the results',
-    body: 'Overview answers the key questions at a glance. Fleet map shows the racks server by server. Scenario analysis tests what else could pack onto the fleet on top of what you ran.',
-  },
-];
-
-// ── Concepts — the "library" ──────────────────────────────────────────────
 export const CONCEPTS: Concept[] = [
   {
     id: 'fleet-clusters',
@@ -299,3 +253,89 @@ export const FAQS: Faq[] = [
     ],
   },
 ];
+
+// ── Start here — the front door for each half of the suite ────────────────
+//
+// A first-time visitor lands here, not on an authoring form. The altitude is
+// the public README's: what question this half answers, what it does, what
+// each page in the rail is for, and a one-click path to a populated result.
+// Deliberately shallow — the depth lives in CONCEPTS and the CMA FAQ.
+
+export interface StartHerePageRow {
+  /** Nav label, verbatim as it appears in the rail. */
+  label: string;
+  /** What that page answers, in one line. */
+  answers: string;
+}
+
+export interface StartHereContent {
+  /** The question this half of the suite exists to answer. */
+  question: string;
+  /** Two or three sentences of framing, README register. */
+  lede: string;
+  /** What it does — planner language, no field names, no engine internals. */
+  does: string[];
+  /** Map of the rail: the gap the README never fills. */
+  pages: StartHerePageRow[];
+  /** Primary CTA — loads the worked demo and lands on a populated result. */
+  demoCta: string;
+  demoSub: string;
+  /** Secondary CTA — author your own. */
+  buildCta: string;
+  buildSub: string;
+}
+
+export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
+  simulator: {
+    question:
+      'Will this deployment actually land on the fleet we own — and if not, which resource is stopping it?',
+    lede:
+      'Not “do we have enough memory,” and not “what is our average utilization.” The real question is whether every VM in a committed bill of materials finds a node where memory, vCPU, network bandwidth and storage throughput all clear at the same time — and when one does not, exactly which of those four blocked it, on which node, by how much.',
+    does: [
+      'Packs committed demand onto hardware you describe, node by node, and tells you whether it fits.',
+      'Names the binding constraint for every VM that fails to place, with both numbers stated.',
+      'Reports what is left over — stranded capacity across all four dimensions, and how much more you could still absorb.',
+      'Costs the fleet: capex and depreciation over usable life, operating cost, margin, and whether payback lands before the hardware is due for retirement.',
+    ],
+    pages: [
+      { label: 'Quick Start', answers: 'Stand up a whole fleet from one form, then run it.' },
+      { label: 'Cluster Builder', answers: 'Define the server types your fleet runs on.' },
+      { label: 'VM Fungibility', answers: 'Which VM families may land on which hardware, and in what order.' },
+      { label: 'Fleet Builder', answers: 'Place racks into regions and availability zones.' },
+      { label: 'VM Demand', answers: 'The bill of materials — which VMs, how many, and where.' },
+      { label: 'Run Results', answers: 'The five answers: supportable, blocked, sellable, investment, payback.' },
+      { label: 'Fleet Map', answers: 'The rack picture, with per-node and per-zone drill-down.' },
+      { label: 'Scenario Analysis', answers: 'What else would fit on the fleet as it stands today.' },
+      { label: 'Glossary', answers: 'Every concept the tool uses, plus the common questions.' },
+    ],
+    demoCta: 'See it work',
+    demoSub: 'Loads a worked fleet and jumps straight to the results. Nothing to fill in.',
+    buildCta: 'Build your own',
+    buildSub: 'Start from a single form in Quick Start.',
+  },
+  cma: {
+    question:
+      'What should run where, on which cloud, in which region, at what cost — and what do we give up by moving it?',
+    lede:
+      'The simulator answers whether demand lands on the fleet you own. This half answers the sourcing question that follows: demand that will not fit has to go somewhere, and somewhere carries a price, a region footprint and a spec compromise. Answering feasibility without answering sourcing leaves you where you started.',
+    does: [
+      'Finds the closest real equivalent for a VM on each cloud, computed from live catalog specs rather than a hand-kept lookup table.',
+      'States the compromise instead of hiding it — every match carries a similarity score and a named caveat when it is not a true peer.',
+      'Prices it over time: pay-as-you-go against one- and three-year commitments, per region.',
+      'Shows where each cloud actually offers the equivalent, and the metros where none does.',
+    ],
+    pages: [
+      { label: 'Comparison Setup', answers: 'Set the base cloud and pick what to compare. Drives every other page.' },
+      { label: 'Executive Summary', answers: 'The verdict first — cheapest viable target, the delta, the gaps.' },
+      { label: 'Specs', answers: 'Side-by-side hardware, with the match percentage and what differs.' },
+      { label: 'Pricing', answers: 'Cost over time, and an estimator you can put your own quantities into.' },
+      { label: 'Region Availability', answers: 'Where each cloud offers it — and where nobody does.' },
+      { label: 'Rate Library', answers: 'The per-region rate card behind every number above.' },
+      { label: 'FAQ & Glossary', answers: 'How matching, similarity and region equivalency actually work.' },
+    ],
+    demoCta: 'See it work',
+    demoSub: 'Loads a worked comparison and jumps straight to the executive summary.',
+    buildCta: 'Set up your own',
+    buildSub: 'Pick a base cloud and a VM in Comparison Setup.',
+  },
+};

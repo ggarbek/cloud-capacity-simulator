@@ -1,6 +1,6 @@
 {
   "provider": "aws",
-  "generatedAt": "2026-08-03T10:47:17.117Z",
+  "generatedAt": "2026-08-17T07:59:42.978Z",
   "regions": [
     {
       "region": "af-south-1",
@@ -16,7 +16,7 @@
     },
     {
       "region": "ap-east-2",
-      "skuCount": 241
+      "skuCount": 253
     },
     {
       "region": "ap-northeast-1",
@@ -96,7 +96,7 @@
     },
     {
       "region": "ap-southeast-3",
-      "skuCount": 384
+      "skuCount": 395
     },
     {
       "region": "ap-southeast-4",
@@ -112,11 +112,11 @@
     },
     {
       "region": "ap-southeast-7",
-      "skuCount": 331
+      "skuCount": 342
     },
     {
       "region": "ca-central-1",
-      "skuCount": 754
+      "skuCount": 766
     },
     {
       "region": "ca-central-1-wl1-yto1",
@@ -124,7 +124,7 @@
     },
     {
       "region": "ca-west-1",
-      "skuCount": 291
+      "skuCount": 311
     },
     {
       "region": "eu-central-1",
@@ -176,11 +176,11 @@
     },
     {
       "region": "eu-south-1",
-      "skuCount": 468
+      "skuCount": 488
     },
     {
       "region": "eu-south-2",
-      "skuCount": 747
+      "skuCount": 753
     },
     {
       "region": "eu-west-1",
@@ -204,7 +204,7 @@
     },
     {
       "region": "eu-west-3",
-      "skuCount": 668
+      "skuCount": 679
     },
     {
       "region": "eu-west-3-wl1-cmn1",
@@ -216,7 +216,7 @@
     },
     {
       "region": "il-central-1",
-      "skuCount": 301
+      "skuCount": 312
     },
     {
       "region": "me-central-1",
@@ -232,11 +232,11 @@
     },
     {
       "region": "mx-central-1",
-      "skuCount": 261
+      "skuCount": 273
     },
     {
       "region": "sa-east-1",
-      "skuCount": 745
+      "skuCount": 746
     },
     {
       "region": "us-east-1",
@@ -372,7 +372,7 @@
     },
     {
       "region": "us-west-2",
-      "skuCount": 1343
+      "skuCount": 1345
     },
     {
       "region": "us-west-2-den-1",
@@ -381,10 +381,6 @@
     {
       "region": "us-west-2-hnl-1",
       "skuCount": 11
-    },
-    {
-      "region": "us-west-2-las-1",
-      "skuCount": 7
     },
     {
       "region": "us-west-2-lax-1",

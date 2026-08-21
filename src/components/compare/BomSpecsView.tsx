@@ -477,7 +477,7 @@ function LineCard({
   );
 }
 
-// ── Collapsed one-line row — Line pill · SKU · qty · per-cloud pills ───
+// ── Collapsed one-line row (S66) — Line pill · SKU · qty · per-cloud pills ───
 function CollapsedLineRow({
   model,
   onSelect,

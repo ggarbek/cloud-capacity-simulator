@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-03T10:47:50.797Z",
+  "generatedAt": "2026-08-17T08:00:21.402Z",
   "clouds": {
     "azure": {
       "specs": {
         "rows": 1501,
-        "generatedAt": "2026-08-03T10:47:39.466Z",
+        "generatedAt": "2026-08-17T08:00:10.676Z",
         "coverage": {
           "processorPct": 0,
           "networkPct": 69.15,
@@ -13,16 +13,16 @@
         }
       },
       "network": {
-        "rows": 1098,
-        "generatedAt": "2026-08-03T10:40:48.839Z",
+        "rows": 1099,
+        "generatedAt": "2026-08-17T07:51:05.243Z",
         "estimatedRows": 0,
         "curatedFallbackRows": 1038
       },
       "rates": {
         "regions": 78,
         "rows": 75327,
-        "newestGeneratedAt": "2026-08-03T10:47:39.466Z",
-        "oldestGeneratedAt": "2026-08-03T10:40:48.839Z"
+        "newestGeneratedAt": "2026-08-17T08:00:10.676Z",
+        "oldestGeneratedAt": "2026-08-17T07:51:05.243Z"
       },
       "join": {
         "joined": 65934,
@@ -34,7 +34,7 @@
     "aws": {
       "specs": {
         "rows": 1402,
-        "generatedAt": "2026-08-03T10:45:20.888Z",
+        "generatedAt": "2026-08-17T07:57:11.579Z",
         "coverage": {
           "processorPct": 100,
           "networkPct": 99.43,
@@ -43,18 +43,18 @@
       },
       "network": {
         "rows": 1394,
-        "generatedAt": "2026-08-03T10:45:20.893Z",
+        "generatedAt": "2026-08-17T07:57:11.584Z",
         "estimatedRows": 0,
         "curatedFallbackRows": 1394
       },
       "rates": {
         "regions": 106,
-        "rows": 24383,
-        "newestGeneratedAt": "2026-08-03T10:47:17.117Z",
-        "oldestGeneratedAt": "2026-08-03T10:45:20.888Z"
+        "rows": 24512,
+        "newestGeneratedAt": "2026-08-17T07:59:42.978Z",
+        "oldestGeneratedAt": "2026-08-17T07:57:11.579Z"
       },
       "join": {
-        "joined": 24383,
+        "joined": 24512,
         "ratesWithoutSpec": 0,
         "specsNeverPriced": 15,
         "sampleRegion": "us-east-1"
@@ -63,7 +63,7 @@
     "gcp": {
       "specs": {
         "rows": 341,
-        "generatedAt": "2026-08-03T10:47:17.178Z",
+        "generatedAt": "2026-08-17T07:59:43.040Z",
         "coverage": {
           "processorPct": 100,
           "networkPct": 100,
@@ -72,18 +72,18 @@
       },
       "network": {
         "rows": 341,
-        "generatedAt": "2026-08-03T10:47:17.178Z",
+        "generatedAt": "2026-08-17T07:59:43.040Z",
         "estimatedRows": 0,
         "curatedFallbackRows": 341
       },
       "rates": {
         "regions": 46,
-        "rows": 8932,
-        "newestGeneratedAt": "2026-08-03T10:47:50.105Z",
-        "oldestGeneratedAt": "2026-08-03T10:47:17.178Z"
+        "rows": 8950,
+        "newestGeneratedAt": "2026-08-17T08:00:20.715Z",
+        "oldestGeneratedAt": "2026-08-17T07:59:43.040Z"
       },
       "join": {
-        "joined": 8766,
+        "joined": 8784,
         "ratesWithoutSpec": 166,
         "specsNeverPriced": 133,
         "sampleRegion": "us-central1"

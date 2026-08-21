@@ -17,7 +17,7 @@
  * before any real model is connected.
  *
  * WIRING REAL INTELLIGENCE (later — see
- *
+ * the design notes):
  *   - BYO-account (the goal): the signed-in user's Claude/OpenAI account is the
  *     transport. Each vendor becomes a `TerminalProvider`; `getProvider()`
  *     returns the one matching the user's connected account. `buildSystemPrompt`

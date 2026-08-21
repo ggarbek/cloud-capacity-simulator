@@ -16,14 +16,11 @@ import {
 } from '../utils/demoSnapshot';
 
 export type AppPage =
-  | 'getting-started'
   | 'simulator'
   | 'competitive'
-  | 'region-availability'
-  | 'capacity-planning';
+  | 'region-availability';
 
 const PAGE_LABELS: Record<AppPage, string> = {
-  'getting-started': 'Getting started',
   simulator: 'Simulator',
   // S47 — VM Competitive Offering + Region Availability were merged into one
   // page (the unified CompetitivePage shell, S45/S46), so the nav shows ONE
@@ -31,26 +28,23 @@ const PAGE_LABELS: Record<AppPage, string> = {
   // valid route (deep-links / saved profiles) but is not a separate menu item.
   competitive: 'Cloud Market Analytics',
   'region-availability': 'Cloud Market Analytics',
-  'capacity-planning': 'Capacity Planning',
 };
 
-const PAGE_ORDER: AppPage[] = [
-  'getting-started',
-  'simulator',
-  'competitive',
-  'capacity-planning',
-];
+// S68 — two pages, both finished. 'Getting started' became the Simulator's
+// own Start here tab + Glossary; the Capacity Planning roadmap preview was
+// removed rather than shipped as a stub.
+const PAGE_ORDER: AppPage[] = ['simulator', 'competitive'];
 
 // S47 — the header brand adapts to the active page: the big title + accent
 // word + subtitle tag all change so the header reflects where you are (the
 // VC suite mark stays constant). `competitive` + `region-availability` are
 // the one merged "Cloud Market Analytics" page, so they share a title.
 const PAGE_TITLE: Record<AppPage, { lead: string; accent: string; tag: string }> = {
-  'getting-started': { lead: 'Getting', accent: 'Started', tag: 'Start here' },
-  simulator: { lead: 'VM Capacity', accent: 'Simulator', tag: 'Fleet packing & economics' },
+  // S68 — "Cloud Capacity Simulator" everywhere: the browser tab, the header
+  // and the public repo used to disagree on the product's own name.
+  simulator: { lead: 'Cloud Capacity', accent: 'Simulator', tag: 'Fleet packing & economics' },
   competitive: { lead: 'Cloud Market', accent: 'Analytics', tag: 'Cross-cloud pricing & regions' },
   'region-availability': { lead: 'Cloud Market', accent: 'Analytics', tag: 'Cross-cloud pricing & regions' },
-  'capacity-planning': { lead: 'Capacity', accent: 'Planning', tag: 'Fleet roadmap' },
 };
 
 interface AppHeaderProps {
@@ -174,8 +168,8 @@ export function AppHeader({
 
 /**
  * v2.8 — Top-level page-nav menu. Hamburger button on the left side of the
- * header opens an inline popover listing the three suite pages: Simulator,
- * Competitive Offering, Capacity Planning. The active page is highlighted.
+ * header opens an inline popover listing the suite pages: Simulator and
+ * Cloud Market Analytics. The active page is highlighted.
  * Click outside / pick a page / press Esc to close.
  */
 function PageMenu({
@@ -261,10 +255,6 @@ function PageMenu({
             const isActive =
               p === activePage ||
               (p === 'competitive' && activePage === 'region-availability');
-            // v2.19.44 — WIP badge for the pages that aren't finished yet.
-            // Simulator + Getting started (v2.23) are stable; the others
-            // ship as previews so users know not to rely on them.
-            const isWip = p !== 'simulator' && p !== 'getting-started';
             return (
               <button
                 key={p}
@@ -291,28 +281,9 @@ function PageMenu({
                   if (!isActive)
                     (e.currentTarget as HTMLElement).style.background = 'transparent';
                 }}
-                title={isWip ? `${PAGE_LABELS[p]} · work in progress, expect rough edges` : undefined}
               >
                 <span>{PAGE_LABELS[p]}</span>
                 <span className="flex items-center gap-1.5">
-                  {isWip && (
-                    <span
-                      style={{
-                        fontSize: 9,
-                        letterSpacing: '0.12em',
-                        padding: '1px 6px',
-                        borderRadius: 'var(--radius-pill)',
-                        background: 'rgba(251, 191, 36, 0.14)',
-                        color: '#FCD34D',
-                        border: '1px solid rgba(251, 191, 36, 0.40)',
-                        fontWeight: 600,
-                        textTransform: 'none',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      WIP
-                    </span>
-                  )}
                   {isActive && (
                     <span style={{ fontSize: 11, opacity: 0.85 }}>●</span>
                   )}

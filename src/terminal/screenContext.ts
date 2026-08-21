@@ -1,10 +1,10 @@
 /**
  * screenContext — the Terminal's siloed "what is the user pointing at" channel.
  *
- * This is a tiny singleton pub/sub modeled on a lightweight
+ * This is a tiny singleton pub/sub modeled on a dashboard
  * `screenContext` publisher pattern, RE-IMPLEMENTED here so the Capacity
  * Simulator stays a self-contained silo (see
- *. Components that hold a
+ * the design notes). Components that hold a
  * meaningful ephemeral selection that is NOT already in AppState — e.g. the
  * VM a user just picked in CrossCloudCompare — call `screenContext.publish`
  * so the Terminal can resolve "this", "that VM", "these regions" to the thing

@@ -1,5 +1,5 @@
 /**
- * MetricCard — the "Distance from Ideal" primitive.
+ * MetricCard — the "Distance from Ideal" primitive (S26).
  *
  * One visual idiom, reused across all four Simple-track metric families:
  * a headline value, a horizontal track with the current position + one or

@@ -51,6 +51,7 @@ import { CostCalculator } from './compare/CostCalculator';
 import { MatchMethodology } from './compare/MatchMethodology';
 import { BomSpecsView } from './compare/BomSpecsView';
 import type { Term } from '../utils/costCalculator';
+import { StartHerePage } from './StartHerePage';
 import { CmaFaqPage } from './CmaFaqPage';
 import { LIVE_CATALOG_AS_OF } from '../data/liveCatalog';
 import {
@@ -91,13 +92,13 @@ import {
   buildExecComparisonModel,
   buildExecBomModel,
 } from '../utils/export/execSummaryModel';
-// PRICING — price verdict + cumulative cost-over-time keystone; snapshot
+// PRICING (S65) — price verdict + cumulative cost-over-time keystone; snapshot
 // tables demoted into a reference Disclosure.
 import { Disclosure } from './Disclosure';
 import { PriceVerdict } from './compare/PriceVerdict';
 import { CostOverTimeChart } from './compare/charts/CostOverTimeChart';
 import { priceVerdict } from './compare/charts/chartMath';
-// EXEC — executive-briefing redesign: dollar verdict, KPI strip,
+// EXEC (S65) — executive-briefing redesign: dollar verdict, KPI strip,
 // what-you-get/give-up columns, market-posture strip, assumptions footer.
 import { ExecBriefVerdict } from './compare/ExecBriefVerdict';
 import { ExecBriefKpis } from './compare/ExecBriefKpis';
@@ -106,7 +107,7 @@ import { ExecBriefPosture } from './compare/ExecBriefPosture';
 import { ExecBriefAssumptions } from './compare/ExecBriefAssumptions';
 import { collectAssumptions } from './compare/execBriefMath';
 import { buildMarketGapReport, refsFromVms, REGION_GEO_MAP, type GapProvider } from '../utils/marketGaps';
-// SPECS — the at-a-glance spec-showdown hero + insight strip.
+// SPECS (S65) — the at-a-glance spec-showdown hero + insight strip.
 // (Disclosure already imported above; compareSpecs imported here supersedes the
 // former end-of-file EXPORT import — S65 integration dedupe.)
 import {
@@ -162,6 +163,7 @@ const REGION_BAR_MATCH_KM = 1000;
 // sub-views render the embedded RegionAvailabilityPage (availability / coverage
 // / equivalency) so both top-level pages live in ONE unified shell.
 type CompetitiveTab =
+  | 'start-here'
   | 'setup'
   | 'executive-summary'
   | 'compare'
@@ -175,6 +177,7 @@ type CompetitiveTab =
 // reads "Cloud Market Analytics · At a Glance" and the model knows the user is
 // most likely asking about what's on this exact sub-page.
 const SUBPAGE_LABEL: Record<CompetitiveTab, string> = {
+  'start-here': 'Start Here',
   setup: 'Comparison Setup',
   'executive-summary': 'Executive Summary',
   compare: 'Specs',
@@ -3691,7 +3694,7 @@ export function CompetitivePage({
     .filter((v) => v !== methodologyBase)
     .map((v) => ({ provider: (v.provider ?? '') as string, vm: v }));
 
-  // SPECS — the Spec Showdown hero. The at-a-glance side-by-side table's
+  // SPECS (S65) — the Spec Showdown hero. The at-a-glance side-by-side table's
   // COLUMNS: the base pick first, then each cross-cloud analog for the ACTIVE
   // comparison. We reuse the already-resolved `methodologyVms` (BoM row / active
   // comparison row / all picks) for identity, look up each cloud's region-matched
@@ -3730,7 +3733,7 @@ export function CompetitivePage({
     });
   }, [isProducts, methodologyVms, methodologyBase, horizons, caveatsByProvider]);
 
-  // SPECS — the compact Stands-out / Trails-on strip under the hero. Pulls
+  // SPECS (S65) — the compact Stands-out / Trails-on strip under the hero. Pulls
   // the SAME per-VM standout/weakness the educational columns use (`compareSpecs`),
   // one line per cloud. Empty in products mode / when nothing separates the picks.
   const showdownInsights = useMemo<ShowdownInsight[]>(() => {
@@ -4077,7 +4080,7 @@ export function CompetitivePage({
     [userVmsArr, baselineProvider, baseline, pricingRegions],
   );
 
-  // PRICING — the dollar-quantified verdict for the selected commitment
+  // PRICING (S65) — the dollar-quantified verdict for the selected commitment
   // term. Depends only on the (cheap) region-matched `bars` + `pricingTerm`, so
   // it recomputes instantly on a term/mode flip. Prices on the SAME × 730
   // convention as timeHorizonCosts/normalizedRates so every $ surface agrees.
@@ -4106,7 +4109,7 @@ export function CompetitivePage({
   // from Comparison setup; only the base quantity is editable, mirrored to the
   // other clouds + a "port my VM-demand BoM" scenario), then the cross-cloud cost
   // table + rate bars for the anchored comparison.
-  // PRICING — slim commitment-term pill row that drives the SAME
+  // PRICING (S65) — slim commitment-term pill row that drives the SAME
   // `setPricingTerm` state as CostCalculator's control, so the verdict + chart +
   // (still-present) calculator control all reflect one term. Placed above the
   // chart so the term is visible before the time projection.
@@ -4162,7 +4165,7 @@ export function CompetitivePage({
     />
   );
 
-  // PRICING — the reference disclosure: the snapshot views (rate bars,
+  // PRICING (S65) — the reference disclosure: the snapshot views (rate bars,
   // commitment step-down, horizon matrix, full normalized table) are not deleted,
   // just DEMOTED behind a one-click expand now that the verdict + cumulative
   // chart carry the decision narrative. Region-rate reference for the base SKU is
@@ -4539,7 +4542,7 @@ export function CompetitivePage({
       marketGapNote: 'Gaps reflect the full-catalog regional footprint of the selected clouds, not only the BoM deployment regions.',
     });
 
-  // EXEC — executive-briefing memos. Placed immediately before the
+  // EXEC (S65) — executive-briefing memos. Placed immediately before the
   // `executiveSummaryPage` block (per the EXEC ticket) so the redesigned brief's
   // derived facts live next to where they render, and nothing above is touched.
 
@@ -4582,7 +4585,7 @@ export function CompetitivePage({
           {isProducts ? (
             <>Product-offering briefing across the selected clouds</>
           ) : compareMode === 'bom' ? (
-            // EXEC — BoM mode describes the committed BoM, never the
+            // EXEC (S65) — BoM mode describes the committed BoM, never the
             // (empty) comparison-pick counter. Fixes "across all 0 picks" when a
             // BoM is loaded but no comparison sizes are picked.
             <>
@@ -4687,7 +4690,7 @@ export function CompetitivePage({
         )
       ) : (
         <>
-          {/* EXEC — VM-sizes, 'this pairing' scope: the redesigned brief.
+          {/* EXEC (S65) — VM-sizes, 'this pairing' scope: the redesigned brief.
               Order (visualization-first): dollar verdict → KPI strip → ONE cost
               chart → what-you-get/give-up → situational best-at → market posture
               → assumptions footer. Reads top-to-bottom in <60s. */}
@@ -4857,6 +4860,12 @@ export function CompetitivePage({
         }
       }}
     />
+  ) : competitiveTab === 'start-here' ? (
+    <StartHerePage
+      kind="cma"
+      onGoDemo={() => setCompetitiveTab('executive-summary')}
+      onGoBuild={() => setCompetitiveTab('setup')}
+    />
   ) : competitiveTab === 'setup' ? (
     setupPage
   ) : competitiveTab === 'executive-summary' ? (
@@ -4913,6 +4922,7 @@ export function CompetitivePage({
                 the Specs page (it's a read-only spec comparison — the template
                 up/download doesn't belong on it). */}
             {!isRegionTab &&
+              competitiveTab !== 'start-here' &&
               competitiveTab !== 'setup' &&
               competitiveTab !== 'faq' &&
               competitiveTab !== 'pricing' &&
@@ -4940,6 +4950,7 @@ export function CompetitivePage({
 // destinations; tinted-fill active state; ink text; no stripes/glow. The
 // content pane (the <main> above) is what scrolls.
 const COMPETITIVE_TAB_TITLE: Record<CompetitiveTab, string> = {
+  'start-here': 'Start Here',
   setup: 'Comparison Setup',
   'executive-summary': 'Executive Summary',
   compare: 'Specs',
@@ -4950,6 +4961,8 @@ const COMPETITIVE_TAB_TITLE: Record<CompetitiveTab, string> = {
   faq: 'FAQ & Glossary',
 };
 const COMPETITIVE_TAB_BLURB: Record<CompetitiveTab, string> = {
+  'start-here':
+    'What cross-cloud sourcing question this half answers, what each page here is for, and a worked example in one click.',
   setup:
     'Set the base cloud, choose a focus, and pick a VM — one shared config that drives every comparison and region view.',
   'executive-summary':
@@ -4987,6 +5000,12 @@ function RailSvg({ children }: { children: React.ReactNode }) {
     </svg>
   );
 }
+const IconStartHere = ( // compass — the front door
+  <RailSvg>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="m14.8 9.2-1.6 4.2-4.2 1.6 1.6-4.2 4.2-1.6Z" />
+  </RailSvg>
+);
 const IconSetup = ( // sliders — the control center
   <RailSvg>
     <path d="M5 4v6M5 14v6M12 4v3M12 11v9M19 4v9M19 17v3" />
@@ -5050,6 +5069,7 @@ const COMPETITIVE_NAV: { group: string; items: CompetitiveNavItem[] }[] = [
   {
     group: 'Set up',
     items: [
+      { tab: 'start-here', label: 'Start Here', hint: 'What this half answers, what each page does, and a one-click worked example', icon: IconStartHere },
       { tab: 'setup', label: 'Comparison Setup', hint: 'Base cloud, VM pick & focus — drives every view', icon: IconSetup },
     ],
   },

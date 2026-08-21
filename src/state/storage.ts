@@ -5,7 +5,7 @@
 import type { AppState } from './AppState';
 
 // v2 = multi-hardware silo. v1 persisted a singular `fleet` blob; that key is
-// silently discarded on load per the persistence doctrine "Invalid/old data is silently
+// silently discarded on load per the "Invalid/old data is silently
 // discarded" convention.
 const SCHEMA_VERSION = 2;
 

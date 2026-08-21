@@ -5,8 +5,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  // Absolute, runtime-resolved paths so glob matching works regardless of
-  // where the project is checked out (including paths containing spaces).
+  // Use absolute paths so glob matching doesn't choke on the iCloud
+  // paths containing spaces or `~`. Relative `./src/**`
+  // worked at the previous mount but breaks when Vite's cwd resolves
+  // differently. v2.17.34 fix.
   content: [
     path.join(__dirname, 'index.html'),
     path.join(__dirname, 'src/**/*.{ts,tsx}'),

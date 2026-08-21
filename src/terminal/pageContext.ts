@@ -6,7 +6,7 @@
  * is looking at, so the Terminal can resolve "this VM / these regions / this
  * result" and answer over the numbers actually on screen.
  *
- * SILOING:
+ * SILOING (.):
  *  - Only the simulator's own data is read — the live catalog, the user's
  *    fleet/BoM/run result, and the curated help content. No personal info,
  *    no other projects.
@@ -42,13 +42,11 @@ export interface PageContext {
 }
 
 const PAGE_TITLES: Record<string, string> = {
-  'getting-started': 'Getting started',
   simulator: 'Simulator',
   // S47 — "VM Competitive Offering" + "Region Availability" merged into one
   // "Cloud Market Analytics" page, so the assistant's context names it that.
   competitive: 'Cloud Market Analytics',
   'region-availability': 'Cloud Market Analytics',
-  'capacity-planning': 'Capacity planning',
 };
 
 // Default sub-page for routes that ARE a specific sub-view of a multi-tab
@@ -130,19 +128,11 @@ export function buildPageContext(
   let summary = '';
 
   switch (pageId) {
-    case 'getting-started': {
-      summary =
-        'Onboarding, concepts, and FAQ for the Capacity Simulator. Data and rates are explained here.';
-      facts.push({
-        label: 'Providers',
-        value: topEntries(cat.byProvider),
-      });
-      break;
-    }
-
     case 'simulator': {
+      // S68 — the Simulator page now also hosts Start here and the Glossary,
+      // the two surfaces that used to be a separate 'getting-started' route.
       summary =
-        'Build a fleet, define VM demand, run the packing simulation, and read the results (fit, blockers, utilization, sellable headroom).';
+        'Build a fleet, define VM demand, run the packing simulation, and read the results (fit, blockers, utilization, sellable headroom). Also hosts Start here and the Glossary.';
       const r = state.result;
       data.workspaceView = state.ui.workspaceView;
       data.activeSidebarTab = state.ui.activeSidebarTab;
@@ -222,12 +212,6 @@ export function buildPageContext(
         label: 'Coverage',
         value: `${cat.regions} regions · ${topEntries(cat.byProvider)}`,
       });
-      break;
-    }
-
-    case 'capacity-planning': {
-      summary =
-        'Long-horizon capacity planning (demand forecasting, exhaustion projection) — coming soon.';
       break;
     }
 

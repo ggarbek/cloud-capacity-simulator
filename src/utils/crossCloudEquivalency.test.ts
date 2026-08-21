@@ -940,7 +940,7 @@ describe('bestMatchAnalog — closest cross-cloud analog category/family (v2.44)
     expect(bestMatchAnalog(baseE, [])).toBeNull();
   });
 
-  // Regression: a disk-less base tied between a plain SKU and its
+  // Regression (S62): a disk-less base tied between a plain SKU and its
   // local-NVMe sibling (r5.large vs r5d.large — same vCPU/RAM/cat, so the
   // Storage-Optimized-gated disk term never fires) must resolve the SAME way in
   // BOTH ranking paths — the equivalents panel (topVmMatches) and the post-pick
@@ -1208,7 +1208,7 @@ describe('S65 confidential rung-2 through the live-view scoped path', () => {
   });
 
   // LIVE-CATALOG pin — the same path through the REAL baked catalog, not a
-  // synthetic mini-fixture. Reproduces the exact in-browser scenario: an
+  // synthetic mini-fixture. Reproduces the exact in-browser scenario (S64): an
   // Azure DC* base with the view scoped to the Confidential category, which
   // empties AWS/GCP of same-category rows (they have no dedicated Confidential
   // SKUs). Before the fix the DC family degraded to a rung-3 "different category"

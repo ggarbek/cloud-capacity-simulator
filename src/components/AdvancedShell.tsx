@@ -6,6 +6,8 @@ import { InsightsPane } from './InsightsPane';
 import { ResizeHandle } from './ResizeHandle';
 import { AnswersPanel } from './AnswersPanel';
 import { ScenarioAnalysis } from './ScenarioAnalysis';
+import { StartHerePage } from './StartHerePage';
+import { GettingStartedPage } from './GettingStartedPage';
 import { QuickStartTab } from './QuickStartTab';
 import { ConfigureTab } from './ConfigureTab';
 import { FleetTab } from './FleetTab';
@@ -63,8 +65,8 @@ export function AdvancedShell() {
  * scrolling + simple-baseline layouts); this surface just gives each one
  * the full content area instead of a 380px sidebar slice.
  */
-// One-line "what this page is for" + a deep-link to the matching concept on
-// the Getting started page. Keyed by setup tab.
+// One-line "what this page is for" + a deep-link to the matching concept in
+// the Glossary. Keyed by setup tab.
 const SETUP_INTROS: Record<
   string,
   { text: string; conceptId: string; conceptLabel: string }
@@ -122,7 +124,10 @@ function SetupIntro({ tab }: { tab: string }) {
       <button
         type="button"
         onClick={() =>
-          dispatch({ type: 'UI_SET', ui: { activePage: 'getting-started', helpConcept: intro.conceptId } })
+          dispatch({
+            type: 'UI_SET',
+            ui: { activeSidebarTab: 'glossary', workspaceView: 'setup', helpConcept: intro.conceptId },
+          })
         }
         className="flex-shrink-0"
         style={{
@@ -135,7 +140,7 @@ function SetupIntro({ tab }: { tab: string }) {
           padding: '2px 0',
           whiteSpace: 'nowrap',
         }}
-        title={`Open Getting started → Concepts → ${intro.conceptLabel}`}
+        title={`Open Glossary → Concepts → ${intro.conceptLabel}`}
       >
         Learn: {intro.conceptLabel} →
       </button>
@@ -158,9 +163,13 @@ function SetupSurface() {
       style={{ background: 'var(--bg)' }}
     >
       <div className="min-h-full w-full" style={{ maxWidth: 1020, margin: '0 auto' }}>
-        <div style={{ padding: '14px 16px 0' }}>
-          <SetupIntro tab={tab} />
-        </div>
+        {tab !== 'start-here' && tab !== 'glossary' && (
+          <div style={{ padding: '14px 16px 0' }}>
+            <SetupIntro tab={tab} />
+          </div>
+        )}
+        {tab === 'start-here' && <StartHerePage kind="simulator" />}
+        {tab === 'glossary' && <GettingStartedPage />}
         {tab === 'quickstart' && <QuickStartTab />}
         {tab === 'hardware' && <HardwareTab />}
         {tab === 'fleet' && <FleetTab />}

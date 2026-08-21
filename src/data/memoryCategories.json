@@ -8,7 +8,7 @@
       "ramRangeMin": 0,
       "ramRangeMax": 4096,
       "vmGenerations": ["Mv1", "Mv2", "Mv3"],
-      "hardwareGroups": ["gen-legacy-mm", "gen-a-mm", "gen-c-mm", "gen-d-mm"],
+      "hardwareGroups": ["gen-d-mm", "gen-a-mm-std", "gen-c-mm-std", "gen-e-mm"],
       "isolated": false,
       "color": "#BBF7D0",
       "glow": "rgba(187, 247, 208, 0.40)"
@@ -20,7 +20,7 @@
       "ramRangeMin": 6144,
       "ramRangeMax": 16384,
       "vmGenerations": ["Mv2", "Mv3"],
-      "hardwareGroups": ["gen-legacy0-hm", "gen-legacy-hm", "gen-b-hm-mixed", "gen-c-hm", "gen-d-hm"],
+      "hardwareGroups": ["gen-legacy-hm", "gen-d-hm", "gen-b-hm-mixed", "gen-c-hm-mixed", "gen-e-hm"],
       "isolated": false,
       "color": "#22C55E",
       "glow": "rgba(34, 197, 94, 0.40)"

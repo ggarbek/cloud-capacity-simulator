@@ -34,8 +34,9 @@ function resolveReservedForRunner(
 }
 
 /**
- * Mean memory per node for a cluster — handles heterogeneous racks (Gen-B
- * HM-Mixed–style mixed-position) by weighted average over `rackComposition`.
+ * Mean memory per node for a cluster — handles heterogeneous racks
+ * (mixed-position, e.g. two 8 TiB nodes plus one 16 TiB node in the same rack)
+ * by weighted average over `rackComposition`.
  * Used for the cheap sum-based admissibility check in the claim phase; the
  * per-node bin-packer in the engine still has the final say on per-VM fit.
  */
@@ -63,16 +64,16 @@ function meanMemPerNode(fleet: FleetSpec): number {
  * `normalizeGroupName` reduces both to the same family form so they line up.
  */
 function normalizeGroupName(name: string): string {
-  // "Gen-A MM-Std" → "Gen-A MM"
-  // "Gen-A HM"      → "Gen-A HM"
-  // "Gen-Legacy0 HM"      → "Gen-Legacy0 HM"
-  const m = name.trim().match(/^(Gen\d+)(?:\.\d+)?\s*(VHM|HM|MM)/);
+  // "Gen-A MM-Std"   → "Gen-A MM"
+  // "Gen-A HM"       → "Gen-A HM"
+  // "Gen-Legacy HM"  → "Gen-Legacy HM"
+  const m = name.trim().match(/^(Gen-[A-Za-z0-9]+)(?:\.\d+)?\s*(VHM|HM|MM)/);
   if (!m) return name.trim();
   return `${m[1]} ${m[2]}`;
 }
 function homeMatchesCluster(catalogHome: string, clusterHwName: string): boolean {
   const cluster = normalizeGroupName(clusterHwName);
-  // Catalog may encode home + spillover as "Gen-Legacy0 HM / Gen-Legacy HM" — accept either.
+  // Catalog may encode home + spillover as "Gen-Legacy HM / Gen-D HM" — accept either.
   return catalogHome
     .split('/')
     .map((s) => normalizeGroupName(s))
@@ -1036,7 +1037,7 @@ export function RunFooter() {
   const run = async () => {
     dispatch({ type: 'RUN_START' });
     const start = performance.now();
-    // v3 — orchestration extracted to the shared buildAndRunSimulation()
+    // v3 (S25) — orchestration extracted to the shared buildAndRunSimulation()
     // so the Simple track triggers the engine identically (region-scoped
     // catalog + vmClassByName + live HW index). Engine never forks.
     const result = buildAndRunSimulation(state);

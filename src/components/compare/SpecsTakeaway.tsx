@@ -2,7 +2,7 @@
 // SpecsTakeaway — executive "Key takeaway" box for the cross-cloud
 // Compare → Specs page.
 //
-// Leads with the verdict (internal Diet/fitness-insight-card style: most important
+// Leads with the verdict (insight-card style: most important
 // point first, plain language, scannable), then unpacks the per-VM (sizes mode)
 // or per-product (products mode) detail. Pure derived render — it consumes the
 // already-built + tested `specInsights` engine and adds no new data.

@@ -4,8 +4,8 @@
  * Both the Advanced RunFooter and the Simple track trigger the engine through
  * this one function so the marshalling (region-scoped catalog, vmClassByName,
  * live HW index) is identical and the engine is never forked. It wraps the
- * canonical `runMulti` — and
- * .
+ * canonical `runMulti` — see feedback engine live mirror hw spec and
+ * project simple advanced two track doctrine.
  */
 import type { AppState } from '../state/AppState';
 import { fleetList } from '../state/AppState';

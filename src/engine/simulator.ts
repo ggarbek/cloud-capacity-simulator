@@ -77,7 +77,7 @@ export function runSimulation(input: SimulatorInput): SimulatorResult {
   // v2.17 — Per-node Premium SSD throughput cap. null = constraint disabled.
   const nodeStorage: number | null = fleet.storageThroughputMbpsPerNode ?? null;
 
-  // Per-position lookup for heterogeneous racks (e.g. Gen-B HM Mixed = 2×
+  // Per-position lookup for heterogeneous racks (e.g. Gen-B HM-Mixed = 2×
   // 8TiB + 1× 16TiB). v2.17 — slots can be marked `isUtility`
   // (control-plane hosts); those positions are pre-tagged as reserved
   // so the workload allocator never lands a VM on them. v2.17.23 — slots

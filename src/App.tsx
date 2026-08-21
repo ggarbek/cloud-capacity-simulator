@@ -2,8 +2,6 @@ import { AppProvider } from './state/AppContext';
 import { AppHeader } from './components/AppHeader';
 import { AdvancedShell } from './components/AdvancedShell';
 import { CompetitivePage } from './components/CompetitivePage';
-import { CapacityPlanningPage } from './components/CapacityPlanningPage';
-import { GettingStartedPage } from './components/GettingStartedPage';
 import { useApp } from './state/AppContext';
 import { buildFeedbackMailto } from './utils/feedback';
 import { TerminalPanel } from './terminal/TerminalPanel';
@@ -34,15 +32,13 @@ function PageRouter() {
           (NavRail shell: Set up pages + Results pages). The Simple track +
           its header toggle were retired once the Results group (Overview =
           the five answers + Fleet map) covered the same ground. */}
-      {page === 'getting-started' && <GettingStartedPage />}
       {page === 'simulator' && <AdvancedShell />}
       {/* v2.30 — Both top-level entries route into ONE unified Competitive
           Offering sidebar shell; the menu item just picks the landing tab. */}
-      {page === 'competitive' && <CompetitivePage initialTab="setup" />}
+      {page === 'competitive' && <CompetitivePage initialTab="start-here" />}
       {page === 'region-availability' && (
         <CompetitivePage initialTab="region-availability" />
       )}
-      {page === 'capacity-planning' && <CapacityPlanningPage />}
       <CopyrightFooter />
       {/* v2.27 — the in-dashboard data assistant. Floats over every page,
           grounds its answers in the current page's data, and is sandboxed to
@@ -71,7 +67,7 @@ function CopyrightFooter() {
         userSelect: 'none',
         fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
       }}
-      aria-label="Project attribution"
+      aria-label="Copyright Gabryel Garbek 2026"
     >
       <span>Cloud Capacity Simulator · MIT licensed ·</span>
       <a

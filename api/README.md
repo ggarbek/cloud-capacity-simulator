@@ -12,7 +12,7 @@ REST API — so the key is never shipped to the browser.
 Set **one** environment variable in the Vercel project:
 
 ```
-ANTHROPIC_API_KEY = sk-ant-...
+ANTHROPIC_API_KEY = <your key>
 ```
 
 That's it. With the key set, the Terminal uses the real `claude-sonnet-4-6`

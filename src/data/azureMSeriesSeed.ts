@@ -29,7 +29,7 @@
  * doctrine's red line is INTERNAL proprietary data (real fleets, contract
  * pricing, internal SKU/generation codes, "our team's policy is X"). Azure
  * M-Series VM specs from Microsoft Learn are explicitly in the "Allowed in
- * seed" bucket of the project docs. User uploads
+ * seed" bucket of the design notes. User uploads
  * still merge/override on top — the seed is a first-run convenience, not a
  * lock-in. Delete a row from the VM Library and it stays gone.
  *

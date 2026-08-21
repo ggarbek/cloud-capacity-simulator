@@ -1,15 +1,21 @@
 /**
- * GettingStartedPage — the help surface (v2.23).
+ * GettingStartedPage — the Glossary (v2.23 → S68).
  *
- * One page, three sub-views (Getting started · Concepts · FAQ), modeled on
- * the wiki-with-sub-views pattern. Content is curated + static in
- * `src/data/help.ts`. Deliberately high-level — it explains what the
- * dashboard does and why, not how the engine works internally.
+ * Two sub-views (Concepts · FAQ), modeled on a wiki-with-sub-views
+ * pattern. Content is curated + static in `src/data/help.ts`. Deliberately
+ * high-level — it explains what the dashboard does and why, not how the
+ * engine works internally.
+ *
+ * S68 — this used to be a top-level "Getting started" page whose first view
+ * was a numbered workflow. It now lives at the bottom of the Simulator rail
+ * as the Glossary (mirroring how Cloud Market Analytics parks its FAQ &
+ * Glossary), and the onboarding role moved to the Start Here tab, which can
+ * do the one thing this page never could: load a worked example and show a
+ * populated result.
  */
 import { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../state/AppContext';
 import {
-  GETTING_STARTED_STEPS,
   CONCEPTS,
   FAQS,
   type Concept,
@@ -17,11 +23,11 @@ import {
   type Faq,
 } from '../data/help';
 
-type SubView = 'start' | 'concepts' | 'faq';
+type SubView = 'concepts' | 'faq';
 
 export function GettingStartedPage() {
   const { state, dispatch } = useApp();
-  const [view, setView] = useState<SubView>('start');
+  const [view, setView] = useState<SubView>('concepts');
   const [conceptTarget, setConceptTarget] = useState<string | null>(null);
   // Deep-link from a setup page's "Learn about X" link: open Concepts on that
   // concept, then clear the pending target so a later visit lands on the
@@ -44,10 +50,10 @@ export function GettingStartedPage() {
               className="font-semibold"
               style={{ fontSize: 26, letterSpacing: '-0.02em', color: 'var(--text-primary)', lineHeight: 1.1 }}
             >
-              Getting started
+              Glossary
             </h1>
             <div className="text-[12.5px]" style={{ color: 'var(--text-muted)', marginTop: 3 }}>
-              How the capacity simulator works — the workflow, the concepts, and the common questions.
+              Every concept the simulator uses, and the questions that come up most.
             </div>
           </div>
           <div
@@ -57,7 +63,6 @@ export function GettingStartedPage() {
             style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-pill)', background: 'var(--tint-soft)' }}
           >
             {([
-              ['start', 'Getting started'],
               ['concepts', 'Concepts'],
               ['faq', 'FAQ'],
             ] as [SubView, string][]).map(([id, label]) => {
@@ -87,67 +92,11 @@ export function GettingStartedPage() {
           </div>
         </div>
 
-        {view === 'start' && <StartView />}
         {view === 'concepts' && (
           <ConceptsView key={conceptTarget ?? 'default'} initialId={conceptTarget ?? undefined} />
         )}
         {view === 'faq' && <FaqView />}
       </div>
-    </div>
-  );
-}
-
-// ── Getting started — numbered workflow ───────────────────────────────────
-function StartView() {
-  const { dispatch } = useApp();
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <p className="text-[13px] leading-relaxed" style={{ color: 'var(--text-secondary)', marginBottom: 4 }}>
-        The simulator packs a set of VMs (your demand) onto hardware you describe (your fleet), then shows you
-        whether it fits, what it costs, and what else you could sell. Here is the path from empty to a result.
-      </p>
-      {GETTING_STARTED_STEPS.map((s) => (
-        <div
-          key={s.n}
-          className="flex gap-3"
-          style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '14px 16px',
-          }}
-        >
-          <div
-            aria-hidden="true"
-            className="grid place-items-center flex-shrink-0 font-mono"
-            style={{
-              width: 26,
-              height: 26,
-              borderRadius: '50%',
-              fontSize: 12,
-              fontWeight: 700,
-              background: s.n === 0 ? 'var(--interactive)' : 'var(--interactive-muted)',
-              color: s.n === 0 ? '#FFFFFF' : 'var(--interactive)',
-            }}
-          >
-            {s.n === 0 ? '★' : s.n}
-          </div>
-          <div className="min-w-0">
-            <div style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text-primary)' }}>{s.title}</div>
-            <div className="text-[12.5px] leading-relaxed" style={{ color: 'var(--text-secondary)', marginTop: 2 }}>
-              {s.body}
-            </div>
-          </div>
-        </div>
-      ))}
-      <button
-        type="button"
-        onClick={() => dispatch({ type: 'UI_SET', ui: { activePage: 'simulator' } })}
-        className="btn-primary self-start"
-        style={{ padding: '8px 18px', fontSize: 12.5, marginTop: 6 }}
-      >
-        Open the Simulator →
-      </button>
     </div>
   );
 }

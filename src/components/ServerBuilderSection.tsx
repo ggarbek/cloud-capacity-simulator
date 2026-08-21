@@ -140,7 +140,7 @@ export function ServerBuilderSection({
   // v2.19 — Buffer/overhead REMOVED from the Hardware Library. It now lives
   // on the placed cluster in the Fleet Builder (per-cluster + optional per-
   // node-type override) because rack-planning sizing requires the cluster
-  // shape.
+  // shape..
 
   const [error, setError] = useState<string | null>(null);
   const [savedMsg, setSavedMsg] = useState<string | null>(null);

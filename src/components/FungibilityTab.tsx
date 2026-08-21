@@ -1,7 +1,7 @@
 /**
- * Fungibility Configurator — an earlier iteration.
+ * Fungibility Configurator.
  *
- * UX (locked with the user in an earlier iteration):
+ * UX (locked with the user):
  *   • Empty by default — fungibility is OPTIONAL. GCP-dedicated-host case
  *     "just works" without authoring a single cell.
  *   • Priority-ordered, not tri-state — cells carry numeric priority
@@ -67,17 +67,17 @@ function cycleNext(v: CellValue): CellValue {
 // uploads, real state takes over.
 // ────────────────────────────────────────────────────────────────────────
 const MOCK_HW: HardwareGroup[] = [
-  mockHw('gen-legacy-mm',     'Gen-Legacy MM',     'Azure', 'mm', 4096),
-  mockHw('gen-a-mm',   'Gen-A MM-Std', 'Azure', 'mm', 4096),
-  mockHw('gen-c-mm',   'Gen-C MM-Std', 'Azure', 'mm', 4096),
-  mockHw('gen-legacy0-hm',     'Gen-Legacy0 HM',     'Azure', 'hm', 12288),
-  mockHw('gen-b-hm-mixed', 'Gen-B HM Mixed', 'Azure', 'hm', 8192),
-  mockHw('gen-c-hm',   'Gen-C HM Mixed', 'Azure', 'hm', 16384),
-  mockHw('gen-a-vhm',    'Gen-A VHM',    'Azure', 'vhm', 32768),
-  mockHw('aws-m7i',     'AWS m7i host','AWS',   'mm', 1024),
-  mockHw('aws-r7i',     'AWS r7i host','AWS',   'hm', 1024),
-  mockHw('gcp-n2',      'GCP n2 host', 'GCP',   'mm', 1024),
-  mockHw('gcp-c3',      'GCP c3 host', 'GCP',   'mm', 1024),
+  mockHw('gen-d-mm',       'Gen-D MM',       'Azure', 'mm', 4096),
+  mockHw('gen-a-mm-std',   'Gen-A MM-Std',   'Azure', 'mm', 4096),
+  mockHw('gen-c-mm-std',   'Gen-C MM-Std',   'Azure', 'mm', 4096),
+  mockHw('gen-legacy-hm',  'Gen-Legacy HM',  'Azure', 'hm', 12288),
+  mockHw('gen-b-hm-mixed', 'Gen-B HM-Mixed', 'Azure', 'hm', 8192),
+  mockHw('gen-c-hm-mixed', 'Gen-C HM-Mixed', 'Azure', 'hm', 16384),
+  mockHw('gen-a-vhm',      'Gen-A VHM',      'Azure', 'vhm', 32768),
+  mockHw('aws-m7i',        'AWS m7i host',   'AWS',   'mm', 1024),
+  mockHw('aws-r7i',        'AWS r7i host',   'AWS',   'hm', 1024),
+  mockHw('gcp-n2',         'GCP n2 host',    'GCP',   'mm', 1024),
+  mockHw('gcp-c3',         'GCP c3 host',    'GCP',   'mm', 1024),
 ];
 function mockHw(id: string, name: string, provider: string, cat: 'mm'|'hm'|'vhm', ram: number): HardwareGroup {
   return {

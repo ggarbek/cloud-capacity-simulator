@@ -1,5 +1,5 @@
 /**
- * Live-rate lazy loader.
+ * Live-rate lazy loader (S36).
  *
  * Joins the offline-ingested shards (see `scripts/ingest/`) into the engine's
  * `UserVm` catalog, on demand, one region at a time:

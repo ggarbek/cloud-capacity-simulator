@@ -315,7 +315,7 @@ function gpuCount(vm: CatalogEntry): number {
   return m ? Number(m[1]) : 1;
 }
 
-// PERF — `vmFeatures` is pure in `vm` and is the hottest call in the
+// PERF (S65) — `vmFeatures` is pure in `vm` and is the hottest call in the
 // ranking pass: `bestVmMatch`/`topVmMatches`/`vmDistance` recompute it for every
 // candidate on every call, and `rankedFamiliesPerBase` re-scans the same
 // candidate pools once per base family. Since the deduped catalog reuses stable

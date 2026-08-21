@@ -1,5 +1,5 @@
 /**
- * CostOverTimeChart — the keystone the Pricing page was missing. Every
+ * CostOverTimeChart (S65) — the keystone the Pricing page was missing. Every
  * other pricing element is a snapshot of RATES; this is the only view with a
  * TIME axis: cumulative $ from month 0 to 36 per cloud at the selected commitment
  * term, so the reader sees "what will I actually pay over MY horizon" and where

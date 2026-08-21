@@ -33,7 +33,7 @@ function catalogEntry(
     vmGeneration: gen,
     series: 'M-Series',
     memoryCategory: cat,
-    homeHardwareGroup: 'Gen-A MM',
+    homeHardwareGroup: 'Gen-A MM-Std',
     spilloverTarget: 'N/A',
     processor: 'Intel Xeon 4th Gen Scalable',
     vcpus,
@@ -48,7 +48,7 @@ function catalogEntry(
 // PRD §10 scenarios test per-node packing — fleet collapses to 1 Gen-A MM node
 // (4096 GiB, 208 vCPU). Multi-node behaviour is exercised by other tests.
 const genAMmFleet: FleetSpec = {
-  hardwareGroupName: 'Gen-A MM',
+  hardwareGroupName: 'Gen-A MM-Std',
   memoryCategory: 'mm',
   rackCount: 1,
   nodesPerRack: 1,
@@ -376,7 +376,7 @@ describe('Fungibility matrix (v2.4)', () => {
   // these tests (we're exercising the matrix, not the packer).
   const mmFleet: FleetSpec = {
     ...genAMmFleet,
-    hardwareGroupId: 'gen-a-mm',
+    hardwareGroupId: 'gen-a-mm-std',
     rackCount: 2,
     nodesPerRack: 4,
   };
@@ -406,7 +406,7 @@ describe('Fungibility matrix (v2.4)', () => {
       makeInput({
         fleet: mmFleet,
         bom: [{ vmSizeName: 'Standard_M96s_1_v3', quantity: 1 }],
-        fungibilityMatrix: { 'Mv3-MM': { 'gen-a-mm': 0 } },
+        fungibilityMatrix: { 'Mv3-MM': { 'gen-a-mm-std': 0 } },
         vmClassByName: { Standard_M96s_1_v3: 'Mv3-MM' },
       }),
     );
@@ -418,7 +418,7 @@ describe('Fungibility matrix (v2.4)', () => {
       makeInput({
         fleet: mmFleet,
         bom: [{ vmSizeName: 'Standard_M96s_1_v3', quantity: 2 }],
-        fungibilityMatrix: { 'Mv3-MM': { 'gen-a-mm': 'blocked' } },
+        fungibilityMatrix: { 'Mv3-MM': { 'gen-a-mm-std': 'blocked' } },
         vmClassByName: { Standard_M96s_1_v3: 'Mv3-MM' },
       }),
     );
@@ -435,7 +435,7 @@ describe('Fungibility matrix (v2.4)', () => {
         bom: [{ vmSizeName: 'Standard_M96s_1_v3', quantity: 3 }],
         // Matrix has SOME entries (so it counts as authored), but not for
         // this specific (vmClass, hwGroupId) pair.
-        fungibilityMatrix: { 'Mv1-MM': { 'gen-a-mm': 0 } },
+        fungibilityMatrix: { 'Mv1-MM': { 'gen-a-mm-std': 0 } },
         vmClassByName: { Standard_M96s_1_v3: 'Mv3-MM' },
       }),
     );
@@ -455,8 +455,8 @@ describe('Fungibility matrix (v2.4)', () => {
         fleet: mmFleet,
         bom: [{ vmSizeName: 'Standard_M32ts', quantity: 1 }],
         fungibilityMatrix: {
-          'Mv2-MM': { 'gen-a-mm': 0, 'gen-b-hm-mixed': 'blocked' },
-          'Mv2-HM': { 'gen-a-mm': 'blocked', 'gen-b-hm-mixed': 0 },
+          'Mv2-MM': { 'gen-a-mm-std': 0, 'gen-b-hm-mixed': 'blocked' },
+          'Mv2-HM': { 'gen-a-mm-std': 'blocked', 'gen-b-hm-mixed': 0 },
         },
         vmClassByName: {
           Standard_M32ts: 'Mv2-MM',    // Mv2 medium-memory
@@ -472,8 +472,8 @@ describe('Fungibility matrix (v2.4)', () => {
         fleet: mmFleet,
         bom: [{ vmSizeName: 'Standard_M832is_16_v3', quantity: 1 }],
         fungibilityMatrix: {
-          'Mv2-MM': { 'gen-a-mm': 0, 'gen-b-hm-mixed': 'blocked' },
-          'Mv2-HM': { 'gen-a-mm': 'blocked', 'gen-b-hm-mixed': 0 },
+          'Mv2-MM': { 'gen-a-mm-std': 0, 'gen-b-hm-mixed': 'blocked' },
+          'Mv2-HM': { 'gen-a-mm-std': 'blocked', 'gen-b-hm-mixed': 0 },
         },
         vmClassByName: {
           Standard_M832is_16_v3: 'Mv2-HM',
@@ -492,7 +492,7 @@ describe('Fungibility matrix (v2.4)', () => {
       makeInput({
         fleet: { ...mmFleet, homeFor: [], spilloverFrom: [] },
         bom: [{ vmSizeName: 'Standard_M96s_1_v3', quantity: 1 }],
-        fungibilityMatrix: { 'Mv3-MM': { 'gen-a-mm': 0 } },
+        fungibilityMatrix: { 'Mv3-MM': { 'gen-a-mm-std': 0 } },
         vmClassByName: { Standard_M96s_1_v3: 'Mv3-MM' },
       }),
     );

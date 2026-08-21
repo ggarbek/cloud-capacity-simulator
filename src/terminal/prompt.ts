@@ -2,7 +2,7 @@
  * prompt — the Terminal's guardrails + system prompt.
  *
  * This file encodes the user's three HARD CONSTRAINTS
- * ( as actual enforcement:
+ *  as actual enforcement:
  *
  *  1. CAPACITY-SILOED. The assistant answers only over the simulator's own
  *     data — VM specs, rates, regions, equivalency, run results, financials.
@@ -42,7 +42,7 @@ export const SECRET_SAUCE_REFUSAL =
 /** Phrases that signal a request for personal / out-of-silo info. */
 const OUT_OF_SILO_PATTERNS: RegExp[] = [
   /\b(?:my|the user'?s) (?:email|calendar|inbox|messages?|contacts?|files?|photos?|notes?)\b/i,
-  /\b(?:other project|personal|home assistant|email|calendar)\b/i,
+  /\b(?:other project|personal|home assistant|fitness|music|notes|email|calendar)\b/i,
 ];
 
 export function isOutOfSiloQuestion(text: string): boolean {
@@ -114,12 +114,6 @@ export function suggestedQuestions(ctx: PageContext): string[] {
         'Which regions have no equivalent on another cloud?',
         'What is the nearest AWS region to this Azure one?',
         'Which clouds serve this country?',
-      ];
-    case 'getting-started':
-      return [
-        'How current are the VM sizes and rates?',
-        'What is an estimated reserved rate?',
-        'How does the weekly rate refresh work?',
       ];
     default:
       return [

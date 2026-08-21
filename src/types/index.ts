@@ -58,7 +58,7 @@ export interface HardwareGroup {
   coresPerSocket: number | null;
   nodesPerRack: number | null;
   processor: string;
-  /** Heterogeneous racks: per-position memory pattern (e.g. Gen-B HM Mixed).
+  /** Heterogeneous racks: per-position memory pattern (e.g. Gen-B HM-Mixed).
    *  Up to 4 distinct slots per group (UI cap; engine handles any length).
    *  Each slot can optionally be marked as a `utility` node — utility
    *  nodes don't take VM workload (control-plane / management hosts) and
@@ -124,7 +124,7 @@ export interface HardwareGroup {
   // requires knowing the cluster shape (rack count × non-utility node count).
   // Library entries are pure templates; deployment-time concerns live in
   // the Fleet Builder. Persisted v2.18 data is migrated at boot — see
-  //.
+  // the design notes.
 }
 
 export interface UserCpu {
@@ -206,7 +206,7 @@ export interface CatalogEntry {
   remoteStorageMbpsUltra?: number;
   /** Accelerator type — e.g. "None", "NVIDIA A100", "AMD MI300X". */
   acceleratorType?: string;
-  // ── B2 — processor provenance + estimate flags (ACCURACY-FIRST) ──
+  // ── B2 (S64) — processor provenance + estimate flags (ACCURACY-FIRST) ──
   /** When a family is scheduled across two silicon options (host-dependent),
    *  the individual processor strings — e.g. Azure Dv3 = Broadwell + Skylake,
    *  GCP n2 = Cascade Lake + Ice Lake. `processor` carries the combined label;
@@ -325,7 +325,7 @@ export interface RackSlot {
 // Fleet & Hardware Group
 // ────────────────────────────────────────────────────────────────────────
 export interface FleetSpec {
-  hardwareGroupName: string; // e.g. "Gen-A MM"
+  hardwareGroupName: string; // e.g. "Gen-A MM-Std"
   memoryCategory: MemoryCategoryId;
   rackCount: number;
   nodesPerRack: number;
@@ -334,7 +334,7 @@ export interface FleetSpec {
   hyperthreadingEnabled: boolean;
   memoryGibPerNode: number;
   /** Heterogeneous racks: per-position memory pattern, expanded round-robin within each rack.
-   *  e.g. Gen-B HM Mixed = [{8192,2},{16384,1}] → positions 1,2 = 8 TiB; position 3 = 16 TiB.
+   *  e.g. Gen-B HM-Mixed = [{8192,2},{16384,1}] → positions 1,2 = 8 TiB; position 3 = 16 TiB.
    *  When absent, every node uses `memoryGibPerNode`. Counts must sum to `nodesPerRack`.
    *  v2.17.23 — slots may optionally override CPU / network / storage per node. */
   rackComposition?: RackSlot[];
@@ -401,7 +401,7 @@ export interface FleetSpec {
   bufferDefault?: BufferSpec;
   /** v2.19 — Per-node-type buffer overrides, keyed by the slot's
    *  `memoryGibPerNode` (stringified, since `Record<number>` doesn't survive
-   *  JSON round-trips cleanly). Lets heterogeneous racks (e.g. Gen-B HM Mixed
+   *  JSON round-trips cleanly). Lets heterogeneous racks (e.g. Gen-B HM-Mixed
    *  with 2× 8 TiB compute + 1× 16 TiB compute) buffer the 8 TiB tier
    *  differently from the 16 TiB tier. Missing key → falls through to
    *  `bufferDefault`. Utility slots are NEVER buffered (they don't accept
@@ -636,7 +636,7 @@ export type BlockingReason =
    *  any VMs onto this hardware until the user fills in those columns. */
   | 'NO_FUNGIBILITY_DEFINED'
   /** This VM's generation isn't in the cluster's homeFor ∪ spilloverFrom set.
-   *  E.g. running Mv2 BOM against a Gen-C HM Mixed cluster whose homeFor=Mv3 only. */
+   *  E.g. running Mv2 BOM against a Gen-C HM-Mixed cluster whose homeFor=Mv3 only. */
   | 'NOT_FUNGIBLE_TO_HARDWARE'
   /** v2.4: matrix is populated but the (vmClass, hwGroupId) cell is missing.
    *  Surfaces "you have a fungibility matrix but haven't authored a rule for
@@ -698,7 +698,7 @@ export interface UnplaceableEntry {
   /** v2.5: optional human-readable specifics that flesh out `blockingReason`.
    *  Examples:
    *   - MEMORY        → "VM needs 5700 GiB; largest available node has 4096 GiB"
-   *   - OVERFLOWED_ALL_TIERS → "Home Gen-Legacy MM full (1024/1024 GiB); Spill Gen-A MM full (4096/4096 GiB)"
+   *   - OVERFLOWED_ALL_TIERS → "Home Gen-D MM full (1024/1024 GiB); Spill Gen-A MM full (4096/4096 GiB)"
    *   - REGION_MISMATCH      → "VM tagged East US 2; active region is West US 3"
    *   - VM_OVERSIZED_MEMORY  → "VM needs 30400 GiB; no node in any cluster exceeds 16384 GiB"
    *  When absent, the UI falls back to the generic reason copy. */

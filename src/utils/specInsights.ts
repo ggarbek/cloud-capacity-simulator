@@ -90,7 +90,7 @@ export interface ProductInsight {
  * benchmark corroborates the exact number). We surface them as honest caveats so
  * a planner treats them as directional, not guaranteed. The figures may still
  * appear (hedged) in the curated prose; this is the explicit "don't bank on it"
- * disclosure.
+ * disclosure..
  */
 export interface UnverifiedClaim {
   /** Stable id (for keys / dedup). */

@@ -9,7 +9,7 @@
  *                      network / local NVMe / processor / $ per month).
  *   - marketGaps     — the base cloud's regional gaps vs the competitors.
  *   - lineHighlights — (BoM) the few lines that drive cost / where a cloud wins.
- *   - recommendation — the synthesized adopt / stay / validate / watch
+ *   - recommendation — (S66) the synthesized adopt / stay / validate / watch
  *                      bullets a leadership reader acts on. Situational framing
  *                      only — never an unconditional crowned winner.
  *
@@ -395,7 +395,7 @@ export function buildLineHighlights(
   });
 }
 
-// ── recommendation ────────────────────────────────────────────────────
+// ── recommendation (S66) ────────────────────────────────────────────────────
 
 export type RecommendationKind = 'adopt' | 'stay' | 'validate' | 'watch';
 

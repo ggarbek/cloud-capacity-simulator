@@ -1415,7 +1415,7 @@ function ClusterCard({
       </div>
 
       {/* Row 3 — Per-node-type override disclosure, ONLY for heterogeneous
-          racks (e.g. Gen-B HM Mixed — 2× 8 TiB + 1× 16 TiB compute). Homogeneous
+          racks (e.g. Gen-B HM-Mixed — 2× 8 TiB + 1× 16 TiB compute). Homogeneous
           clusters never see this row. */}
       {heterogeneous && (
         <PerNodeTypeOverride
@@ -1432,7 +1432,7 @@ function ClusterCard({
 
 // ────────────────────────────────────────────────────────────────────────
 // v2.19 — Per-node-type Buffer override disclosure. ONLY rendered for
-// heterogeneous racks (e.g. Gen-B HM Mixed with 2× 8 TiB + 1× 16 TiB compute).
+// heterogeneous racks (e.g. Gen-B HM-Mixed with 2× 8 TiB + 1× 16 TiB compute).
 // The cluster-wide default is now authored inline on the ClusterCard row;
 // this component handles only the optional per-memory-tier overrides.
 // ────────────────────────────────────────────────────────────────────────
