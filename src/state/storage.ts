@@ -56,6 +56,53 @@ function safeSet(key: string, data: unknown): void {
   }
 }
 
+/** The one seeded server, present on every fresh profile. Its presence is not
+ *  evidence of anything; anything ALONGSIDE it is. */
+const SEEDED_SAMPLE_SERVER_ID = 'sample-reference-server';
+
+/**
+ * Has this visitor actually used the tool, or merely looked at it?
+ *
+ * Only three things count, and each means work that cannot happen by accident:
+ * a bill of materials was entered, a simulation was run, or a server was built
+ * beyond the seeded sample. Browsing pages, toggling the theme and resizing a
+ * panel are not work — a visitor who did only those should be met by the front
+ * door again, not dropped back wherever they happened to stop scrolling.
+ *
+ * Deliberately NOT counted: `fleetOrder`, which ships holding the default fleet
+ * id and so is never empty, and `userVms`/`userCpus`, which are seeded from the
+ * public catalog at boot.
+ */
+function hasDoneRealWork(p: {
+  bom: AppState['bom'] | null;
+  result: AppState['result'] | null;
+  userHardware: AppState['userHardware'] | null;
+}): boolean {
+  if (p.bom && p.bom.length > 0) return true;
+  if (p.result) return true;
+  if (p.userHardware?.some((h) => h.id !== SEEDED_SAMPLE_SERVER_ID)) return true;
+  return false;
+}
+
+/**
+ * Keep the visitor's harmless preferences, reset only where they land.
+ *
+ * Theme, rail collapse, panel widths and every other cosmetic choice survive —
+ * throwing those away would be its own kind of rude. The three navigation
+ * fields go back to the front door: the Simulator, on Start Here, in the setup
+ * view. Notably this also pulls a returning visitor out of Cloud Market
+ * Analytics, which is the correct default entry point for someone meeting the
+ * project for the first time.
+ */
+function landOnStartHere(ui: AppState['ui']): AppState['ui'] {
+  return {
+    ...ui,
+    activePage: 'simulator',
+    activeSidebarTab: 'start-here',
+    workspaceView: 'setup',
+  };
+}
+
 export function loadPersisted(): Partial<AppState> {
   const bom = safeGet<AppState['bom']>(KEYS.bom);
   const fleets = safeGet<AppState['fleets']>(KEYS.fleets);
@@ -83,7 +130,7 @@ export function loadPersisted(): Partial<AppState> {
   if (packingMode) out.packingMode = packingMode;
   if (fungibilityOn !== null) out.fungibilityOn = fungibilityOn;
   if (result) out.result = result;
-  if (ui) out.ui = ui;
+  if (ui) out.ui = hasDoneRealWork({ bom, result, userHardware }) ? ui : landOnStartHere(ui);
   if (userHardware) out.userHardware = userHardware;
   if (userCpus) out.userCpus = userCpus;
   if (userVms) out.userVms = userVms;

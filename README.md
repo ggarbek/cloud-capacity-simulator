@@ -1,5 +1,13 @@
 # Cloud Capacity Simulator
 
+> [!NOTE]
+> **Proof of concept — active work in progress.** This is not a finished or
+> production-ready planning system, and it is not in production use anywhere.
+> It exists to show how fleet capacity constraints and their economics can be
+> reasoned about end to end. The engine rules and the honesty gates are real
+> and tested; coverage is partial and several surfaces are still being built.
+> Read the numbers as a demonstration of method, not as an operational answer.
+
 **Will this deployment actually land on the fleet we own — and if not, which resource is stopping it?**
 
 That is the question this tool exists to answer. Not "do we have enough memory," not "what's our average utilization," but the real one: does every VM in a committed bill of materials find a node where **memory and vCPU and network bandwidth and storage throughput all clear at the same time** — and when one doesn't, exactly which of those four blocked it, on which node, by how much.

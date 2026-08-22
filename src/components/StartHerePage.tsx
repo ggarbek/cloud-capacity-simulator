@@ -19,7 +19,7 @@ import { useApp } from '../state/AppContext';
 import { useRunSimulation } from '../utils/useRunSimulation';
 import { fetchDemoSnapshot, prepareSnapshotHydrate } from '../utils/demoSnapshot';
 import { VerdictBand } from './compare/ui/VerdictBand';
-import { START_HERE, type StartHereContent } from '../data/help';
+import { PROJECT_STATUS, START_HERE, type StartHereContent } from '../data/help';
 
 /**
  * One click → a populated result.
@@ -129,6 +129,46 @@ export function StartHerePage({
           support={c.lede}
         />
 
+        {/* Project status. Sits under the headline and above the actions so it
+            is read before anything is clicked, and cannot be mistaken for a
+            footnote. Amber, not red — this is scope, not a warning. */}
+        <div
+          style={{
+            marginTop: 14,
+            padding: '11px 14px',
+            border: '1px solid var(--status-warn)',
+            borderRadius: 'var(--radius-md)',
+            background: 'color-mix(in srgb, var(--status-warn) 8%, transparent)',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 10,
+          }}
+        >
+          <span
+            aria-hidden="true"
+            style={{ color: 'var(--status-warn)', fontSize: 13, lineHeight: 1.5, flexShrink: 0 }}
+          >
+            ⚠
+          </span>
+          <div>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+                color: 'var(--status-warn)',
+                marginBottom: 3,
+              }}
+            >
+              Proof of concept · work in progress
+            </div>
+            <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+              {PROJECT_STATUS}
+            </div>
+          </div>
+        </div>
+
         {/* The one action that matters. Kept immediately under the band so it
             is reachable without scrolling on a laptop viewport. */}
         <div className="flex items-center gap-3 flex-wrap" style={{ marginTop: 16 }}>
@@ -194,6 +234,45 @@ export function StartHerePage({
             </li>
           ))}
         </ul>
+
+        <SectionLabel>Assumptions this rests on</SectionLabel>
+        <ol
+          style={{
+            margin: 0,
+            padding: 0,
+            listStyle: 'none',
+            counterReset: 'assumption',
+          }}
+        >
+          {c.assumptions.map((a, i) => (
+            <li
+              key={a}
+              className="flex items-start gap-2.5"
+              style={{
+                fontSize: 13,
+                color: 'var(--text-secondary)',
+                lineHeight: 1.6,
+                marginBottom: 9,
+              }}
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: 'var(--text-dim)',
+                  fontVariantNumeric: 'tabular-nums',
+                  minWidth: 16,
+                  flexShrink: 0,
+                  paddingTop: 2,
+                }}
+              >
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <span>{a}</span>
+            </li>
+          ))}
+        </ol>
 
         <SectionLabel>What each page is for</SectionLabel>
         <div

@@ -52,3 +52,24 @@ vite.config.d.ts
 .claude/worktrees/
 .vercel
 .env*
+
+# ── Public-repo hygiene ─────────────────────────────────────────────────────
+# This repo is public and auto-deploys. Development-process, career and
+# session material lives in the private archive or the local-only working
+# store and must never be committed here. Enforced at commit time by
+# .githooks/pre-commit; these entries stop it being staged in the first place.
+memory/
+efficiency/
+legacy/
+.claude/
+CLAUDE.md
+CLAUDE_HISTORY.md
+CHANGELOG.md
+PRD_ADDENDUM_*.md
+NEXT_SESSION_BRIEF.md
+BACKLOG.md
+RESEARCH_REFRESH.md
+_index.md
+SESSION_*_LEARNINGS.md
+*.docx
+scripts/test-data/

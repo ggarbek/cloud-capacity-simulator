@@ -275,6 +275,10 @@ export interface StartHereContent {
   lede: string;
   /** What it does — planner language, no field names, no engine internals. */
   does: string[];
+  /** The standing assumptions behind every number this half produces. Stated
+   *  on the front page rather than buried, because a capacity answer read
+   *  without its assumptions is worse than no answer. Planner language. */
+  assumptions: string[];
   /** Map of the rail: the gap the README never fills. */
   pages: StartHerePageRow[];
   /** Primary CTA — loads the worked demo and lands on a populated result. */
@@ -284,6 +288,19 @@ export interface StartHereContent {
   buildCta: string;
   buildSub: string;
 }
+
+/**
+ * Project status — rendered at the top of BOTH Start Here pages.
+ *
+ * One constant, deliberately: the two halves must never drift into claiming
+ * different levels of maturity. Reads as a statement of scope, not an apology.
+ */
+export const PROJECT_STATUS =
+  'This is a proof of concept and an active work in progress — not a finished or ' +
+  'production-ready planning system, and not in production use anywhere. It exists to ' +
+  'show how fleet capacity constraints and their economics can be reasoned about end to ' +
+  'end. The engine rules and the honesty gates are real and tested, but coverage is ' +
+  'partial and several surfaces are still being built.';
 
 export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
   simulator: {
@@ -296,6 +313,15 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       'Names the binding constraint for every VM that fails to place, with both numbers stated.',
       'Reports what is left over — stranded capacity across all four dimensions, and how much more you could still absorb.',
       'Costs the fleet: capex and depreciation over usable life, operating cost, margin, and whether payback lands before the hardware is due for retirement.',
+    ],
+    assumptions: [
+      'Nothing lands anywhere you have not allowed it. Fungibility rules decide which VM families may occupy which hardware and in what order — a preferred home first, then spillover. A family with no rule does not place at all, however much room the fleet has.',
+      'A node has to clear every dimension at once. Memory, vCPU, network bandwidth and storage throughput are tested together, and the one that runs out first is the binding constraint — so what governs is the highest utilisation of the four, never the average. A cluster sitting at 55% memory can still be unable to accept a single VM.',
+      'Large VMs are placed first, into the tightest node that still fits. A VM that cannot be placed is recorded with its reason and the run continues, so one oversized request never hides the rest of the answer.',
+      'Very-high-memory classes are treated as isolated: one VM per node, no packing.',
+      'Buffer is withheld before packing starts — either a flat percentage or a fixed node count — so headroom is never counted as usable.',
+      'Leftover capacity is only counted on nodes already holding a VM. Empty and reserved nodes are not reported as stranded.',
+      'Money is list price and straight-line depreciation over the usable life you set. Negotiated discounts and your own amortisation schedule are not modelled.',
     ],
     pages: [
       { label: 'Quick Start', answers: 'Stand up a whole fleet from one form, then run it.' },
@@ -323,6 +349,13 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       'States the compromise instead of hiding it — every match carries a similarity score and a named caveat when it is not a true peer.',
       'Prices it over time: pay-as-you-go against one- and three-year commitments, per region.',
       'Shows where each cloud actually offers the equivalent, and the metros where none does.',
+    ],
+    assumptions: [
+      'Equivalents are computed from published catalog specifications, not a hand-kept mapping table — so they stay correct as new SKUs ship, and every match can be explained rather than asserted.',
+      'A match is scored, not declared. Anything short of a true peer carries its similarity percentage and a named caveat saying exactly what differs.',
+      'Prices are public list rates. Enterprise agreements, committed-use discounts and private pricing are not modelled, and any of them would move every number here.',
+      'Region equivalency is a judgement about geography and latency, not an official vendor mapping. Two clouds naming the same metro do not always mean the same building.',
+      'Every rate carries the date it was pulled. When a refresh is stale it is shown as stale rather than quietly served as current.',
     ],
     pages: [
       { label: 'Comparison Setup', answers: 'Set the base cloud and pick what to compare. Drives every other page.' },

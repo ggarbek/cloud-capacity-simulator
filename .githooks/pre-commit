@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+#
+# Public-repo safety gate.
+#
+# This repository is public and is the working target: commits land here and
+# deploy to a public URL within a minute. The private repo is an archive, so
+# there is no longer a scrubbing sync step standing between a mistake and the
+# internet. This hook is what replaced it.
+#
+# Two independent checks, both over STAGED content only:
+#   1. paths   — files that must never exist in a public repo at all
+#   2. content — strings that must never appear in one
+#
+# FAILS CLOSED. A grep that errors blocks the commit rather than waving it
+# through; an unusable check is treated as a failed check, never a passed one.
+# (Learned the hard way: an earlier revision used a pattern beginning "-----",
+# which BSD grep parsed as options, and the check silently passed everything.)
+#
+# Install (once per clone):   git config core.hooksPath .githooks
+# Verify:                     git config --get core.hooksPath
+#
+# A genuine false positive is fixed by narrowing a pattern below, never by
+# reaching for --no-verify. Bypassing this publishes unreviewed content.
+
+set -uo pipefail
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -z "$staged" ] && exit 0
+
+fail=0
+
+# ── 1. Forbidden paths ──────────────────────────────────────────────────────
+# Development-process and career material. Each of these lives in the private
+# archive or the local-only working store, never here.
+PATHS='^memory/|^efficiency/|^legacy/|^\.claude/|^CLAUDE.*\.md$|^CHANGELOG\.md$|^PRD_ADDENDUM|^NEXT_SESSION_BRIEF|^_index\.md$|^BACKLOG\.md$|^RESEARCH_REFRESH|^SESSION_.*LEARNINGS|^DESIGN\.md$|^PRODUCT\.md$|^RATE_COVERAGE\.md$|^docs/S66_CONTRACT|^scripts/test-data/|\.docx$|\.vercel/|^\.env'
+
+bad_paths=$(printf '%s\n' "$staged" | grep -E -e "$PATHS")
+rc=$?
+if [ "$rc" -gt 1 ]; then
+  echo "✖ BLOCKED — the path check could not run (grep exit $rc). Failing closed."
+  fail=1
+elif [ -n "$bad_paths" ]; then
+  echo "✖ BLOCKED — these paths must not exist in the public repo:"
+  printf '    %s\n' $bad_paths
+  echo "  They belong in the private archive or the local-only store."
+  fail=1
+fi
+
+# ── 2. Forbidden content ────────────────────────────────────────────────────
+# Employer-internal hardware and system codenames, customer and colleague
+# names, personal filesystem paths, AI-process residue, and credentials.
+#
+# Tuned against the real corpus: "Gen2"/"Gen4" (NVIDIA, PCIe) and the
+# "vCPU/memory/network" slash are legitimate and must NOT match. "VHM" and
+# "Standard_M896*" are public Azure vocabulary and are deliberately allowed.
+#
+# No pattern may begin with a dash — see the header note.
+CONTENT='\bGen[- ]?(6|7|9|11|12)\b|\bgen-?(6|7|9)[-.]|HM8S|hm8s|MM2S|mm2s|\bCMAS\b|Hylander|Concordia|WACAP|\bAIOS\b|\baios\b|ggarbek@|All rights reserved|/Users/gabe|Mobile Documents|\[\[[a-z_]+\]\]|future-Claude|CLAUDE\.md|CLAUDE_HISTORY|PRD_ADDENDUM|NEXT_SESSION_BRIEF|BlackRock|\b1ES\b|sk-ant-|AKIA[0-9A-Z]{16}|BEGIN [A-Z ]*PRIVATE KEY'
+
+# Added lines only (a leading '+' that is not the '+++' file header).
+#
+# This hook and .gitignore are exempt from the CONTENT check, and only from
+# that one — they exist to enumerate the forbidden strings, so scanning them
+# for those strings blocks every edit to the guard itself. Both remain subject
+# to the PATH check, both are small, and both should be read closely in review;
+# that review is what stands in for the automated check here.
+added=$(git diff --cached -U0 -- . ':(exclude).githooks/pre-commit' ':(exclude).gitignore' \
+  | grep -E -e '^\+' | grep -v -e '^+++')
+hits=$(printf '%s\n' "$added" | grep -E -n -e "$CONTENT")
+rc=$?
+if [ "$rc" -gt 1 ]; then
+  echo "✖ BLOCKED — the content check could not run (grep exit $rc). Failing closed."
+  fail=1
+elif [ -n "$hits" ]; then
+  echo "✖ BLOCKED — staged changes add text that must not be published:"
+  printf '%s\n' "$hits" | head -20 | sed 's/^/    /'
+  echo "  Remove it, or narrow the pattern in .githooks/pre-commit if it is a false positive."
+  fail=1
+fi
+
+if [ "$fail" -ne 0 ]; then
+  echo
+  echo "Nothing was committed."
+  exit 1
+fi
+
+exit 0

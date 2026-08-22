@@ -462,8 +462,8 @@ export function runMulti(
   //
   // Sum-based admissibility is the cheap necessary check; the per-cluster
   // engine run still has final say on per-VM bin-pack fit. Pathological
-  // bin-pack fragmentation (sum says yes, packing says no) is a follow-on
-  // — see NEXT_SESSION_BRIEF post-v2.4.2 punch list.
+  // bin-pack fragmentation (sum says yes, packing says no) is a known
+  // follow-on, not yet handled here.
   //
   // Falls back to the legacy fleet-acceptance check when the matrix isn't
   // populated (custom/manual fleets without `hardwareGroupId`).
