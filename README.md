@@ -98,9 +98,15 @@ Oversize checks run as a **pre-flight**, before packing starts, so a VM that is 
 ---
 ## Cloud Market Analytics
 
-**Cloud Market Analytics** is the other half of the tool, and it ships in the same app. The simulator answers *"will this land on the fleet we own?"* — Cloud Market Analytics answers the sourcing question that follows: **what should run where, on which cloud, in which region, at what cost, and what do we give up by moving it?**
+**Cloud Market Analytics** is the other half of the tool, and it ships in the same app. It answers three questions.
 
-Those are two views of one decision. Demand that will not fit the owned fleet has to go somewhere, and "somewhere" carries a price, a region footprint and a spec compromise. Answering feasibility without answering sourcing leaves the planner where they started.
+**What is the closest equivalent for this VM on every other cloud, how does it actually compare, and what is the cost delta?** The clouds publish no cross-reference, and the shapes genuinely differ, so the equivalent has to be computed before it can be priced — vCPU, memory, memory-per-vCPU, architecture, accelerators — and the result carries a similarity percentage rather than an assertion.
+
+**Where are the market gaps between clouds for the same offering?** Which metros one cloud serves and another simply does not reach, and which lines of a demand have no acceptable equivalent anywhere. A gap is an answer, and it is reported rather than dropped from a total.
+
+**If I took this exact workload and ran the equivalent somewhere else, what would I save and what would I sacrifice?** Both halves of that trade, stated together: the cost delta across pay-as-you-go and one- and three-year commitments, against the named spec compromise — fewer vCPUs, a different architecture, less local NVMe, no published GPU spec. A saving that hides what it cost you is not a saving.
+
+That is the sourcing question the simulator raises but cannot answer. Demand that will not fit the owned fleet has to go somewhere, and "somewhere" carries a price, a region footprint and a spec compromise. Answering feasibility without answering sourcing leaves the planner where they started.
 
 ![Cloud Market Analytics](docs/images/market-analytics.png)
 

@@ -494,28 +494,22 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
     ],
     answers: [
       {
-        lead: 'Equivalence',
-        body: 'The closest real size on each cloud, computed from published catalog specifications rather than a hand-kept table.',
+        lead: 'The closest equivalent, and how it really compares.',
+        body:
+          'For a VM size or a whole bill of materials, the nearest real size on each of the other clouds — computed from published specifications on vCPU, memory, memory-per-vCPU, architecture and accelerators — carrying a similarity percentage rather than an assertion, plus the cost delta against what you run today.',
         learnMore: { label: 'How matching works', target: 'similarity' },
       },
       {
-        lead: 'Compromise',
-        body: 'What you give up in the move — the similarity score, and a named caveat whenever a match is not a true peer.',
-        learnMore: { label: 'What the percentage means', target: 'similarity' },
-      },
-      {
-        lead: 'Cost',
-        body: 'What it costs over time: pay-as-you-go against one- and three-year commitments, per region, for one size or a whole bill of materials.',
-        learnMore: { label: 'How pricing is calculated', target: 'pricing' },
-      },
-      {
-        lead: 'Footprint',
-        body: 'Where each cloud actually offers the equivalent, and which metros it never reaches.',
+        lead: 'Where the market has gaps.',
+        body:
+          'Which metros one cloud serves and another simply does not reach, and which lines of your demand have no acceptable equivalent anywhere. A gap is an answer, and it is reported rather than quietly dropped from a total.',
         learnMore: { label: 'How region availability works', target: 'region' },
       },
       {
-        lead: 'Gaps',
-        body: 'The lines with no acceptable equivalent anywhere. A gap is an answer too, and it is reported rather than dropped from the total.',
+        lead: 'What the switch would actually cost you.',
+        body:
+          'If you moved this exact workload and ran the equivalent elsewhere: how much you would save across pay-as-you-go and one- and three-year commitments, set against what you would give up — fewer vCPUs, a different architecture, less local NVMe, an unpublished GPU spec. Both halves of the trade, stated together, because a saving that hides what it cost is not a saving.',
+        learnMore: { label: 'How pricing is calculated', target: 'pricing' },
       },
     ],
     assumptions: [
