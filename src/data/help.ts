@@ -348,17 +348,26 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       'Not “do we have enough memory,” and not “what is our average utilization.” The real question is whether every VM in a committed bill of materials finds a node where memory, vCPU, network bandwidth and storage throughput all clear at the same time — and when one does not, exactly which of those four blocked it, on which node, by how much.',
     problem: [
       {
-        lead: 'Over-buying is expensive quietly.',
-        body: 'You carry depreciation on nodes that never fill, and nothing on a dashboard flags it.',
-      },
-      {
-        lead: 'Under-buying strands demand you already committed to.',
-        body: 'The workload is promised before the capacity is proven, and the shortfall surfaces late.',
-      },
-      {
-        lead: 'The gap between them is a packing problem, not a forecasting one.',
+        lead: 'A deployment is not blocked by "capacity" — it is blocked by one resource, on one node.',
         body:
-          'Fleet-level averages cannot see it. A cluster can sit at 55% memory utilisation and still be unable to accept a single additional VM, because vCPU zeroed out or the leftover sliver is too small for anything allowed to run there.',
+          'Memory, vCPU, network bandwidth and storage throughput run out at different rates, and whichever hits zero first is the one that stops you. A fleet-level average cannot see that, and neither can a spreadsheet dividing total demand by total capacity.',
+      },
+      {
+        lead: 'Real allocators follow rules, not arithmetic.',
+        body:
+          'Placement is shaped by zone, by which VM families are permitted on which hardware and in what order, by isolation requirements, and by buffer withheld before packing starts. This simulates that logic under the rules you set, rather than assuming demand lands wherever there happens to be room.',
+        learnMore: { label: 'How routing rules work', target: 'fungibility' },
+      },
+      {
+        lead: 'Being wrong costs money in both directions, and both get quantified.',
+        body:
+          'Demand you cannot place is revenue you cannot serve. Capacity you never fill is depreciation on hardware that ages whether or not it earns. The same run reports the blocked side and the stranded side, in dollars.',
+        learnMore: { label: 'How the economics are calculated', target: 'pricing-basis' },
+      },
+      {
+        lead: 'It runs on your fleet, not a reference one.',
+        body:
+          'Define your own hardware down to the node shape, place it into regions and zones, load the bill of materials you actually committed to, and price the result against published vendor rates. Nothing here assumes a stock fleet you do not own.',
       },
     ],
     answers: [
@@ -467,14 +476,20 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
         body: 'Answering feasibility without answering sourcing leaves the planner exactly where they started.',
       },
       {
-        lead: 'The clouds do not publish a cross-reference.',
+        lead: 'The clouds publish no cross-reference.',
         body:
-          'There is no canonical mapping between an Azure size, an AWS instance and a GCP machine type, and the shapes genuinely differ — so a like-for-like price comparison has to be computed before it can be trusted.',
+          'There is no canonical mapping between an Azure size, an AWS instance and a GCP machine type, and the shapes genuinely differ — so a like-for-like comparison has to be computed before it can be priced, let alone trusted.',
       },
       {
         lead: 'A comparison that hides its compromises is worse than none.',
         body:
           'A 62% match and a 96% match are different answers, and a total assembled from partly-priced lines is not a total. Both get stated rather than smoothed over.',
+      },
+      {
+        lead: 'The rates are real and public.',
+        body:
+          'Every price here comes from published vendor list pricing, dated in the app so it can be checked, rather than from an estimate or a stale internal sheet.',
+        learnMore: { label: 'Where the data comes from', target: 'data' },
       },
     ],
     answers: [

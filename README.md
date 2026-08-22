@@ -21,13 +21,15 @@ The app has two halves. The **Capacity Simulator** packs committed demand onto o
 ---
 ## The problem this solves
 
-Capacity planning fails in two directions, and both are expensive.
+**A deployment is not blocked by "capacity." It is blocked by one specific resource, on one specific node.** Memory, vCPU, network bandwidth and storage throughput run out at different rates, and whichever hits zero first is the one that stops you. A fleet-level average cannot see that, and neither can a spreadsheet dividing total demand by total capacity — both will tell you a deployment fits when it doesn't, and neither can tell you why.
 
-**Over-buy** and you carry depreciation on nodes that never fill. **Under-buy** and you strand demand you already committed to. The gap between those outcomes is usually not a forecasting problem — it's a packing problem, and it's invisible at the altitude most planning is done.
+**Real allocators follow rules, not arithmetic.** Placement is shaped by zone, by which VM families are permitted on which hardware and in what order, by isolation requirements, and by buffer withheld before packing begins. This simulates that logic under the rules you set, rather than assuming demand lands wherever there happens to be room.
 
-The third failure mode is quieter and worse: a model that produces a confident number from data it doesn't actually have. A missing rate becomes a zero, an unmatched line item silently drops out of a total, and a savings recommendation reaches senior leadership built on a comparison where one side was only two-thirds priced.
+**Being wrong costs money in both directions, and the tool quantifies both.** Demand you cannot place is revenue you cannot serve. Capacity you never fill is depreciation on hardware that ages whether or not it earns. A single run reports the blocked side and the stranded side, in dollars.
 
-This tool answers the first two concretely and structurally refuses the third.
+**It runs on your fleet, not a reference one.** Define your own hardware down to the node shape, place it into regions and availability zones, load the bill of materials you actually committed to, and price the result against published vendor list rates. Nothing here assumes a stock fleet you don't own.
+
+There is a third failure mode, quieter than the other two: a model that produces a confident number from data it doesn't actually have. A missing rate becomes a zero, an unmatched line item silently drops out of a total, and a savings recommendation reaches senior leadership built on a comparison where one side was only two-thirds priced. This tool answers the first two concretely and [structurally refuses the third](#it-refuses-to-state-a-number-it-cant-defend).
 
 ---
 ## What it answers
