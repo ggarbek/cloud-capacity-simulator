@@ -350,20 +350,26 @@ export const PROJECT_STATUS =
  *
  * The two halves answer adjacent questions and are easy to confuse, so the
  * distinction is defined ONCE and rendered identically on both Start Here
- * pages. The dividing line is ownership: the simulator reasons about hardware
- * you own and control; Cloud Market Analytics reasons about capacity you would
- * rent from someone else. Never let the two pages describe this differently.
+ * pages.
+ *
+ * The dividing line is SCOPE, not ownership. The simulator reasons about one
+ * concrete fleet against one concrete deployment; Cloud Market Analytics
+ * reasons about the published market across providers. Ownership is the wrong
+ * axis — the fleet being modelled is often one the operator sells capacity
+ * from rather than rents, and the market view is as useful for benchmarking
+ * your own offering as for shopping. Never let the two pages describe this
+ * differently.
  */
 export const TOOL_SPLIT: Record<'simulator' | 'cma', { title: string; when: string }> = {
   simulator: {
-    title: 'Capacity Simulator — hardware you own',
+    title: 'Capacity Simulator — one fleet, one deployment',
     when:
-      'Use it when the fleet already exists or is being bought: will this demand fit, where does it break, how much more could it hold, and does the economics work.',
+      'Use it when the question is about specific hardware and specific demand: will this land, which resource stops it, how much capacity is left over, and what the economics look like.',
   },
   cma: {
-    title: 'Cloud Market Analytics — capacity you would rent',
+    title: 'Cloud Market Analytics — the published market',
     when:
-      'Use it to compare clouds on published data: the closest equivalent for a size or a whole demand, what it costs, where each provider can actually run it, and what a switch would give up.',
+      'Use it when the question is about how the clouds compare: the closest equivalent for a VM size or a whole demand, how the specifications differ, the cost delta, and where the market has a gap.',
   },
 };
 
@@ -375,50 +381,45 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       'Not “do we have enough memory,” and not “what is our average utilization.” The real question is whether every VM in a committed bill of materials finds a node where memory, vCPU, network bandwidth and storage throughput all clear at the same time — and when one does not, exactly which of those four blocked it, on which node, by how much.',
     problem: [
       {
-        lead: 'Nobody publishes a cross-reference.',
+        lead: 'A utilisation average cannot tell you whether the next VM fits.',
         body:
-          'There is no canonical mapping between an Azure size, an AWS instance and a GCP machine type, and the shapes genuinely differ. The equivalent has to be computed before anything can be compared, let alone priced.',
+          'Half-empty on the dashboard and unable to accept another VM are routinely both true of the same cluster, because the resource that runs out first is not the one being averaged.',
       },
       {
-        lead: 'Price alone does not tell you what you are buying.',
+        lead: 'Demand gets committed before the fleet is proven able to hold it.',
         body:
-          'A cheaper size with fewer vCPUs, a different CPU architecture or no local NVMe is not the same product. Comparing rates without comparing shape produces a saving that does not survive contact with the workload.',
+          'The bill of materials is agreed with a date attached. Whether it lands is discovered later, when the cheap ways to fix it have gone.',
       },
       {
-        lead: 'Coverage is part of the answer.',
+        lead: 'Shortfall and spare capacity are the same blind spot.',
         body:
-          'A cloud that does not serve the metro is not an option at any price. Where each provider can actually run the equivalent is a constraint on the decision, not a footnote to it.',
-      },
-      {
-        lead: 'The rates are real and public.',
-        body:
-          'Every price comes from published vendor list pricing, dated in the app so it can be checked, rather than from an estimate or a stale internal sheet.',
-        learnMore: { label: 'Where the data comes from', target: 'data' },
+          'Neither is visible until a specific deployment is tested against a specific fleet, and both cost money every month they go unnoticed — one as demand you cannot serve, the other as hardware depreciating unused.',
       },
     ],
     answers: [
       {
-        lead: 'Does this fleet investment make sense?',
+        lead: 'The closest equivalent.',
         body:
-          'What the fleet costs to run against what it earns — depreciation and operating cost, gross margin against the target you set, and whether payback lands inside the usable life of the hardware rather than after it retires.',
-        learnMore: { label: 'Pricing basis (PAYG / RI)', target: 'pricing-basis' },
+          'For one VM size or a whole bill of materials, the nearest real size each other cloud offers — derived from published specifications, not a hand-kept mapping, so it stays correct as new SKUs ship.',
+        learnMore: { label: 'How matching works', target: 'similarity' },
       },
       {
-        lead: 'Is this deployment supportable on current capacity?',
+        lead: 'How they compare.',
         body:
-          'Whether every VM in the committed demand finds a node, at what utilisation, and with how much capacity left stranded.',
+          'Where the equivalent differs and by how much: vCPU, memory, memory per vCPU, CPU architecture, local storage, network. A similarity percentage, and a named caveat whenever the match is not a true peer.',
+        learnMore: { label: 'Reading the numbers', target: 'markers' },
       },
       {
-        lead: 'Where are we blocked, and why?',
+        lead: 'The cost delta.',
         body:
-          'For every VM that fails to place: which of the four constraints stopped it, on which node, and by how much — including the difference between "this cluster cannot take it" and "no node anywhere ever could", because those are different decisions.',
-        learnMore: { label: 'Hardware, nodes & racks', target: 'hardware-nodes-racks' },
+          'What the equivalent costs against what you run today, across pay-as-you-go and one- and three-year commitments, per region and over time.',
+        learnMore: { label: 'How pricing is calculated', target: 'pricing' },
       },
       {
-        lead: 'How much more can we sell on this fleet?',
+        lead: 'The market gaps.',
         body:
-          'A defensible ceiling on the capacity still unused — what else would fit alongside what is already running, and what it would be worth.',
-        learnMore: { label: 'Sellable capacity & headroom', target: 'sellable-headroom' },
+          'Where no provider has an acceptable answer — a metro one cloud does not reach, a category with no peer, a line of demand nothing matches. Reported as a result, never dropped from a total.',
+        learnMore: { label: 'How region availability works', target: 'region' },
       },
     ],
     assumptions: [
@@ -456,7 +457,7 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       },
     ],
     answersFootnote:
-      'And the demand that did not fit is the fifth thing this produces — a sourcing list. The simulator decides what has to go elsewhere; pricing that move is what the other half is for.',
+      'Whatever could not be placed is, in effect, a shortlist of work that has to run somewhere else. Deciding that is this side of the tool; comparing where it could go is the other.',
     dataNote:
       'Your fleet, VM catalog and demand can be typed in or loaded from a spreadsheet. Everything runs in your browser: no account, and nothing you load is uploaded anywhere.',
     pages: [
@@ -494,29 +495,29 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
   },
   cma: {
     question:
-      'What are the closest equivalents across clouds, how do they compare, and what is the cost delta?',
+      'What are the closest VM equivalents across clouds, how do they compare, what are the cost deltas, and where are the market gaps?',
     lede:
-      'Cross-cloud comparison on published data. No vendor publishes a mapping between an Azure size, an AWS instance and a GCP machine type, so the equivalent has to be computed before it can be compared or priced at all. This half does that for a single VM or an entire bill of materials: the nearest real size on each cloud, how it differs, what it costs across commitment terms, and which metros a cloud cannot reach.',
+      'Cross-cloud VM comparison on published data, for a single size or an entire bill of materials. Four outputs: the nearest real equivalent on each cloud, how it differs in specification, what it costs across commitment terms, and where the market has a gap no provider fills.',
     problem: [
       {
-        lead: 'Demand that will not fit has to go somewhere.',
-        body: 'Answering feasibility without answering sourcing leaves the planner exactly where they started.',
+        lead: 'A vendor calculator can only price its own catalog.',
+        body:
+          'It will tell you what an AWS instance costs on AWS. It will not tell you which AWS instance corresponds to the Azure size you actually run — the one comparison that matters is the one no vendor has an incentive to build.',
       },
       {
-        lead: 'The clouds publish no cross-reference.',
+        lead: 'Eyeballing vCPU and memory is how bad matches get made.',
         body:
-          'There is no canonical mapping between an Azure size, an AWS instance and a GCP machine type, and the shapes genuinely differ — so a like-for-like comparison has to be computed before it can be priced, let alone trusted.',
+          'Two sizes with the same headline numbers can differ in CPU architecture, memory ratio, local storage and network ceiling — the things that decide whether the workload actually runs, and none of which show up in a two-column comparison.',
       },
       {
-        lead: 'A comparison that hides its compromises is worse than none.',
+        lead: 'A cloud you cannot deploy into is not a cheaper cloud.',
         body:
-          'A 62% match and a 96% match are different answers, and a total assembled from partly-priced lines is not a total. Both get stated rather than smoothed over.',
+          'Price comparisons routinely ignore whether the provider offers that size in the regions you are bound to, which turns an apparent saving into an option that was never available.',
       },
       {
-        lead: 'The rates are real and public.',
+        lead: 'Gaps only appear when you look across providers at once.',
         body:
-          'Every price here comes from published vendor list pricing, dated in the app so it can be checked, rather than from an estimate or a stale internal sheet.',
-        learnMore: { label: 'Where the data comes from', target: 'data' },
+          'Where nobody has an acceptable answer — for a category, a size class or a whole metro — that absence is itself the finding, and it is invisible from inside any single vendor catalog.',
       },
     ],
     answers: [

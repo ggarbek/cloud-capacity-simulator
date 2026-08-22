@@ -4963,7 +4963,7 @@ const COMPETITIVE_TAB_TITLE: Record<CompetitiveTab, string> = {
 };
 const COMPETITIVE_TAB_BLURB: Record<CompetitiveTab, string> = {
   'start-here':
-    'What cross-cloud sourcing question this half answers, what each page here is for, and a worked example in one click.',
+    'What this half compares, what each page here is for, and a worked example in one click.',
   setup:
     'Set the base cloud, choose a focus, and pick a VM — one shared config that drives every comparison and region view.',
   'executive-summary':
