@@ -51,6 +51,7 @@ import { CrossCloudCompare } from './CrossCloudCompare';
 import { VmEquivalencyTable } from './VmEquivalencyTable';
 import { RegionEquivalencyTable } from './RegionEquivalencyTable';
 import { CompetitiveMap, type MapMark } from './CompetitiveMap';
+import { PanelErrorBoundary } from './PanelErrorBoundary';
 
 type Provider = 'Azure' | 'AWS' | 'GCP';
 const PROVIDERS: Provider[] = ['Azure', 'AWS', 'GCP'];
@@ -1450,7 +1451,9 @@ export function RegionAvailabilityPage({
           category / family / size to scope the footprint).
         </div>
       ) : whereView === 'map' ? (
-        <CompetitiveMap marks={mapMarks} />
+        <PanelErrorBoundary label="The region map">
+          <CompetitiveMap marks={mapMarks} />
+        </PanelErrorBoundary>
       ) : (
         <RegionRoster bySg={roster.bySg} total={roster.total} />
       )}
