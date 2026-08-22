@@ -19,7 +19,13 @@ import { useApp } from '../state/AppContext';
 import { useRunSimulation } from '../utils/useRunSimulation';
 import { fetchDemoSnapshot, prepareSnapshotHydrate } from '../utils/demoSnapshot';
 import { VerdictBand } from './compare/ui/VerdictBand';
-import { PROJECT_STATUS, START_HERE, type StartHereContent } from '../data/help';
+import {
+  PROJECT_STATUS,
+  START_HERE,
+  type StartHereBullet,
+  type StartHereContent,
+  type StartHereLink,
+} from '../data/help';
 
 /**
  * One click → a populated result.
@@ -65,6 +71,48 @@ function useSeeItWork(): { go: () => Promise<void>; busy: boolean; error: string
 /** The proven walkthrough baseline — the SKU the CMA pages were verified on. */
 const CMA_DEMO_SKU = 'Standard_E8s_v5';
 
+/**
+ * The depth link a bullet can carry. Inline with the prose rather than on its
+ * own row, so a bullet the reader is happy with reads as one sentence and the
+ * link is only noticed by someone who wanted more.
+ */
+function LearnMore({ link, onOpen }: { link: StartHereLink; onOpen: (target: string) => void }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(link.target)}
+      style={{
+        display: 'inline',
+        marginLeft: 6,
+        padding: 0,
+        border: 'none',
+        background: 'transparent',
+        color: 'var(--interactive)',
+        font: 'inherit',
+        fontWeight: 600,
+        cursor: 'pointer',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {link.label} →
+    </button>
+  );
+}
+
+/**
+ * The house bullet: a bold topic phrase carrying the takeaway, then the
+ * explanation. Reading only the bold leads should still give the argument.
+ */
+function BulletText({ item, onOpen }: { item: StartHereBullet; onOpen: (target: string) => void }) {
+  return (
+    <span>
+      <strong style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{item.lead}</strong>{' '}
+      {item.body}
+      {item.learnMore && <LearnMore link={item.learnMore} onOpen={onOpen} />}
+    </span>
+  );
+}
+
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div
@@ -86,16 +134,38 @@ export function StartHerePage({
   kind,
   onGoDemo,
   onGoBuild,
+  onOpenFaq,
 }: {
   kind: 'simulator' | 'cma';
   /** CMA only — CompetitivePage owns its tab in local state, so it hands down
    *  the navigation rather than this page reaching for a global. */
   onGoDemo?: () => void;
   onGoBuild?: () => void;
+  /** CMA only — opens the FAQ & Glossary at a section id, same helper the
+   *  public-data pill uses. Simulator depth links go through the reducer
+   *  instead, so this stays optional. */
+  onOpenFaq?: (section: string) => void;
 }) {
   const { dispatch } = useApp();
   const c: StartHereContent = START_HERE[kind];
   const sim = useSeeItWork();
+
+  /**
+   * Where a bullet's depth link lands. The two halves keep their depth in
+   * different places: the simulator's Glossary is a sidebar tab reached through
+   * the reducer (the same dispatch `SetupIntro` uses), while the CMA FAQ is a
+   * local tab on CompetitivePage, so that one is handed down as a prop.
+   */
+  const openDepth = (target: string) => {
+    if (kind === 'simulator') {
+      dispatch({
+        type: 'UI_SET',
+        ui: { activeSidebarTab: 'glossary', workspaceView: 'setup', helpConcept: target },
+      });
+      return;
+    }
+    onOpenFaq?.(target);
+  };
 
   const onSeeItWork = () => {
     if (kind === 'simulator') {
@@ -223,14 +293,14 @@ export function StartHerePage({
         <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
           {c.does.map((d) => (
             <li
-              key={d}
+              key={d.lead}
               className="flex items-start gap-2.5"
               style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 8 }}
             >
               <span aria-hidden="true" style={{ color: 'var(--interactive)', flexShrink: 0 }}>
                 ●
               </span>
-              <span>{d}</span>
+              <BulletText item={d} onOpen={openDepth} />
             </li>
           ))}
         </ul>
@@ -246,7 +316,7 @@ export function StartHerePage({
         >
           {c.assumptions.map((a, i) => (
             <li
-              key={a}
+              key={a.lead}
               className="flex items-start gap-2.5"
               style={{
                 fontSize: 13,
@@ -269,7 +339,7 @@ export function StartHerePage({
               >
                 {String(i + 1).padStart(2, '0')}
               </span>
-              <span>{a}</span>
+              <BulletText item={a} onOpen={openDepth} />
             </li>
           ))}
         </ol>

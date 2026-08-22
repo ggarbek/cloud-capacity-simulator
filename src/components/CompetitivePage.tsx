@@ -4865,6 +4865,7 @@ export function CompetitivePage({
       kind="cma"
       onGoDemo={() => setCompetitiveTab('executive-summary')}
       onGoBuild={() => setCompetitiveTab('setup')}
+      onOpenFaq={openFaqAt}
     />
   ) : competitiveTab === 'setup' ? (
     setupPage

@@ -268,17 +268,46 @@ export interface StartHerePageRow {
   answers: string;
 }
 
+/**
+ * Where a bullet sends a reader who wants the depth behind it.
+ *
+ * `target` is resolved by the surface that renders it, because the two halves
+ * of the suite keep their depth in different places: on the simulator it is a
+ * `CONCEPTS` id (opened in the Glossary), on Cloud Market Analytics it is a
+ * section id in the FAQ & Glossary page.
+ */
+export interface StartHereLink {
+  /** Link text, written as the thing you will learn — not "learn more". */
+  label: string;
+  /** Simulator: a `CONCEPTS` id. CMA: a FAQ & Glossary section id. */
+  target: string;
+}
+
+/**
+ * One Start Here bullet, in the house style: a short bold topic phrase that
+ * carries the takeaway on its own, then the explanation behind it. A reader
+ * skimming only the leads should still come away with the argument.
+ */
+export interface StartHereBullet {
+  /** The takeaway, rendered bold. A statement, never a label. */
+  lead: string;
+  /** The explanation that earns the lead. */
+  body: string;
+  /** Optional pointer to the fuller account. Not every bullet needs one. */
+  learnMore?: StartHereLink;
+}
+
 export interface StartHereContent {
   /** The question this half of the suite exists to answer. */
   question: string;
   /** Two or three sentences of framing, README register. */
   lede: string;
   /** What it does — planner language, no field names, no engine internals. */
-  does: string[];
+  does: StartHereBullet[];
   /** The standing assumptions behind every number this half produces. Stated
    *  on the front page rather than buried, because a capacity answer read
    *  without its assumptions is worse than no answer. Planner language. */
-  assumptions: string[];
+  assumptions: StartHereBullet[];
   /** Map of the rail: the gap the README never fills. */
   pages: StartHerePageRow[];
   /** Primary CTA — loads the worked demo and lands on a populated result. */
@@ -309,19 +338,59 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
     lede:
       'Not “do we have enough memory,” and not “what is our average utilization.” The real question is whether every VM in a committed bill of materials finds a node where memory, vCPU, network bandwidth and storage throughput all clear at the same time — and when one does not, exactly which of those four blocked it, on which node, by how much.',
     does: [
-      'Packs committed demand onto hardware you describe, node by node, and tells you whether it fits.',
-      'Names the binding constraint for every VM that fails to place, with both numbers stated.',
-      'Reports what is left over — stranded capacity across all four dimensions, and how much more you could still absorb.',
-      'Costs the fleet: capex and depreciation over usable life, operating cost, margin, and whether payback lands before the hardware is due for retirement.',
+      {
+        lead: 'It answers fit, not averages.',
+        body: 'A committed bill of materials is placed onto the hardware you describe, one node at a time, and the run reports whether every VM in it found somewhere to land.',
+        learnMore: { label: 'How nodes and racks are modelled', target: 'hardware-nodes-racks' },
+      },
+      {
+        lead: 'Every failure comes back with a named cause.',
+        body: 'A VM that cannot place is reported with the dimension that stopped it and both sides of the number — what it asked for, and what was left.',
+      },
+      {
+        lead: 'Leftover capacity is treated as money, so it is measured.',
+        body: 'The run reports what is stranded across all four dimensions, and how much more demand the fleet could still absorb exactly as it stands today.',
+        learnMore: { label: 'Sellable capacity & headroom', target: 'sellable-headroom' },
+      },
+      {
+        lead: 'Feasibility is costed, not just declared.',
+        body: 'Capex and depreciation over the usable life you set, operating cost, margin, and whether payback lands before the hardware is due for retirement.',
+        learnMore: { label: 'Pricing basis (PAYG / RI)', target: 'pricing-basis' },
+      },
     ],
     assumptions: [
-      'Nothing lands anywhere you have not allowed it. Fungibility rules decide which VM families may occupy which hardware and in what order — a preferred home first, then spillover. A family with no rule does not place at all, however much room the fleet has.',
-      'A node has to clear every dimension at once. Memory, vCPU, network bandwidth and storage throughput are tested together, and the one that runs out first is the binding constraint — so what governs is the highest utilisation of the four, never the average. A cluster sitting at 55% memory can still be unable to accept a single VM.',
-      'Large VMs are placed first, into the tightest node that still fits. A VM that cannot be placed is recorded with its reason and the run continues, so one oversized request never hides the rest of the answer.',
-      'Very-high-memory classes are treated as isolated: one VM per node, no packing.',
-      'Buffer is withheld before packing starts — either a flat percentage or a fixed node count — so headroom is never counted as usable.',
-      'Leftover capacity is only counted on nodes already holding a VM. Empty and reserved nodes are not reported as stranded.',
-      'Money is list price and straight-line depreciation over the usable life you set. Negotiated discounts and your own amortisation schedule are not modelled.',
+      {
+        lead: 'Placement is permissioned, not automatic.',
+        body: 'Fungibility rules decide which VM families may occupy which hardware and in what order — a preferred home first, then spillover. A family with no rule does not place at all, however much room the fleet has.',
+        learnMore: { label: 'Fungibility — Home vs Spillover', target: 'fungibility' },
+      },
+      {
+        lead: 'A node has to clear all four dimensions at once.',
+        body: 'Memory, vCPU, network bandwidth and storage throughput are tested together, and whichever runs out first is the binding constraint — so what governs is the highest utilisation of the four, never the average. A cluster sitting at 55% memory can still be unable to accept a single VM.',
+      },
+      {
+        lead: 'Large VMs are placed first, into the tightest node that still fits.',
+        body: 'A VM that cannot be placed is recorded with its reason and the run carries on, so one oversized request never hides the rest of the answer.',
+      },
+      {
+        lead: 'Very-high-memory classes never share a node.',
+        body: 'They are treated as isolated — one VM per node, with nothing packed alongside them.',
+      },
+      {
+        lead: 'Buffer is withheld before packing starts.',
+        body: 'A flat percentage or a fixed node count comes off each cluster first, so headroom is never counted as capacity you could sell.',
+        learnMore: { label: 'Buffer / overhead', target: 'buffer' },
+      },
+      {
+        lead: 'Stranded capacity is counted only where work is already running.',
+        body: 'Leftover room is reported on nodes already holding a VM. Empty and reserved nodes are left out, so the figure means space trapped beside live workloads rather than hardware you simply have not filled yet.',
+        learnMore: { label: 'Sellable capacity & headroom', target: 'sellable-headroom' },
+      },
+      {
+        lead: 'Money is list price and straight-line depreciation.',
+        body: 'Capex is written down evenly across the usable life you set. Negotiated discounts and your own amortisation schedule are not modelled, and either would move the result.',
+        learnMore: { label: 'Pricing basis (PAYG / RI)', target: 'pricing-basis' },
+      },
     ],
     pages: [
       { label: 'Quick Start', answers: 'Stand up a whole fleet from one form, then run it.' },
@@ -345,17 +414,53 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
     lede:
       'The simulator answers whether demand lands on the fleet you own. This half answers the sourcing question that follows: demand that will not fit has to go somewhere, and somewhere carries a price, a region footprint and a spec compromise. Answering feasibility without answering sourcing leaves you where you started.',
     does: [
-      'Finds the closest real equivalent for a VM on each cloud, computed from live catalog specs rather than a hand-kept lookup table.',
-      'States the compromise instead of hiding it — every match carries a similarity score and a named caveat when it is not a true peer.',
-      'Prices it over time: pay-as-you-go against one- and three-year commitments, per region.',
-      'Shows where each cloud actually offers the equivalent, and the metros where none does.',
+      {
+        lead: 'Every VM gets its counterpart on each cloud.',
+        body: 'Name a size and the nearest real equivalent on the other clouds comes back, read out of the published catalog rather than a mapping table somebody keeps by hand.',
+        learnMore: { label: 'How matching works', target: 'similarity' },
+      },
+      {
+        lead: 'The compromise is stated, never hidden.',
+        body: 'Every match carries its similarity percentage, and anything short of a true peer carries a named caveat spelling out what differs.',
+        learnMore: { label: 'What the match percentage means', target: 'specs' },
+      },
+      {
+        lead: 'Cost is read over time, not as a sticker price.',
+        body: 'Pay-as-you-go is set against one- and three-year commitments, per region, so a cheaper hourly rate that loses over a three-year term shows up as the worse deal it is.',
+        learnMore: { label: 'How pricing is calculated', target: 'pricing' },
+      },
+      {
+        lead: 'A coverage gap is an answer too.',
+        body: 'The region view shows where each cloud actually offers the equivalent, and names the metros where none of them does.',
+        learnMore: { label: 'How region availability works', target: 'region' },
+      },
     ],
     assumptions: [
-      'Equivalents are computed from published catalog specifications, not a hand-kept mapping table — so they stay correct as new SKUs ship, and every match can be explained rather than asserted.',
-      'A match is scored, not declared. Anything short of a true peer carries its similarity percentage and a named caveat saying exactly what differs.',
-      'Prices are public list rates. Enterprise agreements, committed-use discounts and private pricing are not modelled, and any of them would move every number here.',
-      'Region equivalency is a judgement about geography and latency, not an official vendor mapping. Two clouds naming the same metro do not always mean the same building.',
-      'Every rate carries the date it was pulled. When a refresh is stale it is shown as stale rather than quietly served as current.',
+      {
+        lead: 'Matching is computed from catalog specifications, not curated.',
+        body: 'Two sizes must first sit in the same product category — memory-optimised only ever matches memory-optimised — and within that gate the closest size wins on vCPU count, memory, and memory per vCPU, with the same CPU architecture and matching accelerators preferred. Because nothing is asserted from a hand-kept table, matches stay correct as new SKUs ship.',
+        learnMore: { label: 'How matching works, in full', target: 'similarity' },
+      },
+      {
+        lead: 'A match is scored, not declared.',
+        body: 'Whatever difference remains is blended into one similarity percentage, measured proportionally — a 4-vs-8 vCPU gap counts the same as 64 vs 128 — and anything short of a true peer carries a named caveat. Read the percentage as a distance, not a guarantee.',
+        learnMore: { label: 'What the percentage means', target: 'similarity' },
+      },
+      {
+        lead: 'Prices are public list rates.',
+        body: 'Enterprise agreements, committed-use discounts and private pricing are not modelled, and any of them would move every number here.',
+        learnMore: { label: 'How pricing is calculated', target: 'pricing' },
+      },
+      {
+        lead: 'Region equivalency is a distance rule, not a vendor mapping.',
+        body: 'Two regions line up on the same row when they are in the same country, share the same sovereign or commercial class, and sit within 400 km of each other by great-circle distance. Country leads because data residency usually binds harder than latency. Grouping is by proximity rather than by matching city names, which is why AWS us-west-2 and GCP us-west1 — roughly 180 km apart in Oregon — correctly land together.',
+        learnMore: { label: 'How region equivalency works', target: 'region' },
+      },
+      {
+        lead: 'Every rate carries the date it was pulled.',
+        body: 'When a refresh has gone stale it is shown as stale, rather than quietly served as current.',
+        learnMore: { label: 'Where the data comes from', target: 'data' },
+      },
     ],
     pages: [
       { label: 'Comparison Setup', answers: 'Set the base cloud and pick what to compare. Drives every other page.' },
