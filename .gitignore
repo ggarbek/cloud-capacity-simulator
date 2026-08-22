@@ -50,3 +50,5 @@ vite.config.d.ts
 # lazy loader) and refreshed by the scheduled GitHub Action (.github/workflows/
 # refresh-rates.yml). Regenerate locally with scripts/ingest/*; don't hand-edit.
 .claude/worktrees/
+.vercel
+.env*
