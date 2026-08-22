@@ -302,14 +302,23 @@ export interface StartHereContent {
   question: string;
   /** Two or three sentences of framing, README register. */
   lede: string;
-  /** What it does — planner language, no field names, no engine internals. */
-  does: StartHereBullet[];
+  /** Why a planner would care, before what the tool is. Mirrors the README's
+   *  "The problem this solves" — the two expensive failure directions, plus
+   *  the quieter third one this refuses to commit. */
+  problem: StartHereBullet[];
+  /** The named answers this half produces, in the README's register: name the
+   *  answer, then say what it contains. A reader should be able to scan the
+   *  leads alone and know whether this tool is for them. */
+  answers: StartHereBullet[];
   /** The standing assumptions behind every number this half produces. Stated
    *  on the front page rather than buried, because a capacity answer read
    *  without its assumptions is worse than no answer. Planner language. */
   assumptions: StartHereBullet[];
   /** Map of the rail: the gap the README never fills. */
   pages: StartHerePageRow[];
+  /** Why the numbers can be trusted — condensed from the README's "It refuses
+   *  to state a number it can't defend". Three points, no code identifiers. */
+  honesty: StartHereBullet[];
   /** Primary CTA — loads the worked demo and lands on a populated result. */
   demoCta: string;
   demoSub: string;
@@ -337,25 +346,48 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       'Will this deployment actually land on the fleet we own — and if not, which resource is stopping it?',
     lede:
       'Not “do we have enough memory,” and not “what is our average utilization.” The real question is whether every VM in a committed bill of materials finds a node where memory, vCPU, network bandwidth and storage throughput all clear at the same time — and when one does not, exactly which of those four blocked it, on which node, by how much.',
-    does: [
+    problem: [
       {
-        lead: 'It answers fit, not averages.',
-        body: 'A committed bill of materials is placed onto the hardware you describe, one node at a time, and the run reports whether every VM in it found somewhere to land.',
-        learnMore: { label: 'How nodes and racks are modelled', target: 'hardware-nodes-racks' },
+        lead: 'Over-buying is expensive quietly.',
+        body: 'You carry depreciation on nodes that never fill, and nothing on a dashboard flags it.',
       },
       {
-        lead: 'Every failure comes back with a named cause.',
-        body: 'A VM that cannot place is reported with the dimension that stopped it and both sides of the number — what it asked for, and what was left.',
+        lead: 'Under-buying strands demand you already committed to.',
+        body: 'The workload is promised before the capacity is proven, and the shortfall surfaces late.',
       },
       {
-        lead: 'Leftover capacity is treated as money, so it is measured.',
-        body: 'The run reports what is stranded across all four dimensions, and how much more demand the fleet could still absorb exactly as it stands today.',
-        learnMore: { label: 'Sellable capacity & headroom', target: 'sellable-headroom' },
+        lead: 'The gap between them is a packing problem, not a forecasting one.',
+        body:
+          'Fleet-level averages cannot see it. A cluster can sit at 55% memory utilisation and still be unable to accept a single additional VM, because vCPU zeroed out or the leftover sliver is too small for anything allowed to run there.',
+      },
+    ],
+    answers: [
+      {
+        lead: 'Feasibility',
+        body:
+          'Whether committed demand can be placed on the fleet you own, at what utilisation, and with how much capacity left stranded.',
       },
       {
-        lead: 'Feasibility is costed, not just declared.',
-        body: 'Capex and depreciation over the usable life you set, operating cost, margin, and whether payback lands before the hardware is due for retirement.',
-        learnMore: { label: 'Pricing basis (PAYG / RI)', target: 'pricing-basis' },
+        lead: 'Diagnosis',
+        body:
+          'For every VM that fails to place: which of the four constraints blocked it, on which node, and by how much.',
+        learnMore: { label: 'What the four constraints are', target: 'hardware-nodes-racks' },
+      },
+      {
+        lead: 'Headroom',
+        body: 'How much more of a given size the fleet can still absorb before it runs out.',
+        learnMore: { label: 'How sellable headroom is measured', target: 'sellable-headroom' },
+      },
+      {
+        lead: 'Investment',
+        body:
+          'What a proposed cluster costs in capex and operating cost, what it earns at capacity, and whether payback lands inside the usable life of the hardware.',
+        learnMore: { label: 'How the economics are calculated', target: 'pricing-basis' },
+      },
+      {
+        lead: 'Sourcing',
+        body:
+          'For demand you decide to place externally, what each cloud charges for the closest real equivalent. That is the other half of the suite, Cloud Market Analytics.',
       },
     ],
     assumptions: [
@@ -403,6 +435,22 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       { label: 'Scenario Analysis', answers: 'What else would fit on the fleet as it stands today.' },
       { label: 'Glossary', answers: 'Every concept the tool uses, plus the common questions.' },
     ],
+    honesty: [
+      {
+        lead: 'A value the vendor does not publish stays empty.',
+        body: 'Nothing is interpolated to fill a gap, and a dash never silently means zero.',
+      },
+      {
+        lead: 'Anything estimated is labelled wherever it appears.',
+        body:
+          'The markers survive into the exported deck as footnotes, because caveats that live only in the app and vanish in the slide are the ones that get someone burned in a review.',
+      },
+      {
+        lead: 'A saving is only claimed when both sides are fully priced.',
+        body:
+          'If either side has an unmatched or unpriced line, no saving is stated and the incomplete side is named. A favourable answer gets the same scrutiny as an unfavourable one.',
+      },
+    ],
     demoCta: 'See it work',
     demoSub: 'Loads a worked fleet and jumps straight to the results. Nothing to fill in.',
     buildCta: 'Build your own',
@@ -413,26 +461,46 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       'What should run where, on which cloud, in which region, at what cost — and what do we give up by moving it?',
     lede:
       'The simulator answers whether demand lands on the fleet you own. This half answers the sourcing question that follows: demand that will not fit has to go somewhere, and somewhere carries a price, a region footprint and a spec compromise. Answering feasibility without answering sourcing leaves you where you started.',
-    does: [
+    problem: [
       {
-        lead: 'Every VM gets its counterpart on each cloud.',
-        body: 'Name a size and the nearest real equivalent on the other clouds comes back, read out of the published catalog rather than a mapping table somebody keeps by hand.',
+        lead: 'Demand that will not fit has to go somewhere.',
+        body: 'Answering feasibility without answering sourcing leaves the planner exactly where they started.',
+      },
+      {
+        lead: 'The clouds do not publish a cross-reference.',
+        body:
+          'There is no canonical mapping between an Azure size, an AWS instance and a GCP machine type, and the shapes genuinely differ — so a like-for-like price comparison has to be computed before it can be trusted.',
+      },
+      {
+        lead: 'A comparison that hides its compromises is worse than none.',
+        body:
+          'A 62% match and a 96% match are different answers, and a total assembled from partly-priced lines is not a total. Both get stated rather than smoothed over.',
+      },
+    ],
+    answers: [
+      {
+        lead: 'Equivalence',
+        body: 'The closest real size on each cloud, computed from published catalog specifications rather than a hand-kept table.',
         learnMore: { label: 'How matching works', target: 'similarity' },
       },
       {
-        lead: 'The compromise is stated, never hidden.',
-        body: 'Every match carries its similarity percentage, and anything short of a true peer carries a named caveat spelling out what differs.',
-        learnMore: { label: 'What the match percentage means', target: 'specs' },
+        lead: 'Compromise',
+        body: 'What you give up in the move — the similarity score, and a named caveat whenever a match is not a true peer.',
+        learnMore: { label: 'What the percentage means', target: 'similarity' },
       },
       {
-        lead: 'Cost is read over time, not as a sticker price.',
-        body: 'Pay-as-you-go is set against one- and three-year commitments, per region, so a cheaper hourly rate that loses over a three-year term shows up as the worse deal it is.',
+        lead: 'Cost',
+        body: 'What it costs over time: pay-as-you-go against one- and three-year commitments, per region, for one size or a whole bill of materials.',
         learnMore: { label: 'How pricing is calculated', target: 'pricing' },
       },
       {
-        lead: 'A coverage gap is an answer too.',
-        body: 'The region view shows where each cloud actually offers the equivalent, and names the metros where none of them does.',
+        lead: 'Footprint',
+        body: 'Where each cloud actually offers the equivalent, and which metros it never reaches.',
         learnMore: { label: 'How region availability works', target: 'region' },
+      },
+      {
+        lead: 'Gaps',
+        body: 'The lines with no acceptable equivalent anywhere. A gap is an answer too, and it is reported rather than dropped from the total.',
       },
     ],
     assumptions: [
@@ -470,6 +538,22 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       { label: 'Region Availability', answers: 'Where each cloud offers it — and where nobody does.' },
       { label: 'Rate Library', answers: 'The per-region rate card behind every number above.' },
       { label: 'FAQ & Glossary', answers: 'How matching, similarity and region equivalency actually work.' },
+    ],
+    honesty: [
+      {
+        lead: 'A value the vendor does not publish stays empty.',
+        body: 'Nothing is interpolated to fill a gap, and a dash never silently means zero.',
+      },
+      {
+        lead: 'Anything estimated is labelled wherever it appears.',
+        body:
+          'The markers survive into the exported deck as footnotes, because caveats that live only in the app and vanish in the slide are the ones that get someone burned in a review.',
+      },
+      {
+        lead: 'A saving is only claimed when both sides are fully priced.',
+        body:
+          'If either side has an unmatched or unpriced line, no saving is stated and the incomplete side is named. A favourable answer gets the same scrutiny as an unfavourable one.',
+      },
     ],
     demoCta: 'See it work',
     demoSub: 'Loads a worked comparison and jumps straight to the executive summary.',

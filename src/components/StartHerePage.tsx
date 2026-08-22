@@ -289,13 +289,34 @@ export function StartHerePage({
           </span>
         </div>
 
-        <SectionLabel>What it does</SectionLabel>
+        {/* Why a planner would care, before what the tool is. The README
+            opens the reader's half this way and the ordering is deliberate:
+            the problem earns the rest of the page. */}
+        <SectionLabel>The problem it solves</SectionLabel>
         <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
-          {c.does.map((d) => (
+          {c.problem.map((d) => (
             <li
               key={d.lead}
               className="flex items-start gap-2.5"
-              style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 8 }}
+              style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 9 }}
+            >
+              <span aria-hidden="true" style={{ color: 'var(--text-dim)', flexShrink: 0 }}>
+                ●
+              </span>
+              <BulletText item={d} onOpen={openDepth} />
+            </li>
+          ))}
+        </ul>
+
+        {/* The five named answers. Scanning the leads alone should tell a
+            reader whether this tool is for them. */}
+        <SectionLabel>What it answers</SectionLabel>
+        <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+          {c.answers.map((d) => (
+            <li
+              key={d.lead}
+              className="flex items-start gap-2.5"
+              style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 9 }}
             >
               <span aria-hidden="true" style={{ color: 'var(--interactive)', flexShrink: 0 }}>
                 ●
@@ -305,6 +326,45 @@ export function StartHerePage({
           ))}
         </ul>
 
+        <SectionLabel>What each page is for</SectionLabel>
+        <div
+          style={{
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius-md)',
+            overflow: 'hidden',
+            background: 'var(--surface)',
+          }}
+        >
+          {c.pages.map((p, i) => (
+            <div
+              key={p.label}
+              className="flex items-baseline gap-3 flex-wrap"
+              style={{
+                padding: '9px 14px',
+                borderTop: i === 0 ? 'none' : '1px solid var(--border-dark)',
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  minWidth: 148,
+                  flexShrink: 0,
+                }}
+              >
+                {p.label}
+              </span>
+              <span style={{ fontSize: 12.5, color: 'var(--text-secondary)', flex: 1, minWidth: 240, lineHeight: 1.5 }}>
+                {p.answers}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* Restored after the section reorder. Assumptions sit AFTER the page
+            map on purpose: a reader needs to know what the tool does and where
+            to go before the caveats on its output mean anything. */}
         <SectionLabel>Assumptions this rests on</SectionLabel>
         <ol
           style={{
@@ -344,41 +404,24 @@ export function StartHerePage({
           ))}
         </ol>
 
-        <SectionLabel>What each page is for</SectionLabel>
-        <div
-          style={{
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-md)',
-            overflow: 'hidden',
-            background: 'var(--surface)',
-          }}
-        >
-          {c.pages.map((p, i) => (
-            <div
-              key={p.label}
-              className="flex items-baseline gap-3 flex-wrap"
-              style={{
-                padding: '9px 14px',
-                borderTop: i === 0 ? 'none' : '1px solid var(--border-dark)',
-              }}
+        {/* The README's other design centre, condensed. Placed after the
+            substance so it reads as a standard the tool holds itself to,
+            rather than as a disclaimer up front. */}
+        <SectionLabel>How it stays honest</SectionLabel>
+        <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+          {c.honesty.map((d) => (
+            <li
+              key={d.lead}
+              className="flex items-start gap-2.5"
+              style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 9 }}
             >
-              <span
-                style={{
-                  fontSize: 12.5,
-                  fontWeight: 600,
-                  color: 'var(--text-primary)',
-                  minWidth: 148,
-                  flexShrink: 0,
-                }}
-              >
-                {p.label}
+              <span aria-hidden="true" style={{ color: 'var(--text-dim)', flexShrink: 0 }}>
+                ●
               </span>
-              <span style={{ fontSize: 12.5, color: 'var(--text-secondary)', flex: 1, minWidth: 240, lineHeight: 1.5 }}>
-                {p.answers}
-              </span>
-            </div>
+              <BulletText item={d} onOpen={openDepth} />
+            </li>
           ))}
-        </div>
+        </ul>
 
         {/* Provenance. Stated as an asset, not a disclaimer — the numbers are
             auditable, which is the point. */}
