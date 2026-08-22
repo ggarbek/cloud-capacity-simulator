@@ -19,7 +19,17 @@ The app has two halves. The **Capacity Simulator** packs committed demand onto o
 ![Run results overview](docs/images/overview.png)
 
 ---
+## The problem this solves
 
+Capacity planning fails in two directions, and both are expensive.
+
+**Over-buy** and you carry depreciation on nodes that never fill. **Under-buy** and you strand demand you already committed to. The gap between those outcomes is usually not a forecasting problem — it's a packing problem, and it's invisible at the altitude most planning is done.
+
+The third failure mode is quieter and worse: a model that produces a confident number from data it doesn't actually have. A missing rate becomes a zero, an unmatched line item silently drops out of a total, and a savings recommendation reaches senior leadership built on a comparison where one side was only two-thirds priced.
+
+This tool answers the first two concretely and structurally refuses the third.
+
+---
 ## What it answers
 
 - **Feasibility** — can committed demand be placed on the current fleet, at what utilization, with how much stranded capacity
@@ -29,43 +39,19 @@ The app has two halves. The **Capacity Simulator** packs committed demand onto o
 - **Sourcing** — for workload you've decided to place externally, what each cloud charges for the closest real equivalent
 
 ---
+## The simulator
 
-## Accuracy: it refuses to state a number it can't defend
+Define clusters (node shape, rack composition, buffer, fungibility rules), place them into regions and availability zones, load a bill of materials, and run.
 
-This is the other design center, and the part that took the most work.
+Output is a rack map with per-node drill-down, an unplaceable list with diagnosed reasons and real numbers, utilization and stranded-capacity metrics across all four dimensions, and a financial view covering depreciation, OPEX, margin, revenue at capacity and payback.
 
-**Unpublished values stay `null`.** If a vendor doesn't publish a figure, the field stays null through ingest, join and render. Nothing is interpolated to fill a gap. `"EBS only"` becomes zero local disk, not an estimate.
+Setup is workflow-ordered — **Cluster Builder → VM Fungibility → Fleet Builder → VM Demand** — with a Quick Start form that collapses all four into a single page, and a **Start Here** page that explains what each one is for. Results land on **Run Results**, **Fleet Map** (rack visualization with per-node, per-zone and financial drill-down), and **Scenario Analysis** (what *else* would fit on the fleet as it currently stands).
 
-**Estimated values are labeled, everywhere.** A curated processor mapping renders as `(assumed)`. A network figure from a legacy doc fallback, or a reserved rate derived from pay-as-you-go, renders as `(est.)`. Those markers survive into the PPTX and DOCX exports as footnotes on the slides that carry them — the failure mode where caveats live in the app and vanish in the deck is exactly the one that gets someone burned in a review.
+### Screenshots
 
-**Savings claims are suppressed when the comparison isn't sound.** `bomVerdictCore` in [`src/components/compare/execBriefMath.ts`](src/components/compare/execBriefMath.ts) states a saving only when **both** the base and the winning scenario are *fully* priced — every BoM line matched and priced, not merely most of them. Otherwise it returns `savingMonthly: null` and a machine-readable reason:
-
-| Reason | Meaning |
-|---|---|
-| `base-unpriced` | The base produced no usable total |
-| `base-partially-priced` | Some base lines are unmatched or unpriced, so the base total undercounts |
-| `cheapest-partially-priced` | The apparent winner is undercounted, so its lead may be an artifact |
-
-Notably, "the base already wins" is *also* suppressed off a partially-priced base. A favorable answer gets the same scrutiny as an unfavorable one — that asymmetry is where most tools quietly cheat.
-
-**One kernel per number.** Every picked-pair match percentage on every surface comes from `pairMatchPct` in [`src/components/compare/specShowdownMath.ts`](src/components/compare/specShowdownMath.ts); every cost verdict comes from `bomVerdictCore`. Two views cannot disagree about the same fact, because there is exactly one place the fact is computed.
-
-**List prices only.** All pricing is vendor-published list pricing. No negotiated rates, no spot, no assumed discounts.
-
-The practical effect is that the tool sometimes answers "I can't tell you that yet, and here's what's missing." That's the correct output when the underlying data is incomplete, and it's the output a planner can take into a room and stand behind.
+![Fleet map with per-node drill-down](docs/images/fleet-map.png)
 
 ---
-
-## How this was built
-
-This is a personal project, built on my own time, using **only public vendor data** — published specification documentation and public list pricing. It contains no proprietary, internal or employer data of any kind, and it is not in production use anywhere.
-
-It was developed with heavy assistance from AI coding assistants and multi-agent orchestration. That's worth being direct about, because it's a real part of how the project reached this scope. What the AI did not decide: the domain model, which constraints bind and in what priority, how a blocked placement should be diagnosed, what counts as a defensible number versus a suppressed one, or where the honesty gates go. Those required knowing how capacity planning actually fails in practice, and they're the parts I own. The AI wrote a great deal of the code that implements them, and I reviewed, tested and rejected a great deal of it.
-
-The engine test suite exists largely because of that workflow. When code arrives faster than you can read it line by line, locked acceptance scenarios are what stop a plausible-looking refactor from quietly changing what the tool tells you.
-
----
-
 ## Feasibility is multi-dimensional
 
 A deployment is not feasible because there is enough memory. It is feasible only when every binding resource clears **simultaneously, per node**. A cluster can sit at 55% memory utilization and still be unable to accept a single additional VM because vCPU zeroed out, or because the NIC budget is spent, or because a leftover sliver is too small for anything the workload is allowed to run.
@@ -108,33 +94,6 @@ Diagnosis is deliberately two-tiered, because "buy a different cluster" and "dro
 Oversize checks run as a **pre-flight**, before packing starts, so a VM that is physically impossible is named as such rather than appearing as a generic capacity shortfall at the end of the run. For nodes that are partially filled, the engine reports whichever resource is *most* consumed, so a planner can see which dimension a cluster will run out of next.
 
 ---
-
-## The problem this solves
-
-Capacity planning fails in two directions, and both are expensive.
-
-**Over-buy** and you carry depreciation on nodes that never fill. **Under-buy** and you strand demand you already committed to. The gap between those outcomes is usually not a forecasting problem — it's a packing problem, and it's invisible at the altitude most planning is done.
-
-The third failure mode is quieter and worse: a model that produces a confident number from data it doesn't actually have. A missing rate becomes a zero, an unmatched line item silently drops out of a total, and a savings recommendation reaches senior leadership built on a comparison where one side was only two-thirds priced.
-
-This tool answers the first two concretely and structurally refuses the third.
-
----
-
-## The simulator
-
-Define clusters (node shape, rack composition, buffer, fungibility rules), place them into regions and availability zones, load a bill of materials, and run.
-
-Output is a rack map with per-node drill-down, an unplaceable list with diagnosed reasons and real numbers, utilization and stranded-capacity metrics across all four dimensions, and a financial view covering depreciation, OPEX, margin, revenue at capacity and payback.
-
-Setup is workflow-ordered — **Cluster Builder → VM Fungibility → Fleet Builder → VM Demand** — with a Quick Start form that collapses all four into a single page, and a **Start Here** page that explains what each one is for. Results land on **Run Results**, **Fleet Map** (rack visualization with per-node, per-zone and financial drill-down), and **Scenario Analysis** (what *else* would fit on the fleet as it currently stands).
-
-### Screenshots
-
-![Fleet map with per-node drill-down](docs/images/fleet-map.png)
-
----
-
 ## Cloud Market Analytics
 
 **Cloud Market Analytics** is the other half of the tool, and it ships in the same app. The simulator answers *"will this land on the fleet we own?"* — Cloud Market Analytics answers the sourcing question that follows: **what should run where, on which cloud, in which region, at what cost, and what do we give up by moving it?**
@@ -173,13 +132,83 @@ Everything renders in either mode from a single toggle:
 Executive summaries export to **PPTX and DOCX** with every caveat carried through, so the deck a stakeholder receives says exactly what the screen said — including what could not be priced.
 
 ---
+## It refuses to state a number it can't defend
 
+This is the other design centre, and the part that took the most work.
+
+**A value the vendor does not publish stays empty.** Nothing is interpolated to fill a
+gap. "EBS only" becomes zero local disk, not an estimate.
+
+**Anything estimated is labelled, everywhere it appears.** A derived processor mapping
+reads *(assumed)*. A network figure taken from a legacy document, or a reserved rate
+inferred from pay-as-you-go, reads *(est.)*. Those markers survive into the PowerPoint
+and Word exports as footnotes on the slides that carry them — because the failure mode
+where caveats live in the app and vanish in the deck is exactly the one that gets
+someone burned in a review.
+
+**A saving is only claimed when both sides are fully priced.** If any line on either
+side is unmatched or unpriced, the tool reports no saving and names which side is
+incomplete. Notably, *"the option you already have is the cheapest"* is suppressed by
+the same rule. A favourable answer gets the same scrutiny as an unfavourable one, and
+that asymmetry is where most tools quietly cheat.
+
+**Two views can never disagree about the same fact**, because each number is computed in
+exactly one place and read everywhere else.
+
+**List prices only.** No negotiated rates, no spot, no assumed discounts.
+
+The practical effect is that the tool sometimes answers *"I can't tell you that yet, and
+here is what is missing."* That is the correct output when the underlying data is
+incomplete, and it is the output a planner can take into a room and stand behind.
+
+*The mechanics — which gate fires, what it returns, and where it is enforced — are in
+[Honesty gates](#honesty-gates) below.*
+
+---
+## How this was built
+
+This is a personal project, built on my own time, using **only public vendor data** — published specification documentation and public list pricing. It contains no proprietary, internal or employer data of any kind, and it is not in production use anywhere.
+
+It was developed with heavy assistance from AI coding assistants and multi-agent orchestration. That's worth being direct about, because it's a real part of how the project reached this scope. What the AI did not decide: the domain model, which constraints bind and in what priority, how a blocked placement should be diagnosed, what counts as a defensible number versus a suppressed one, or where the honesty gates go. Those required knowing how capacity planning actually fails in practice, and they're the parts I own. The AI wrote a great deal of the code that implements them, and I reviewed, tested and rejected a great deal of it.
+
+The engine test suite exists largely because of that workflow. When code arrives faster than you can read it line by line, locked acceptance scenarios are what stop a plausible-looking refactor from quietly changing what the tool tells you.
+
+---
 # For engineers
 
 Everything above is what the tool is for. Everything below is how it works.
 
 ---
+## Honesty gates
 
+The reader-facing statement of this is [above](#it-refuses-to-state-a-number-it-cant-defend).
+The enforcement:
+
+**Suppressed savings.** `bomVerdictCore` in
+[`src/components/compare/execBriefMath.ts`](src/components/compare/execBriefMath.ts)
+states a saving only when **both** the base and the winning scenario are *fully* priced —
+every BoM line matched and priced, not merely most of them. Otherwise it returns
+`savingMonthly: null` and a machine-readable reason:
+
+| Reason | Meaning |
+|---|---|
+| `base-unpriced` | The base produced no usable total |
+| `base-partially-priced` | Some base lines are unmatched or unpriced, so the base total undercounts |
+| `cheapest-partially-priced` | The apparent winner is undercounted, so its lead may be an artifact |
+
+`base-already-cheapest` is gated on the same condition, so a favourable verdict cannot be
+produced off a partially-priced base.
+
+**One kernel per number.** Every picked-pair match percentage on every surface — dock,
+verdict band, exports, normalized rate table — comes from `pairMatchPct` in
+[`src/components/compare/specShowdownMath.ts`](src/components/compare/specShowdownMath.ts).
+Every cost verdict comes from `bomVerdictCore`. Two views cannot disagree about the same
+fact because there is exactly one place the fact is computed.
+
+**Null propagation.** Unpublished values stay `null` through ingest, join and render;
+no layer substitutes a zero or an average for a missing figure.
+
+---
 ## Engine rules
 
 [`src/engine/simulator.ts`](src/engine/simulator.ts) is a pure function: `runSimulation(input) → SimulatorResult`. No I/O, no UI, no clock, no randomness. Same input, same output, always. Its behavior is pinned by [`src/engine/simulator.test.ts`](src/engine/simulator.test.ts) and documented in [`docs/ENGINE_RULES.md`](docs/ENGINE_RULES.md), including three locked acceptance scenarios whose expected placements, stranded memory and binding constraints are asserted exactly. If those move, the engine has a bug.
@@ -207,9 +236,6 @@ Everything above is what the tool is for. Everything below is how it works.
 ---
 
 ---
-
----
-
 ## Data pipeline
 
 [`scripts/ingest/`](scripts/ingest/) pulls specs, network bandwidth and pricing from vendor sources and writes static JSON the app serves like any other asset.
@@ -247,7 +273,6 @@ The [weekly Action](.github/workflows/refresh-rates.yml) runs Mondays at 07:00 U
 At the last committed refresh the shards cover **230 region-provider pairs and roughly 108,000 priced SKU rows**; `public/rates/_manifest.json` carries the exact current counts.
 
 ---
-
 ## Architecture
 
 **Pure engine, thin shell.** The simulator and the equivalency, pricing and financial math are plain TypeScript functions with no React and no I/O. The UI reads their output. This is why the engine is testable at all, and why the acceptance scenarios can be asserted to the GiB.
@@ -261,7 +286,6 @@ At the last committed refresh the shards cover **230 region-provider pairs and r
 **Bring your own data.** The bundled public catalog gets you running immediately, but hardware shapes, VM sizes, fungibility matrices and bills of materials are all importable from Excel templates for anything the public catalogs don't cover.
 
 ---
-
 ## Tech stack
 
 React 18 · TypeScript 5.6 · Vite 6 · Tailwind CSS 3.4 · Vitest 2
@@ -269,7 +293,6 @@ React 18 · TypeScript 5.6 · Vite 6 · Tailwind CSS 3.4 · Vitest 2
 `react-simple-maps` + `d3-geo` for region cartography, `pptxgenjs` and `docx` for leadership exports, `xlsx` for template import and export. No backend framework, no state library, no UI kit.
 
 ---
-
 ## Running it
 
 ```bash
@@ -283,7 +306,6 @@ npm run build      # tsc -b && vite build
 ---
 
 ---
-
 ## License
 
 MIT — see [LICENSE](LICENSE).
