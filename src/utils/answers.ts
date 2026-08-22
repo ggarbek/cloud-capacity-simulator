@@ -1,20 +1,22 @@
 /**
- * computeAnswers — the five questions, answered in plain English (v3).
+ * computeAnswers — the four questions, answered in plain English (v3).
  *
  * The product thesis after the "value buried under complexity" feedback:
- * the tool exists to answer five questions about a VM deployment —
+ * the tool exists to answer four questions about a VM deployment, in the
+ * executive order Run Results renders them (investment leading) —
  *
- *   1. Is this deployment supportable on current capacity?
- *   2. Where are we blocked, and why?
- *   3. How much more can we sell on this fleet?
- *   4. Does new hardware investment make sense?
- *   5. Will the investment pay off, and when?
+ *   1. Does this fleet investment make sense?   (payback is part of this
+ *      answer, not a question of its own)
+ *   2. Is this deployment supportable on current capacity?
+ *   3. Where are we blocked, and why?
+ *   4. How much more can we sell on this fleet?
  *
- * This module turns a SimulatorResult into verdict-first answers for 1–3
- * (plus a profitability context row), and turns an InvestmentReport into
- * the rows for 4–5. Pure — shared by the Simple track, the Simple
- * Calculator, and the Advanced Insights front door, so every surface
- * speaks the same sentences.
+ * This module turns a SimulatorResult into all four verdict-first answers
+ * (`profitability` carries question 1, including its payback figures).
+ * `investmentAnswerRows` below is a separate surface: the hypothetical
+ * NEW-hardware scenario, not one of the four. Pure — shared by the Simple
+ * track, the Simple Calculator, and the Advanced Insights front door, so
+ * every surface speaks the same sentences.
  */
 import type { AppState, ScopeSelection } from '../state/AppState';
 import { fleetList } from '../state/AppState';
@@ -496,8 +498,10 @@ export function financialsSummary(a: Answers): string {
 }
 
 // ────────────────────────────────────────────────────────────────────────
-// Questions 4 + 5 — verdict rows from an InvestmentReport, so the strip
-// and the panel speak identical sentences.
+// NEW-hardware scenario — verdict rows from an InvestmentReport, so the
+// strip and the panel speak identical sentences. This is the hypothetical
+// purchase surface, NOT one of the four Run Results answers (question 1
+// there judges the fleet you already own).
 // ────────────────────────────────────────────────────────────────────────
 export function investmentAnswerRows(report: InvestmentReport | null): {
   investment: AnswerRow;

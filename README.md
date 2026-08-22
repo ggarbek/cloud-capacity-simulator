@@ -34,11 +34,14 @@ There is a third failure mode, quieter than the other two: a model that produces
 ---
 ## What it answers
 
-- **Feasibility** — can committed demand be placed on the current fleet, at what utilization, with how much stranded capacity
-- **Diagnosis** — for every VM that didn't place, which of the four constraints blocked it, where, and by how much
-- **Headroom** — how much more of a given size the fleet can absorb before it's out
-- **Investment** — what a proposed cluster costs in capex and OPEX, what it earns at capacity, and whether payback lands inside the hardware's usable life
-- **Sourcing** — for workload you've decided to place externally, what each cloud charges for the closest real equivalent
+**Run Results** answers four questions, in this order — investment first, because it is the decision the rest of the run informs:
+
+- **Does this fleet investment make sense?** — what the hardware costs in capex and OPEX, what the demand running on it earns, the gross margin that leaves, and whether payback lands inside the hardware's usable life
+- **Is this deployment supportable on current capacity?** — can committed demand be placed on the current fleet, at what utilization, with how much stranded capacity
+- **Where are we blocked, and why?** — for every VM that didn't place, which of the four constraints blocked it, where, and by how much
+- **How much more can we sell on this fleet?** — how much more of a given size the fleet can absorb before it's out, priced at list
+
+Payback is part of the first answer, not a question of its own. **Sourcing** — what each cloud charges for the closest real equivalent to workload you've decided to place externally — is not one of the four: it belongs to the other half of the app, [Cloud Market Analytics](#cloud-market-analytics).
 
 ---
 ## The simulator
@@ -306,7 +309,7 @@ React 18 · TypeScript 5.6 · Vite 6 · Tailwind CSS 3.4 · Vitest 2
 ```bash
 npm install
 npm run dev        # http://127.0.0.1:5173
-npm test           # Vitest — 937 tests across 49 files
+npm test           # Vitest — 942 tests across 50 files
 npm run typecheck  # tsc --noEmit
 npm run build      # tsc -b && vite build
 ```

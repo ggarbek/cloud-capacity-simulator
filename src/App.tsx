@@ -31,7 +31,7 @@ function PageRouter() {
       {/* v2.22.4 — The Simulator page is the single Advanced workspace
           (NavRail shell: Set up pages + Results pages). The Simple track +
           its header toggle were retired once the Results group (Overview =
-          the five answers + Fleet map) covered the same ground. */}
+          the four answers + Fleet map) covered the same ground. */}
       {page === 'simulator' && <AdvancedShell />}
       {/* v2.30 — Both top-level entries route into ONE unified Competitive
           Offering sidebar shell; the menu item just picks the landing tab. */}

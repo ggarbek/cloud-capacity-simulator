@@ -33,7 +33,7 @@ import { buildFleetHierarchy } from './fleetmap/fleetmapData';
  *   │ AppHeader: brand · mode · ▶ Run · demo / save / theme    │
  *   ├────────┬─────────────────────────────────────────────────┤
  *   │ NavRail│ ONE surface at a time:                          │
- *   │ Results│   overview — the five answers (AnswersPanel)    │
+ *   │ Results│   overview — the four answers (AnswersPanel)    │
  *   │ Set up │   fleetmap — 3-altitude map + Inspector overlay │
  *   │        │   setup    — the active authoring page,         │
  *   │        │              centered at a readable width       │
@@ -182,7 +182,7 @@ function SetupSurface() {
 }
 
 /**
- * Results › Overview — the five answers, leading. What the user most
+ * Results › Overview — the four answers, leading. What the user most
  * needs sits at the top of the page (verdicts), drill-in below, and the
  * fleet map one click away. Pre-run it teaches instead of showing an
  * empty shell.
@@ -506,9 +506,9 @@ function OverviewEmptyState() {
           className="text-[12.5px] leading-relaxed"
           style={{ color: 'var(--text-muted)', marginTop: 8 }}
         >
-          Run a simulation and this page answers five questions: is the deployment
-          supportable, where is it blocked, how much more can you sell, does new
-          hardware make sense, and when does it pay back.
+          Run a simulation and this page answers four questions: does this fleet
+          investment make sense, is the deployment supportable on current capacity,
+          where are we blocked and why, and how much more can we sell on this fleet.
         </p>
         <div className="flex items-center justify-center gap-2 flex-wrap" style={{ marginTop: 18 }}>
           {canRun ? (

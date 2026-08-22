@@ -1,9 +1,9 @@
 /**
- * Investment scenario helper (v3 — the "five questions" rebuild).
+ * Investment scenario helper (v3 — the "four questions" rebuild).
  *
- * Answers the two questions the tool previously couldn't:
- *   "Given this deployment of VMs, does new hardware investment make sense?"
- *   "Will the investment pay off in X years?"
+ * Answers the question the tool previously couldn't — "given this deployment
+ * of VMs, does NEW hardware investment make sense?" — with payback folded
+ * into that one answer rather than asked separately.
  *
  * `evaluateInvestment` sandbox-runs the CANONICAL engine (buildAndRunSimulation
  * — never forked) on a temporary copy of the user's state with one extra

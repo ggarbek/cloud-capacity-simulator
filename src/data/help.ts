@@ -340,6 +340,28 @@ export const PROJECT_STATUS =
   'end. The engine rules and the honesty gates are real and tested, but coverage is ' +
   'partial and several surfaces are still being built.';
 
+/**
+ * Which half does this reader need?
+ *
+ * The two halves answer adjacent questions and are easy to confuse, so the
+ * distinction is defined ONCE and rendered identically on both Start Here
+ * pages. The dividing line is ownership: the simulator reasons about hardware
+ * you own and control; Cloud Market Analytics reasons about capacity you would
+ * rent from someone else. Never let the two pages describe this differently.
+ */
+export const TOOL_SPLIT: Record<'simulator' | 'cma', { title: string; when: string }> = {
+  simulator: {
+    title: 'Capacity Simulator — hardware you own',
+    when:
+      'Use it when the fleet already exists or is being bought: will this demand fit, where does it break, how much more could it hold, and does the economics work.',
+  },
+  cma: {
+    title: 'Cloud Market Analytics — capacity you would rent',
+    when:
+      'Use it when the answer is to place work somewhere else: what the closest equivalent is on each cloud, where the market has gaps, and what the switch would cost you.',
+  },
+};
+
 export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
   simulator: {
     question:
@@ -361,7 +383,7 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       {
         lead: 'Being wrong costs money in both directions, and both get quantified.',
         body:
-          'Demand you cannot place is revenue you cannot serve. Capacity you never fill is depreciation on hardware that ages whether or not it earns. The same run reports the blocked side and the stranded side, in dollars.',
+          'Demand you cannot place is a commitment you cannot serve — revenue if the fleet sells capacity, a missed internal promise if it does not. Capacity you never fill is depreciation on hardware that ages whether or not it earns. The same run reports the blocked side and the stranded side, in dollars.',
         learnMore: { label: 'How the economics are calculated', target: 'pricing-basis' },
       },
       {
@@ -372,31 +394,27 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
     ],
     answers: [
       {
-        lead: 'Feasibility',
+        lead: 'Does this fleet investment make sense?',
         body:
-          'Whether committed demand can be placed on the fleet you own, at what utilisation, and with how much capacity left stranded.',
-      },
-      {
-        lead: 'Diagnosis',
-        body:
-          'For every VM that fails to place: which of the four constraints blocked it, on which node, and by how much.',
-        learnMore: { label: 'What the four constraints are', target: 'hardware-nodes-racks' },
-      },
-      {
-        lead: 'Headroom',
-        body: 'How much more of a given size the fleet can still absorb before it runs out.',
-        learnMore: { label: 'How sellable headroom is measured', target: 'sellable-headroom' },
-      },
-      {
-        lead: 'Investment',
-        body:
-          'What a proposed cluster costs in capex and operating cost, what it earns at capacity, and whether payback lands inside the usable life of the hardware.',
+          'What the fleet costs to run against what it earns — depreciation and operating cost, gross margin against the target you set, and whether payback lands inside the usable life of the hardware rather than after it retires.',
         learnMore: { label: 'How the economics are calculated', target: 'pricing-basis' },
       },
       {
-        lead: 'Sourcing',
+        lead: 'Is this deployment supportable on current capacity?',
         body:
-          'For demand you decide to place externally, what each cloud charges for the closest real equivalent. That is the other half of the suite, Cloud Market Analytics.',
+          'Whether every VM in the committed demand finds a node, at what utilisation, and with how much capacity left stranded.',
+      },
+      {
+        lead: 'Where are we blocked, and why?',
+        body:
+          'For every VM that fails to place: which of the four constraints stopped it, on which node, and by how much — including the difference between "this cluster cannot take it" and "no node anywhere ever could", because those are different decisions.',
+        learnMore: { label: 'What the four constraints are', target: 'hardware-nodes-racks' },
+      },
+      {
+        lead: 'How much more can we sell on this fleet?',
+        body:
+          'A defensible ceiling on the capacity still unused — what else would fit alongside what is already running, and what it would be worth.',
+        learnMore: { label: 'How sellable headroom is measured', target: 'sellable-headroom' },
       },
     ],
     assumptions: [
@@ -439,7 +457,7 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       { label: 'VM Fungibility', answers: 'Which VM families may land on which hardware, and in what order.' },
       { label: 'Fleet Builder', answers: 'Place racks into regions and availability zones.' },
       { label: 'VM Demand', answers: 'The bill of materials — which VMs, how many, and where.' },
-      { label: 'Run Results', answers: 'The five answers: supportable, blocked, sellable, investment, payback.' },
+      { label: 'Run Results', answers: 'The four questions answered in plain English, investment first.' },
       { label: 'Fleet Map', answers: 'The rack picture, with per-node and per-zone drill-down.' },
       { label: 'Scenario Analysis', answers: 'What else would fit on the fleet as it stands today.' },
       { label: 'Glossary', answers: 'Every concept the tool uses, plus the common questions.' },

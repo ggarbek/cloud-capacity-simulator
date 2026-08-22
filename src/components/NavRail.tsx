@@ -13,7 +13,7 @@ import type { TabAlerts } from '../utils/tabAlerts';
  *
  *   SET UP  — Quick start + the four numbered authoring steps
  *             (1 Cluster builder · 2 VM fungibility · 3 Fleet builder · 4 VM demand).
- *   RESULTS — Overview (the five answers) + Fleet map (rack viz + drill).
+ *   RESULTS — Overview (the four answers) + Fleet map (rack viz + drill).
  *
  * VM catalog sits at the bottom, in the rarely-used zone (it's an
  * appendix: VM rows are seeded natively; a run never requires opening it).
@@ -149,7 +149,7 @@ const RESULT_ITEMS: { view: ResultView; item: NavItem }[] = [
     item: {
       icon: IconOverview,
       label: 'Run Results',
-      hint: 'The five answers — supportable, blocked, sellable, investment, payback',
+      hint: 'The four answers — investment, supportable, blocked, sellable',
     },
   },
   {

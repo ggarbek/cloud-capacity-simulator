@@ -1,5 +1,5 @@
 /**
- * Investment scenario helper tests (v3 — the "five questions" rebuild).
+ * Investment scenario helper tests (v3 — the "four questions" rebuild).
  *
  * Verifies evaluateInvestment's verdicts + arithmetic against a small
  * deterministic fleet: one cluster that deliberately can't hold the whole

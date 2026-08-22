@@ -22,6 +22,7 @@ import { VerdictBand } from './compare/ui/VerdictBand';
 import {
   PROJECT_STATUS,
   START_HERE,
+  TOOL_SPLIT,
   type StartHereBullet,
   type StartHereContent,
   type StartHereLink,
@@ -403,6 +404,53 @@ export function StartHerePage({
             </li>
           ))}
         </ol>
+
+        {/* Which half am I in? The two halves answer adjacent questions and
+            are easy to confuse, so both pages render the same contrast from
+            one shared constant, with the current half marked. */}
+        <SectionLabel>Which half you need</SectionLabel>
+        <div
+          style={{
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius-md)',
+            overflow: 'hidden',
+            background: 'var(--surface)',
+          }}
+        >
+          {(['simulator', 'cma'] as const).map((k, i) => {
+            const here = k === kind;
+            return (
+              <div
+                key={k}
+                style={{
+                  padding: '11px 14px',
+                  borderTop: i === 0 ? 'none' : '1px solid var(--border-dark)',
+                  borderLeft: here ? '2px solid var(--interactive)' : '2px solid transparent',
+                  background: here ? 'color-mix(in srgb, var(--interactive) 6%, transparent)' : 'transparent',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 12.5,
+                    fontWeight: 600,
+                    color: here ? 'var(--text-primary)' : 'var(--text-secondary)',
+                    marginBottom: 3,
+                  }}
+                >
+                  {TOOL_SPLIT[k].title}
+                  {here && (
+                    <span style={{ color: 'var(--interactive)', fontWeight: 600, marginLeft: 8 }}>
+                      you are here
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
+                  {TOOL_SPLIT[k].when}
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
         {/* The README's other design centre, condensed. Placed after the
             substance so it reads as a standard the tool holds itself to,

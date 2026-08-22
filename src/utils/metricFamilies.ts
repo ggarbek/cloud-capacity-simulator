@@ -1,7 +1,7 @@
 /**
  * computeMetricFamilies — the four Simple-track families as MetricCard props.
  *
- * Extracted from SimpleApp so BOTH the Simple/Advanced toggle view and the
+ * Extracted from the retired Simple view so both it and the
  * Simple Calculator tab compute the four families identically from a
  * SimulatorResult + the same pure helpers the Advanced track uses. Pure
  * function, no React. (S27 / Simple Calculator.)
