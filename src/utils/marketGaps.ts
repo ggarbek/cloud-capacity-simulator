@@ -12,7 +12,7 @@
  *   - Cross-cloud metros are clustered via `clusterCoverageMetros` — the SAME
  *     single-linkage union-find the equivalents table uses (same country + gov
  *     + ≤ REGION_CLUSTER_KM). So "Azure exclusive / Served by all / Market gap"
- *     reconciles with the equivalents rather than mis-labelling e.g. Azure
+ *     reconciles with the equivalents rather than mis-labeling e.g. Azure
  *     "West US 2" (Washington) exclusive when AWS us-west-2 / GCP us-west1
  *     (Oregon, ~180 km) serve the same metro.
  *   - Everything is counted by UNIQUE REGION NAME, not by metro, so the base
@@ -298,7 +298,7 @@ export function buildMarketGapReport(
  * selector pure while matching how the RA page builds its refs. The predicate
  * receives the ref's OWN provider so callers can apply a provider-aware filter
  * (e.g. drop edge regions per provider) WITHOUT pre-filtering the vm list into an
- * intermediate array. When a caller ignores the provider arg the behaviour is
+ * intermediate array. When a caller ignores the provider arg the behavior is
  * unchanged (region-only filter).
  */
 export function refsFromVms(

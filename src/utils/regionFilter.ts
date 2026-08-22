@@ -16,7 +16,7 @@
  *     and answer "where does each cloud offer the comparable product?".
  *
  * Explicit Category chips are always cross-cloud and apply to every provider.
- * Pure + exported so the behaviour is unit-tested (the page just wires it).
+ * Pure + exported so the behavior is unit-tested (the page just wires it).
  */
 import type { UserVm } from '../types';
 import { vmFamily } from './vmTaxonomy';

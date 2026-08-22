@@ -247,7 +247,7 @@ describe('timeHorizonCosts — term-aware repricing', () => {
     expect(azure('3y').oneMonthPayg).toBeCloseTo(1.0 * HOURS_PER_MONTH, 5);
   });
 
-  it('falls back to PAYG (labelled honestly) when the SKU lacks the requested tier', () => {
+  it('falls back to PAYG (labeled honestly) when the SKU lacks the requested tier', () => {
     const noRi: UserVm[] = [
       vm('Standard_M64s', 'Azure', 64, 1024, {
         riOneYrHourlyUsd: undefined,
@@ -260,7 +260,7 @@ describe('timeHorizonCosts — term-aware repricing', () => {
     expect(row.bestRateLabel).toBe('PAYG');
   });
 
-  it('with no term, still uses the best available rate (legacy behaviour)', () => {
+  it('with no term, still uses the best available rate (legacy behavior)', () => {
     expect(azure(undefined).oneMonthBest).toBeCloseTo(0.42 * HOURS_PER_MONTH, 5);
     expect(azure(undefined).bestRateLabel).toBe('3y RI');
   });
@@ -363,7 +363,7 @@ describe('normalizedRates (A2)', () => {
     expect(az.rateLabel).toBe('1y RI');
   });
 
-  it('falls back to PAYG (labelled honestly) when the SKU lacks the requested term tier', () => {
+  it('falls back to PAYG (labeled honestly) when the SKU lacks the requested term tier', () => {
     const noRi: UserVm[] = [
       vm('Standard_M64s', 'Azure', 64, 1024, {
         riOneYrHourlyUsd: undefined,

@@ -34,7 +34,7 @@ function segmentColor(i: number): string {
   return base;
 }
 
-/** Dim repeats past the first cycle so wrap-around colours don't read as new. */
+/** Dim repeats past the first cycle so wrap-around colors don't read as new. */
 function segmentOpacity(i: number): number {
   const cycles = Math.floor(i / SEGMENT_PALETTE.length);
   return cycles === 0 ? 0.85 : Math.max(0.4, 0.85 - cycles * 0.2);

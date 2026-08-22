@@ -10,7 +10,7 @@
  * mutation site. Filter and selection state stay in plain useState because
  * they're not value-mutations the user expects to undo.
  *
- * Behaviour notes:
+ * Behavior notes:
  *   - History is bounded by `opts.cap` (default 50). Oldest snapshots drop
  *     off the front and the cursor adjusts so `value` stays stable.
  *   - When the cursor isn't at the tip and the user mutates, the redo tail is

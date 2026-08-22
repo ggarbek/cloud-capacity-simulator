@@ -46,7 +46,7 @@ function catalogEntry(
 }
 
 // PRD §10 scenarios test per-node packing — fleet collapses to 1 Gen-A MM node
-// (4096 GiB, 208 vCPU). Multi-node behaviour is exercised by other tests.
+// (4096 GiB, 208 vCPU). Multi-node behavior is exercised by other tests.
 const genAMmFleet: FleetSpec = {
   hardwareGroupName: 'Gen-A MM-Std',
   memoryCategory: 'mm',

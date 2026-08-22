@@ -11,7 +11,7 @@
  * This classifier is intentionally DATA-DRIVEN — it keys off `country`
  * (primary) plus a longitude split for the USA. There is NO per-region
  * hardcoded enumeration, so a new region classifies automatically as long as
- * its country (or, for the USA, its longitude) is recognised. An unrecognised
+ * its country (or, for the USA, its longitude) is recognized. An unrecognised
  * country falls into the per-super-geo `Other` bucket (sorted last); it never
  * throws.
  *
@@ -36,7 +36,7 @@ export interface SubGeoInput {
   lon: number;
 }
 
-/** Normalise a country string for matching: lowercase, trimmed. */
+/** Normalize a country string for matching: lowercase, trimmed. */
 function norm(country: string): string {
   return (country || '').trim().toLowerCase();
 }

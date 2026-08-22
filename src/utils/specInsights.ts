@@ -119,7 +119,7 @@ const NET_MID_MBPS = 25_000; // ≥ 25 Gbps
 const MPV_COMPUTE_MAX = 2; // < 2 GiB/vCPU → compute-dense
 const MPV_MEMORY_MIN = 6; // > 6 GiB/vCPU → memory-dense
 
-// ── Arch labelling ───────────────────────────────────────────────────────
+// ── Arch labeling ───────────────────────────────────────────────────────
 
 /** Provider-aware marketing name for an Arm part, when inferable. Returns
  *  null for non-Arm or unknown. Grounded in provider + arch only. */

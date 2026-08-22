@@ -20,7 +20,7 @@
  *     still gates them.
  *   - `baseProvider` (optional) scopes the Family + Size options to that ONE
  *     "base cloud of comparison"; Category options stay cross-cloud. Undefined =
- *     all selected providers (the original behaviour).
+ *     all selected providers (the original behavior).
  */
 import { useMemo, useRef, useState } from 'react';
 import type { UserVm } from '../types';
@@ -43,7 +43,7 @@ interface Props {
    * Optional "base cloud of comparison". When set, the Family + Size option
    * lists are scoped to THIS provider only (so the page can disambiguate
    * "is this family Azure or AWS?"). Category options stay cross-cloud.
-   * When undefined, options span all selected `providers` (original behaviour).
+   * When undefined, options span all selected `providers` (original behavior).
    */
   baseProvider?: Provider;
 }

@@ -296,7 +296,7 @@ export function buildEquivalencyRows({
   // correct for rung 1 (the same-category hard gate), but it also strips the
   // ladder's fallback pool of the very families it exists to reach — e.g. a base
   // Azure DC* (Confidential) whose AWS confidential-capable PEERS (m6a/c6a/r6a,
-  // labelled General Purpose / Compute / Memory Optimized) are dropped before
+  // labeled General Purpose / Compute / Memory Optimized) are dropped before
   // rung 2 runs. FIX: draw the fallback pool from the FULL provider catalog
   // (`userVms`), restricted ONLY by the user's ACTUAL region pick
   // (`regionScopeByProvider[p]`) — never by scope INFERRED from `filteredVms`.
@@ -729,7 +729,7 @@ export function rankedFamiliesVsBase(
   // S65 (Fix 2) — the region-scoped-but-category-UNFILTERED catalog. When the base
   // is Confidential and the ② category filter has narrowed every cloud to
   // Confidential, `filteredVms` no longer holds the confidential-CAPABLE peers
-  // (m6a/c6a/r6a — labelled GP/CO/MO), so rung 2 would find an empty pool and the
+  // (m6a/c6a/r6a — labeled GP/CO/MO), so rung 2 would find an empty pool and the
   // ranking would degrade to a rung-3 cross-category match (~72-77%) instead of the
   // rung-2 confidential-feature-peer (~89%) the equivalents table now bridges to.
   // Passing the full pool restores rung 2's reach WITHOUT touching rung 1 (the
@@ -1089,7 +1089,7 @@ export function rankedCategoriesPerBase(
 // category/family filter — but that filter can hide a far better analog. The
 // canonical case: a memory base size (Azure E2_v3 = 2 vCPU/16 GiB) against GCP
 // scoped to the `m3` family, whose smallest size is ~32 vCPU/1 TB → a 1% match,
-// while GCP's true 100% analog `n2-highmem-2` lives in the `n2` family (labelled
+// while GCP's true 100% analog `n2-highmem-2` lives in the `n2` family (labeled
 // General Purpose) that the filter excludes. This finds those cases so the UI
 // can raise an actionable alert instead of silently showing a dead-end match.
 

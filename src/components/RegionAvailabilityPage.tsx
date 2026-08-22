@@ -196,7 +196,7 @@ export function RegionAvailabilityPage({
   // A picked region scopes to its GEO-EQUIVALENCE CLUSTER, not just its exact
   // name: picking Azure "Australia East" (Sydney) must also bring in AWS
   // ap-southeast-2 and GCP australia-southeast1 (both Sydney), so the scoreboard,
-  // coverage row, reveal lists and map all honour cross-cloud equivalence. We
+  // coverage row, reveal lists and map all honor cross-cloud equivalence. We
   // expand the picked set to every region in the same country within
   // REGION_CLUSTER_KM (the same union-find rule the equivalency table uses). The
   // ONLY thing that removes a cloud is deselecting it (handled by
@@ -1884,7 +1884,7 @@ export function RegionAvailabilityPage({
 
       {/* ── S54 — "At a glance" overlap cards, carried over directly below the
             KPI scoreboard: served-by-all / shared-by-two+ / per-cloud exclusive,
-            click-to-reveal, with the colour key that also explains the map dots.
+            click-to-reveal, with the color key that also explains the map dots.
             Only meaningful (and only shown) when ≥2 clouds are compared. ───── */}
       {showAvailability && coverageDetail.activeCount >= 2 && (
         <OverlapGlance
@@ -2422,7 +2422,7 @@ type RosterCard = {
  *  selection, grouped by super-geo (Americas / EMEA / APAC), rendered as a
  *  responsive multi-column grid of compact cards. Each card shows the metro +
  *  country (primary) and the serving clouds' own region names (secondary), and
- *  is colour-tinted by ownership (1 cloud = brand · 2 = purple · all = green). */
+ *  is color-tinted by ownership (1 cloud = brand · 2 = purple · all = green). */
 function RegionRoster({
   bySg,
   total,
@@ -2630,7 +2630,7 @@ function RevealPanel({
  * S53 — Market-gap reveal, framed from the BASE cloud's point of view.
  * Buckets the gap locations: base-present first ({base} only, then {base} +
  * each other cloud), then a "No {base}" section at the bottom divided by which
- * competitor fills the gap ({other} only, both). A compact colour key rides the
+ * competitor fills the gap ({other} only, both). A compact color key rides the
  * header row, on the same line as the title.
  * ──────────────────────────────────────────────────────────────────────── */
 const GAP_SHARED_FILL = '#A78BFA';
@@ -2827,7 +2827,7 @@ function OverlapStat({
 
 /* ────────────────────────────────────────────────────────────────────────
  * S54 — Overlap "at a glance" cards. The cross-cloud coverage breakdown
- * (served-by-all / shared-by-two+ / per-cloud exclusive) + colour key + a
+ * (served-by-all / shared-by-two+ / per-cloud exclusive) + color key + a
  * click-to-reveal locations panel. Mirrors the cards inside PmSummary so the
  * SAME glance renders on the Region-availability view directly below the KPI
  * scoreboard (carried over per user request), self-contained with its own
@@ -2903,10 +2903,10 @@ function OverlapGlance({
         {overlap.all + overlap.baseShared + (exclusiveItems[base]?.length ?? 0)} of {overlap.total} {base} regions (by unique region name)
       </div>
 
-      {/* Colour key — the reveal cards (and the map dots above) are tinted by
+      {/* Color key — the reveal cards (and the map dots above) are tinted by
           WHO serves a location. */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-text-muted">
-        <span className="font-semibold tracking-[0.04em] uppercase">Colour key</span>
+        <span className="font-semibold tracking-[0.04em] uppercase">Color key</span>
         {providers.map((p) => (
           <span key={p} className="flex items-center gap-1.5">
             <span style={{ width: 8, height: 8, borderRadius: 999, background: PROVIDER_TONE[p].fill, display: 'inline-block' }} />

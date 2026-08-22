@@ -21,7 +21,7 @@ The app has two halves. The **Capacity Simulator** packs committed demand onto o
 ---
 ## The problem this solves
 
-**A utilisation average cannot establish whether the next VM will fit.** Half-empty on the dashboard and unable to accept another VM are routinely both true of the same cluster, because the resource that runs out first is not the one being averaged. Memory, vCPU, network bandwidth and storage throughput deplete at different rates, and the first to run short caps what the fleet can hold however much of the other three is still sitting unused.
+**A utilization average cannot establish whether the next VM will fit.** Half-empty on the dashboard and unable to accept another VM are routinely both true of the same cluster, because the resource that runs out first is not the one being averaged. Memory, vCPU, network bandwidth and storage throughput deplete at different rates, and the first to run short caps what the fleet can hold however much of the other three is still sitting unused.
 
 **Demand is committed before the fleet is proven able to hold it.** The bill of materials is agreed with a date attached. Whether it lands is discovered later, when the inexpensive ways to correct it have gone.
 
@@ -143,12 +143,12 @@ Executive summaries export to **PPTX and DOCX** with every caveat carried throug
 ---
 ## It refuses to state a number it can't defend
 
-This is the other design centre, and the part that took the most work.
+This is the other design center, and the part that took the most work.
 
 **A value the vendor does not publish stays empty.** Nothing is interpolated to fill a
 gap. "EBS only" becomes zero local disk, not an estimate.
 
-**Anything estimated is labelled, everywhere it appears.** A derived processor mapping
+**Anything estimated is labeled, everywhere it appears.** A derived processor mapping
 reads *(assumed)*. A network figure taken from a legacy document, or a reserved rate
 inferred from pay-as-you-go, reads *(est.)*. Those markers survive into the PowerPoint
 and Word exports as footnotes on the slides that carry them — because the failure mode
@@ -158,7 +158,7 @@ someone burned in a review.
 **A saving is only claimed when both sides are fully priced.** If any line on either
 side is unmatched or unpriced, the tool reports no saving and names which side is
 incomplete. Notably, *"the option you already have is the cheapest"* is suppressed by
-the same rule. A favourable answer gets the same scrutiny as an unfavourable one, and
+the same rule. A favorable answer gets the same scrutiny as an unfavorable one, and
 that asymmetry is where most tools quietly cheat.
 
 **Two views can never disagree about the same fact**, because each number is computed in
@@ -205,7 +205,7 @@ every BoM line matched and priced, not merely most of them. Otherwise it returns
 | `base-partially-priced` | Some base lines are unmatched or unpriced, so the base total undercounts |
 | `cheapest-partially-priced` | The apparent winner is undercounted, so its lead may be an artifact |
 
-`base-already-cheapest` is gated on the same condition, so a favourable verdict cannot be
+`base-already-cheapest` is gated on the same condition, so a favorable verdict cannot be
 produced off a partially-priced base.
 
 **One kernel per number.** Every picked-pair match percentage on every surface — dock,

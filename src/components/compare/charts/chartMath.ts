@@ -58,7 +58,7 @@ export function stepdownSeries(bar: PriceBar): StepdownPoint[] {
 
 /** One stacked-bar segment. `unmatched` flags the terminal hatched segment that
  *  represents BoM lines with no cross-cloud match (they carry no cost, so their
- *  `value` is 0 and they exist only as a labelled marker). */
+ *  `value` is 0 and they exist only as a labeled marker). */
 export interface StackSegment {
   label: string;
   value: number;

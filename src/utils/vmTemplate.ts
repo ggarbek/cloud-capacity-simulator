@@ -246,7 +246,7 @@ function readNum(row: unknown[], col: number): number | null {
 
 function deriveMemoryCategoryLabel(memGib: number): CatalogEntry['memoryCategory'] {
   // Mirrors the hardware template's deriveMemoryCategory thresholds so the
-  // BomSection MM/HM/VHM pills colour correctly.
+  // BomSection MM/HM/VHM pills color correctly.
   if (memGib >= 24576) return 'Very High Memory (VHM)';
   if (memGib > 4096) return 'High Memory (HM)';
   return 'Medium Memory (MM)';

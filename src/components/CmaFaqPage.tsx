@@ -7,7 +7,7 @@
  * terms in real time; matching cards auto-expand. Everything is grounded in the
  * live source — the weights / formulae quote `src/utils/equivalence.ts`, the
  * penalties quote `vmCategory.ts` + `crossCloudEquivalency.ts`, and the as-of
- * date is read from `liveCatalog.ts`. Colours are CSS custom properties so it
+ * date is read from `liveCatalog.ts`. Colors are CSS custom properties so it
  * themes in light + dark.
  *
  * Section ids are a CONTRACT — `start` / `specs` / `exec` / `pricing` / `region`
@@ -134,7 +134,7 @@ const GLOSSARY: { term: string; def: string }[] = [
   { term: 'Market gap', def: 'A metro where at least one compared cloud has a region but not every compared cloud does — the unique-reach / missing-coverage signal.' },
   { term: 'Metro', def: 'A region collapsed to its datacenter city + country (N. Virginia, Sydney); the unit for overlap math, since one metro can host several regions on one cloud.' },
   { term: 'Government (sovereign) region', def: 'A region restricted to public-sector workloads. Gov regions only ever cluster with other gov regions, so a commercial region is never offered as their equivalent.' },
-  { term: 'Overlap buckets', def: 'The three ways a metro can be held: Served by all (every selected cloud), Shared by two+ (at least two), and Exclusive (only one). Colour-coded green / purple / that cloud’s own brand colour.' },
+  { term: 'Overlap buckets', def: 'The three ways a metro can be held: Served by all (every selected cloud), Shared by two+ (at least two), and Exclusive (only one). Color-coded green / purple / that cloud’s own brand color.' },
   { term: 'Footprint boxes', def: 'The per-cloud Coverage breakdown into Equivalent (cities a competitor also holds), Exclusive (only this cloud) and Market gaps (cities competitors hold and this one does not).' },
   { term: 'Reconciliation line', def: 'The arithmetic printed under the overlap cards — served-by-all plus shared plus exclusive equals the base cloud’s total regions — so you can check the buckets add up rather than trust them.' },
   { term: 'Region availability matrix', def: 'The location-by-cloud grid where a cell reads "✓ N VMs" when that cloud offers something in your current filter there, and "·" when it offers nothing. One row per metro.' },
@@ -166,7 +166,7 @@ const GLOSSARY: { term: string; def: string }[] = [
   // Data
   { term: 'Region-exploded catalog', def: 'One catalog row per provider × region × size (~96k rows), because pricing is per-region; deduped to ~3.2k distinct specs for matching.' },
   { term: 'As-of date', def: `The date the baked public pricing + specs were last pulled and shipped in the build. Currently as of ${LIVE_CATALOG_AS_OF}; refreshed weekly by CI.` },
-  { term: '(est.) marker', def: 'Marks a figure we modelled rather than read from the vendor: a reserved rate derived from PAYG, or a network throughput taken from a curated fallback. Treat it as directional.' },
+  { term: '(est.) marker', def: 'Marks a figure we modeled rather than read from the vendor: a reserved rate derived from PAYG, or a network throughput taken from a curated fallback. Treat it as directional.' },
   { term: '(assumed) marker', def: 'Marks a processor filled in from a source-cited curated map or inferred from the SKU name, because the vendor publishes no processor string. Display-only; it never changes a match score.' },
   { term: '(inferred) generation', def: 'A CPU generation deduced from the SKU naming rather than read from a published processor string. Shown so you know the generation line is a deduction.' },
   { term: 'host-dependent', def: 'Marks a family scheduled across two silicon options — the cloud decides which host you land on, you do not. Both options rank as the same generation.' },
@@ -1470,7 +1470,7 @@ const SECTIONS: FaqSection[] = [
       {
         id: 'reg-footprint',
         q: 'What are the three footprint boxes (Equivalent / Exclusive / Market gaps)?',
-        text: 'footprint boxes equivalent exclusive market gaps per cloud point of view partition cities colour coded competitor losing city to',
+        text: 'footprint boxes equivalent exclusive market gaps per cloud point of view partition cities color coded competitor losing city to',
         body: (
           <>
             <P>
@@ -1479,8 +1479,8 @@ const SECTIONS: FaqSection[] = [
             </P>
             <UL>
               <li><Strong>Equivalent</Strong> — cities it holds that at least one competitor also holds. Contested ground; the dots name who else is there.</li>
-              <li><Strong>Exclusive</Strong> — cities only it holds. Painted in its own brand colour: its unique reach.</li>
-              <li><Strong>Market gaps</Strong> — cities competitors hold and it doesn&apos;t. Painted in the <em>competitor&apos;s</em> colour — the cloud you&apos;re losing that city to.</li>
+              <li><Strong>Exclusive</Strong> — cities only it holds. Painted in its own brand color: its unique reach.</li>
+              <li><Strong>Market gaps</Strong> — cities competitors hold and it doesn&apos;t. Painted in the <em>competitor&apos;s</em> color — the cloud you&apos;re losing that city to.</li>
             </UL>
             <P>
               These are the same three questions the scoreboard answers, but read per cloud rather than from the
@@ -1802,7 +1802,7 @@ const SECTIONS: FaqSection[] = [
         body: (
           <>
             <P>
-              No — they split into two kinds, and the colour tells you which. An <Strong>amber (warn)</Strong>{' '}
+              No — they split into two kinds, and the color tells you which. An <Strong>amber (warn)</Strong>{' '}
               caveat says the two machines <em>differ</em> in a way that can change your plan. A{' '}
               <Strong>grey (info)</Strong> caveat says a dimension simply <em>could not be checked</em> — the
               match may be perfectly fine, but the score behind it is less informed than it looks. Warns sort
@@ -1843,7 +1843,7 @@ const SECTIONS: FaqSection[] = [
         body: (
           <>
             <P>
-              The colour of the ≈% pill is the fastest read. Three bands, and each implies a different amount of
+              The color of the ≈% pill is the fastest read. Three bands, and each implies a different amount of
               work before you can act on it:
             </P>
             <UL>
@@ -1871,7 +1871,7 @@ const SECTIONS: FaqSection[] = [
               silently and never overwrite a real value.
             </P>
             <UL>
-              <li><Strong><Mono>(est.)</Mono></Strong> — a modelled figure. On a price, a reserved rate derived from PAYG (see 04). On a network row, a throughput taken from a curated fallback because the primary feed carried none. Treat either as <em>directional</em>: right order of magnitude, not a billing quote.</li>
+              <li><Strong><Mono>(est.)</Mono></Strong> — a modeled figure. On a price, a reserved rate derived from PAYG (see 04). On a network row, a throughput taken from a curated fallback because the primary feed carried none. Treat either as <em>directional</em>: right order of magnitude, not a billing quote.</li>
               <li><Strong><Mono>(assumed)</Mono></Strong> — a processor filled in from a source-cited curated map, or inferred from the SKU name, because the vendor publishes no processor string. It is display-only and <Strong>never affects a match score</Strong>.</li>
               <li><Strong><Mono>host-dependent</Mono></Strong> — not an estimate at all. The family genuinely runs on either of two silicon options and the cloud decides which host you land on.</li>
               <li><Strong><Mono>(inferred)</Mono></Strong> on a generation — deduced from the SKU naming rather than read from a published string.</li>
@@ -2066,7 +2066,7 @@ const SECTIONS: FaqSection[] = [
             <UL>
               <li><Strong>Check the as-of date</Strong> in the Public Data pill, and the per-cloud shard age in <Strong>09 · Data health</Strong>. If a cloud&apos;s shard is old, its rates are old.</li>
               <li><Strong>Try PAYG.</Strong> Pay-as-you-go is published far more completely than the reserved tiers; a missing figure is very often a missing <em>reserved</em> rate, not a missing SKU.</li>
-              <li><Strong>Try another region.</Strong> Rates are per-region, and a brand-new region often prices before or after its neighbours.</li>
+              <li><Strong>Try another region.</Strong> Rates are per-region, and a brand-new region often prices before or after its neighbors.</li>
               <li><Strong>Upload your own rates</Strong> via the VM Library. Uploaded values override the baked catalog and are never overwritten by a refresh.</li>
             </UL>
             <P>
@@ -2168,7 +2168,7 @@ const SECTIONS: FaqSection[] = [
               <li><Strong>vCPU, memory and PAYG rates</Strong> — vendor-published on all three clouds and refreshed weekly. Safe to quote.</li>
               <li><Strong>Region presence</Strong> — published and cross-checked by the build-time guard.</li>
               <li><Strong>Network throughput</Strong> — published, but occasionally from a curated fallback; the <Mono>(est.)</Mono> marker tells you which.</li>
-              <li><Strong>Reserved (1-yr / 3-yr) rates</Strong> — real where published, modelled from PAYG where not. An <Mono>est.</Mono> badge marks every modelled one.</li>
+              <li><Strong>Reserved (1-yr / 3-yr) rates</Strong> — real where published, modeled from PAYG where not. An <Mono>est.</Mono> badge marks every modeled one.</li>
               <li><Strong>Azure processor / generation</Strong> — a curated assumption everywhere, because Azure publishes no processor string. Marked <Mono>(assumed)</Mono>, and never used to rank a match.</li>
               <li><Strong>GPU model detail and local-disk figures on newer families</Strong> — the most likely to be simply absent, which raises a &quot;GPU unverified&quot; or &quot;Local disk unknown&quot; caveat.</li>
             </UL>
@@ -2203,7 +2203,7 @@ const SECTIONS: FaqSection[] = [
               <li><Strong>Make capacity comparable.</Strong> &quot;Which machine on cloud B is this machine on cloud A?&quot; is answerable from published specs, repeatably, instead of by opinion or by a table someone maintained once.</li>
               <li><Strong>Score the comparison, then say how good it is.</Strong> A number is only useful next to a statement of how much to trust it — hence the ≈%, the bands and the caveats.</li>
               <li><Strong>Scale from one machine to a fleet</Strong> without changing the question. The same grammar answers &quot;this VM&quot; and &quot;this whole bill of materials&quot;.</li>
-              <li><Strong>Refuse to fabricate.</Strong> Every gap in the data shows up as a gap on screen, and every modelled figure says so.</li>
+              <li><Strong>Refuse to fabricate.</Strong> Every gap in the data shows up as a gap on screen, and every modeled figure says so.</li>
             </UL>
             <P>
               What it is <Strong>not</Strong>: a billing system, a quote, a procurement tool, or a substitute for
@@ -2242,7 +2242,7 @@ const SECTIONS: FaqSection[] = [
             <P>
               The honest verdict this tool <em>can</em> give is narrower and more useful: here is what each option
               wins on, here is what it costs, here is how comparable it really is, and here is what you give up.
-              The last judgement is the one you were hired to make.
+              The last judgment is the one you were hired to make.
             </P>
           </>
         ),
@@ -2294,7 +2294,7 @@ const SECTIONS: FaqSection[] = [
               <li>A missing rate is a <Mono>—</Mono>, never a $0 that would drag a total down and make an incomplete comparison look cheap.</li>
               <li>A <Strong>savings figure is withheld</Strong> when the two totals aren&apos;t comparable, and the reason and the excluded lines are named in its place.</li>
               <li>An <Strong>unpriced but available</Strong> family shows as available with no price, rather than being dropped from the map.</li>
-              <li>A <Strong>modelled</Strong> figure carries <Mono>(est.)</Mono>; an <Strong>inferred</Strong> one carries <Mono>(assumed)</Mono>; neither ever silently replaces a published value.</li>
+              <li>A <Strong>modeled</Strong> figure carries <Mono>(est.)</Mono>; an <Strong>inferred</Strong> one carries <Mono>(assumed)</Mono>; neither ever silently replaces a published value.</li>
               <li>A dimension that couldn&apos;t be compared raises a <Strong>caveat</Strong> instead of being scored as if it had been.</li>
             </UL>
             <P>

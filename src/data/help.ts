@@ -355,7 +355,7 @@ export const PROJECT_STATUS =
  * The dividing line is SCOPE, not ownership. The simulator reasons about one
  * concrete fleet against one concrete deployment; Cloud Market Analytics
  * reasons about the published market across providers. Ownership is the wrong
- * axis — the fleet being modelled is often one the operator sells capacity
+ * axis — the fleet being modeled is often one the operator sells capacity
  * from rather than rents, and the market view is as useful for benchmarking
  * your own offering as for shopping. Never let the two pages describe this
  * differently.
@@ -383,7 +383,7 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       {
         lead: 'The binding constraint identified, not averaged away:',
         body:
-          'Memory, vCPU, network bandwidth and storage throughput deplete at different rates, and the first to run short caps the fleet regardless of what the other three still show. A utilisation average reports a cluster half empty while it cannot accept another VM.',
+          'Memory, vCPU, network bandwidth and storage throughput deplete at different rates, and the first to run short caps the fleet regardless of what the other three still show. A utilization average reports a cluster half empty while it cannot accept another VM.',
       },
       {
         lead: 'Feasibility established before the commitment is made:',
@@ -406,7 +406,7 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       {
         lead: 'Is this deployment supportable on current capacity?',
         body:
-          'Whether every VM in the committed demand finds a node, at what utilisation, and with how much capacity left stranded.',
+          'Whether every VM in the committed demand finds a node, at what utilization, and with how much capacity left stranded.',
       },
       {
         lead: 'Where are we blocked, and why?',
@@ -429,7 +429,7 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       },
       {
         lead: 'A node must clear all four dimensions at once:',
-        body: 'Memory, vCPU, network bandwidth and storage throughput are tested together, and whichever runs out first is the binding constraint — so what governs is the highest utilisation of the four, never the average. A cluster sitting at 55% memory can still be unable to accept a single VM.',
+        body: 'Memory, vCPU, network bandwidth and storage throughput are tested together, and whichever runs out first is the binding constraint — so what governs is the highest utilization of the four, never the average. A cluster sitting at 55% memory can still be unable to accept a single VM.',
       },
       {
         lead: 'Large VMs are placed first, into the tightest fit:',
@@ -451,7 +451,7 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       },
       {
         lead: 'Costs are list price and straight-line depreciation:',
-        body: 'Capex is written down evenly across the usable life you set. Negotiated discounts and your own amortisation schedule are not modelled, and either would move the result.',
+        body: 'Capex is written down evenly across the usable life you set. Negotiated discounts and your own amortisation schedule are not modeled, and either would move the result.',
         learnMore: { label: 'Pricing basis (PAYG / RI)', target: 'pricing-basis' },
       },
     ],
@@ -479,7 +479,7 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       {
         lead: 'Headroom is a menu, never a sum:',
         body:
-          'The sizes that would fit the spare capacity compete for the same nodes, so they are listed as alternatives and never added together. Totalling them would invent capacity the fleet does not have.',
+          'The sizes that would fit the spare capacity compete for the same nodes, so they are listed as alternatives and never added together. Totaling them would invent capacity the fleet does not have.',
         learnMore: { label: 'Sellable capacity & headroom', target: 'sellable-headroom' },
       },
       {
@@ -549,7 +549,7 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
     assumptions: [
       {
         lead: 'Matching is computed from catalog specifications:',
-        body: 'Two sizes must first sit in the same product category — memory-optimised only ever matches memory-optimised — and within that gate the closest size wins on vCPU count, memory, and memory per vCPU, with the same CPU architecture and matching accelerators preferred. Because nothing is asserted from a hand-kept table, matches stay correct as new SKUs ship.',
+        body: 'Two sizes must first sit in the same product category — memory-optimized only ever matches memory-optimized — and within that gate the closest size wins on vCPU count, memory, and memory per vCPU, with the same CPU architecture and matching accelerators preferred. Because nothing is asserted from a hand-kept table, matches stay correct as new SKUs ship.',
         learnMore: { label: 'How matching works', target: 'similarity' },
       },
       {
@@ -559,7 +559,7 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       },
       {
         lead: 'Prices are public list rates:',
-        body: 'Enterprise agreements, committed-use discounts and private pricing are not modelled, and any of them would move every number here.',
+        body: 'Enterprise agreements, committed-use discounts and private pricing are not modeled, and any of them would move every number here.',
         learnMore: { label: 'How pricing is calculated', target: 'pricing' },
       },
       {
@@ -592,14 +592,14 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
         body: 'Nothing is interpolated to fill a gap, and a dash never silently means zero.',
       },
       {
-        lead: 'Estimates labelled wherever they appear:',
+        lead: 'Estimates labeled wherever they appear:',
         body:
           'The markers survive into the exported deck as footnotes, because caveats that live only in the app and vanish in the slide are the ones that get someone burned in a review.',
       },
       {
         lead: 'Savings claimed only when both sides are fully priced:',
         body:
-          'If either side carries an unmatched or unpriced line, no saving is stated and the incomplete side is named. A favourable answer gets the same scrutiny as an unfavourable one.',
+          'If either side carries an unmatched or unpriced line, no saving is stated and the incomplete side is named. A favorable answer gets the same scrutiny as an unfavorable one.',
       },
     ],
     demoCta: 'See it work',

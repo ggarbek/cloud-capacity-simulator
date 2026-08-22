@@ -844,7 +844,7 @@ export function FungibilityTab() {
 
   // Single-click on a cell (after release without drag past it) = cycle value.
   // We detect this by checking if selection size is 1 and matches the clicked
-  // cell AND the user didn't drag (anchor unchanged). Simplest behaviour:
+  // cell AND the user didn't drag (anchor unchanged). Simplest behavior:
   // double-click cycles. Stick with that to keep drag-select unambiguous.
   const onCellDoubleClick = (vmKey: string, hwId: string) => cycleCell(vmKey, hwId);
 

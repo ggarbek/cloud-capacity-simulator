@@ -86,7 +86,7 @@ function homeMatchesCluster(catalogHome: string, clusterHwName: string): boolean
  * populated, we match BOM rows by `cat.vmGeneration` against the union.
  * Falls back to the legacy string-match (catalog's homeHardwareGroup vs
  * cluster's hardwareGroupName) for custom/manual fleets that have neither
- * field set, so the original Phase-1 behaviour is preserved.
+ * field set, so the original Phase-1 behavior is preserved.
  */
 /**
  * v2.5: classifier upgrade. Returns BOTH a `BlockingReason` and a

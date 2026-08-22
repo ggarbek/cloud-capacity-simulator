@@ -10,7 +10,7 @@
  * Colors are semantic-only from tokens: at-or-above parity reads
  * `var(--interactive)`; under-parity (the contender is smaller than the base
  * on that dimension) reads `var(--accent-amber)` as a soft "you're giving
- * something up here" cue. No new accent colours.
+ * something up here" cue. No new accent colors.
  *
  * The `specRatios` helper is a PURE function exported from this file (unit-
  * tested in SpecRatioBars.test.ts). It is deliberately local — the shared

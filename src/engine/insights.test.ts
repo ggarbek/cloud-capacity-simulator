@@ -1,7 +1,7 @@
 /**
  * v2.11 (Phase E.5) — Insights engine acceptance tests.
  *
- * Pins the behaviour of the pure helpers used by the InsightsPane:
+ * Pins the behavior of the pure helpers used by the InsightsPane:
  *   - filterNodesByScope
  *   - sellableCapacity
  *   - revenueRollup

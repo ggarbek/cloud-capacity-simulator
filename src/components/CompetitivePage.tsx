@@ -2352,7 +2352,7 @@ export function CompetitivePage({
   // (c) Commit a value pick. Writes the SAME setter the old dropdown did, so
   //     every downstream consumer is unchanged. Category sets ALL active clouds
   //     (canonical / auto-mirror) and clears their family pick, matching the
-  //     prior behaviour. After a write, collapse the add-control.
+  //     prior behavior. After a write, collapse the add-control.
   const commitAddValue = (value: string) => {
     if (!addDim || addDim === 'provider' || !value) return;
     const p = addCloud;

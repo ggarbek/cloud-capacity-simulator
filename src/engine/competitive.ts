@@ -756,7 +756,7 @@ export interface HorizonCost {
  * Extrapolate per-provider cost over 1-month / 1-year / 3-year horizons.
  *
  * `term` selects the rate tier the whole matrix prices at (driven by the
- * Pricing page's Commitment-term toggle). When omitted, the legacy behaviour
+ * Pricing page's Commitment-term toggle). When omitted, the legacy behavior
  * applies — each row uses its best available rate (3y RI > 1y RI > PAYG). When
  * a term is given but the SKU has no rate for it, the row falls back to PAYG so
  * a missing RI tier never blanks the whole row; `bestRateLabel` records what was

@@ -1,5 +1,5 @@
 /**
- * Shared super-geo grouping + ownership colour-coding helpers.
+ * Shared super-geo grouping + ownership color-coding helpers.
  *
  * Extracted from RegionAvailabilityPage (v2.27.x) so the same framework feeds
  * both the Region Availability tab AND the Competitive page's supporting
@@ -7,12 +7,12 @@
  * dashboard's cross-cloud comparison surfaces.
  *
  * The doctrine these encode:
- *   - super-geo grouping: AMER / EMEA / APAC, labelled Americas / Europe ·
+ *   - super-geo grouping: AMER / EMEA / APAC, labeled Americas / Europe ·
  *     Middle East · Africa / Asia · Pacific.
- *   - ownership colour-coding: a location served by exactly one cloud is tinted
- *     that cloud's brand colour; by exactly two clouds → purple; by all → green.
+ *   - ownership color-coding: a location served by exactly one cloud is tinted
+ *     that cloud's brand color; by exactly two clouds → purple; by all → green.
  *
- * Behaviour is identical to the prior file-local defs in RegionAvailabilityPage.
+ * Behavior is identical to the prior file-local defs in RegionAvailabilityPage.
  */
 import { type SuperGeo, type RegionGeo } from '../data/regionCoordinates';
 import { regionGeo as resolveRegionGeo } from '../data/regionGeo';

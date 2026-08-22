@@ -498,7 +498,7 @@ export function StartHerePage({
           ))}
         </ol>
 
-        {/* The README's other design centre, condensed. Placed after the
+        {/* The README's other design center, condensed. Placed after the
             substance so it reads as a standard the tool holds itself to,
             rather than as a disclaimer up front. */}
         <SectionLabel>How it stays honest</SectionLabel>

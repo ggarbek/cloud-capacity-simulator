@@ -917,7 +917,7 @@ describe('findBetterMatchAlerts — flag a better analog hidden by the filter (v
 
 describe('bestMatchAnalog — closest cross-cloud analog category/family (v2.44)', () => {
   // Azure base = E series (Memory Optimized): small E2_v3 + large E96. GCP offers
-  // m3 (Memory Optimized, huge) AND n2-highmem (labelled General Purpose). The
+  // m3 (Memory Optimized, huge) AND n2-highmem (labeled General Purpose). The
   // genuine best match for the small E size is n2-highmem (General Purpose · n2),
   // NOT m3 — so the auto-pick must choose General Purpose, avoiding the m3 trap.
   const baseE: CatalogEntry[] = [
@@ -983,7 +983,7 @@ describe('bestMatchAnalog — closest cross-cloud analog category/family (v2.44)
       vm('Azure', { vmSizeName: 'DC8as_v5', family: 'DCasv5', category: 'Confidential', vcpus: 8, memoryGib: 32 }),
     ];
     const aws: CatalogEntry[] = [
-      // confidential-capable peer (labelled GP) — should win rung 2.
+      // confidential-capable peer (labeled GP) — should win rung 2.
       vm('AWS', { vmSizeName: 'm6a.2xlarge', family: 'm6a', category: 'General Purpose', vcpus: 8, memoryGib: 32 }),
       // non-capable GP size — rung-3 fodder only.
       vm('AWS', { vmSizeName: 'm7i.2xlarge', family: 'm7i', category: 'General Purpose', vcpus: 8, memoryGib: 32 }),
@@ -1123,7 +1123,7 @@ describe('A2 fallback ladder + caveats', () => {
 // The A2 tests above all pass `userVms === filteredVms`, so they never exercised
 // the bug the live equivalents table hit: `setupScopedVms` applies the ②
 // category filter to EVERY provider, so a Confidential-scoped view drops AWS's
-// confidential-CAPABLE peers (m6a/c6a/r6a — labelled General Purpose / Compute /
+// confidential-CAPABLE peers (m6a/c6a/r6a — labeled General Purpose / Compute /
 // Memory Optimized) from `filteredVms` BEFORE the ladder runs. Rung 2 then had an
 // empty pool and the view degraded to rung 3 "different category" (~72-77%)
 // instead of the rung-2 confidential-feature-peer (~89%) the unit tests saw.
@@ -1149,7 +1149,7 @@ describe('S65 confidential rung-2 through the live-view scoped path', () => {
     vm('Azure', { vmSizeName: 'DC8as_v5', family: 'DCasv5', category: 'Confidential', vcpus: 8, memoryGib: 32 }),
   ];
   const AWS_MIX: CatalogEntry[] = [
-    // Confidential-capable peers, labelled General Purpose (dropped by a
+    // Confidential-capable peers, labeled General Purpose (dropped by a
     // Confidential-only scope).
     vm('AWS', { vmSizeName: 'm6a.xlarge', family: 'm6a', category: 'General Purpose', vcpus: 4, memoryGib: 16 }),
     vm('AWS', { vmSizeName: 'm6a.2xlarge', family: 'm6a', category: 'General Purpose', vcpus: 8, memoryGib: 32 }),

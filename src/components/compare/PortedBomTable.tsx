@@ -25,7 +25,7 @@ import { pctTone } from './ui/tokens'; // S66 FIX-A — the ONE match-% tone
 import { CaveatChip } from './ui/CaveatChip'; // S66 FIX-A — exclusion chips
 
 /** Provider foreground / tint / border hexes — mirrors CompetitivePage's
- *  `PROVIDER_TONE` (which is local + unexported there). No new accent colours:
+ *  `PROVIDER_TONE` (which is local + unexported there). No new accent colors:
  *  Azure blue, AWS gold, GCP red, Custom = the indigo interactive token. */
 const PROVIDER_COLOR: Record<string, { fg: string; bg: string; border: string }> = {
   Azure: { fg: '#93C5FD', bg: 'rgba(96, 165, 250, 0.10)', border: 'rgba(96, 165, 250, 0.30)' },
@@ -170,7 +170,7 @@ export function PortedBomTable({
         ported.targetScenarios.map((s) => ({ provider: s.provider, line: s.lines[i] }));
       return {
         // Original BoM index — drives the visible line number + the row
-        // highlight, so the dock's "VIEW LINE 2" maps to the row labelled "2"
+        // highlight, so the dock's "VIEW LINE 2" maps to the row labeled "2"
         // even though rows are re-ordered into category groups below.
         bomIndex: i,
         vmSizeName: entry.vmSizeName,

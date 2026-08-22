@@ -1,6 +1,6 @@
 /**
  * Multi-cluster orchestration tests for `runMulti` — v2.4.2 iterative
- * spillover-when-full behaviour.
+ * spillover-when-full behavior.
  *
  * The single-cluster engine is already covered by `src/engine/simulator.test.ts`.
  * These tests exercise the claim phase cascade across multiple clusters when

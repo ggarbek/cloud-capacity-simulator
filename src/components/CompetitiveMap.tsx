@@ -382,7 +382,7 @@ export function CompetitiveMap({
         </div>
       )}
 
-      {/* Provider colour key — the metro dots are coloured by cloud. Each
+      {/* Provider color key — the metro dots are coloured by cloud. Each
           indicator is a clickable, multi-select filter: toggling one off hides
           its marks from the map (and re-frames the fit). At least one provider
           stays visible, so clicking the last shown one is a no-op. */}
@@ -693,7 +693,7 @@ function PinDetailCard({
 // Roster — the region list below the map, cleanly organized by super-geo
 // (AMER → EMEA → APAC). Each group gets a small uppercase header with a
 // count, then a tidy multi-column grid of provider-dotted region entries.
-// Entries are clustered by provider within a group so colours read as
+// Entries are clustered by provider within a group so colors read as
 // blocks, not a rainbow jumble. Replaces the old flat flex-wrap list.
 // ────────────────────────────────────────────────────────────────────────
 type RosterMark = { mark: MapMark; geo: RegionGeo; tone: ProviderTone };
@@ -760,7 +760,7 @@ function RosterGroup({
   onToggle: () => void;
 }) {
   // S53 — Within a super-geo, group by PROVIDER → one column per cloud (Azure /
-  // AWS / GCP) so the colours read as clean blocks instead of a scattered
+  // AWS / GCP) so the colors read as clean blocks instead of a scattered
   // rainbow. Within a column, order by sub-region (geographic) then region name.
   const columns = useMemo(() => {
     const subOrder = (m: RosterMark) =>
