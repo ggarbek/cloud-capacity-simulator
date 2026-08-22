@@ -21,13 +21,11 @@ The app has two halves. The **Capacity Simulator** packs committed demand onto o
 ---
 ## The problem this solves
 
-**A deployment is not blocked by "capacity." It is blocked by one specific resource, on one specific node.** Memory, vCPU, network bandwidth and storage throughput run out at different rates, and whichever hits zero first is the one that stops you. A fleet-level average cannot see that, and neither can a spreadsheet dividing total demand by total capacity — both will tell you a deployment fits when it doesn't, and neither can tell you why.
+**A utilisation average cannot establish whether the next VM will fit.** Half-empty on the dashboard and unable to accept another VM are routinely both true of the same cluster, because the resource that runs out first is not the one being averaged. Memory, vCPU, network bandwidth and storage throughput deplete at different rates, and the first to run short caps what the fleet can hold however much of the other three is still sitting unused.
 
-**Real allocators follow rules, not arithmetic.** Placement is shaped by zone, by which VM families are permitted on which hardware and in what order, by isolation requirements, and by buffer withheld before packing begins. This simulates that logic under the rules you set, rather than assuming demand lands wherever there happens to be room.
+**Demand is committed before the fleet is proven able to hold it.** The bill of materials is agreed with a date attached. Whether it lands is discovered later, when the inexpensive ways to correct it have gone.
 
-**It locates where the fleet is over- or under-provisioned for the demand you are placing.** Not a verdict on a past decision — a measurement, taken against a specific deployment and scoped to whichever slice you are looking at: fleet, region, zone or cluster. Where the fleet falls short, the demand that could not land is named and priced. Where it exceeds what the deployment needs, the capacity sitting idle is named and priced too. Both come out of the same run, in dollars.
-
-**It runs on your fleet, not a reference one.** Define your own hardware down to the node shape, place it into regions and availability zones, load the bill of materials you actually committed to, and price the result against published vendor list rates. Nothing here assumes a stock fleet you don't own.
+**Shortfall and excess capacity share the same blind spot.** Neither is visible until a specific deployment is tested against a specific fleet, and both cost money for every month they go unnoticed — one as demand that cannot be served, the other as hardware depreciating unused. The tool measures both, scoped to whichever slice is in view: fleet, region, zone or cluster.
 
 There is a third failure mode, quieter than the other two: a model that produces a confident number from data it doesn't actually have. A missing rate becomes a zero, an unmatched line item silently drops out of a total, and a savings recommendation reaches senior leadership built on a comparison where one side was only two-thirds priced. This tool answers the first two concretely and [structurally refuses the third](#it-refuses-to-state-a-number-it-cant-defend).
 

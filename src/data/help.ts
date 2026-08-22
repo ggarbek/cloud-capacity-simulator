@@ -381,19 +381,19 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       'Not “do we have enough memory,” and not “what is our average utilization.” The real question is whether every VM in a committed bill of materials finds a node where memory, vCPU, network bandwidth and storage throughput all clear at the same time — and when one does not, exactly which of those four blocked it, on which node, by how much.',
     problem: [
       {
-        lead: 'A utilisation average cannot tell you whether the next VM fits.',
+        lead: 'The binding constraint identified, not averaged away:',
         body:
-          'Half-empty on the dashboard and unable to accept another VM are routinely both true of the same cluster, because the resource that runs out first is not the one being averaged.',
+          'Memory, vCPU, network bandwidth and storage throughput deplete at different rates, and the first to run short caps the fleet regardless of what the other three still show. A utilisation average reports a cluster half empty while it cannot accept another VM.',
       },
       {
-        lead: 'Demand gets committed before the fleet is proven able to hold it.',
+        lead: 'Feasibility established before the commitment is made:',
         body:
-          'The bill of materials is agreed with a date attached. Whether it lands is discovered later, when the cheap ways to fix it have gone.',
+          'A bill of materials is agreed with a date attached. Whether it lands is normally discovered afterwards, once the inexpensive ways to correct it are gone.',
       },
       {
-        lead: 'Shortfall and spare capacity are the same blind spot.',
+        lead: 'Shortfall and excess capacity priced in the same run:',
         body:
-          'Neither is visible until a specific deployment is tested against a specific fleet, and both cost money every month they go unnoticed — one as demand you cannot serve, the other as hardware depreciating unused.',
+          'Neither is visible until a specific deployment is tested against a specific fleet, and both cost money every month they go unnoticed — one as demand that cannot be served, the other as hardware depreciating unused.',
       },
     ],
     answers: [
@@ -423,34 +423,34 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
     ],
     assumptions: [
       {
-        lead: 'Placement is permissioned, not automatic.',
+        lead: 'Placement is permissioned, not automatic:',
         body: 'Fungibility rules decide which VM families may occupy which hardware and in what order — a preferred home first, then spillover. A family with no rule does not place at all, however much room the fleet has.',
         learnMore: { label: 'Fungibility — Home vs Spillover', target: 'fungibility' },
       },
       {
-        lead: 'A node has to clear all four dimensions at once.',
+        lead: 'A node must clear all four dimensions at once:',
         body: 'Memory, vCPU, network bandwidth and storage throughput are tested together, and whichever runs out first is the binding constraint — so what governs is the highest utilisation of the four, never the average. A cluster sitting at 55% memory can still be unable to accept a single VM.',
       },
       {
-        lead: 'Large VMs are placed first, into the tightest node that still fits.',
+        lead: 'Large VMs are placed first, into the tightest fit:',
         body: 'A VM that cannot be placed is recorded with its reason and the run carries on, so one oversized request never hides the rest of the answer.',
       },
       {
-        lead: 'Very-high-memory classes never share a node.',
+        lead: 'Very-high-memory classes take a full node each:',
         body: 'They are treated as isolated — one VM per node, with nothing packed alongside them.',
       },
       {
-        lead: 'Buffer is withheld before packing starts.',
+        lead: 'Buffer is withheld before packing starts:',
         body: 'A flat percentage or a fixed node count comes off each cluster first, so headroom is never counted as capacity you could sell.',
         learnMore: { label: 'Buffer / overhead', target: 'buffer' },
       },
       {
-        lead: 'Stranded capacity is counted only where work is already running.',
+        lead: 'Stranded capacity is counted only on occupied nodes:',
         body: 'Leftover room is reported on nodes already holding a VM. Empty and reserved nodes are left out, so the figure means space trapped beside live workloads rather than hardware you simply have not filled yet.',
         learnMore: { label: 'Sellable capacity & headroom', target: 'sellable-headroom' },
       },
       {
-        lead: 'Money is list price and straight-line depreciation.',
+        lead: 'Costs are list price and straight-line depreciation:',
         body: 'Capex is written down evenly across the usable life you set. Negotiated discounts and your own amortisation schedule are not modelled, and either would move the result.',
         learnMore: { label: 'Pricing basis (PAYG / RI)', target: 'pricing-basis' },
       },
@@ -473,19 +473,19 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
     ],
     honesty: [
       {
-        lead: 'A value the vendor does not publish stays empty.',
+        lead: 'Unpublished values stay empty:',
         body: 'Nothing is interpolated to fill a gap, and a dash never silently means zero.',
       },
       {
-        lead: 'Headroom options are alternatives, not a sum.',
+        lead: 'Headroom is a menu, never a sum:',
         body:
-          'The sizes that would fit the spare capacity compete for the same nodes, so they are listed as a menu and never added together. Totalling them would invent capacity the fleet does not have.',
+          'The sizes that would fit the spare capacity compete for the same nodes, so they are listed as alternatives and never added together. Totalling them would invent capacity the fleet does not have.',
         learnMore: { label: 'Sellable capacity & headroom', target: 'sellable-headroom' },
       },
       {
-        lead: 'A number the inputs cannot support is not shown.',
+        lead: 'No number the inputs cannot support:',
         body:
-          'Where a rate, a spec or a cost is missing, the result says so and names what is missing rather than producing a confident figure from a gap.',
+          'Where a rate, a specification or a cost is missing, the result says so and names what is missing rather than producing a confident figure out of a gap.',
       },
     ],
     demoCta: 'See it work',
@@ -500,75 +500,75 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       'Cross-cloud VM comparison on published data, for a single size or an entire bill of materials. Four outputs: the nearest real equivalent on each cloud, how it differs in specification, what it costs across commitment terms, and where the market has a gap no provider fills.',
     problem: [
       {
-        lead: 'A vendor calculator can only price its own catalog.',
+        lead: 'Cross-cloud equivalents computed, not looked up:',
         body:
-          'It will tell you what an AWS instance costs on AWS. It will not tell you which AWS instance corresponds to the Azure size you actually run — the one comparison that matters is the one no vendor has an incentive to build.',
+          'No vendor publishes a mapping between an Azure size, an AWS instance and a GCP machine type. Establishing the equivalent is the prerequisite for any comparison, and it is the one input no provider has an incentive to produce.',
       },
       {
-        lead: 'Eyeballing vCPU and memory is how bad matches get made.',
+        lead: 'Comparisons that hold up against the workload:',
         body:
-          'Two sizes with the same headline numbers can differ in CPU architecture, memory ratio, local storage and network ceiling — the things that decide whether the workload actually runs, and none of which show up in a two-column comparison.',
+          'Two sizes with identical core and memory counts can differ in CPU architecture, memory-to-core ratio, local storage and network ceiling — the characteristics that determine whether the workload performs, none of which appear in the two figures most often quoted.',
       },
       {
-        lead: 'A cloud you cannot deploy into is not a cheaper cloud.',
+        lead: 'Availability enforced before price:',
         body:
-          'Price comparisons routinely ignore whether the provider offers that size in the regions you are bound to, which turns an apparent saving into an option that was never available.',
+          'A provider that does not offer the equivalent in the regions the workload is bound to is not a cheaper option. Comparisons that omit coverage produce savings against alternatives that were never available.',
       },
       {
-        lead: 'Gaps only appear when you look across providers at once.',
+        lead: 'Market gaps surfaced as findings:',
         body:
-          'Where nobody has an acceptable answer — for a category, a size class or a whole metro — that absence is itself the finding, and it is invisible from inside any single vendor catalog.',
+          'Where no provider offers an acceptable equivalent — for a category, a size class or an entire metro — that absence is a planning input in its own right, and it cannot be observed from inside a single vendor catalog.',
       },
     ],
     answers: [
       {
-        lead: 'The closest equivalent.',
+        lead: 'The closest equivalent on each cloud:',
         body:
-          'For one VM size or a whole bill of materials, the nearest real size each other cloud offers — derived from published specifications, not a hand-kept mapping, so it stays correct as new SKUs ship.',
+          'For one VM size or an entire bill of materials, the nearest real size each provider offers — derived from published specifications rather than a hand-kept mapping, so it stays correct as new SKUs ship.',
         learnMore: { label: 'How matching works', target: 'similarity' },
       },
       {
-        lead: 'How they compare.',
+        lead: 'Every specification difference, quantified:',
         body:
-          'Where the equivalent differs and by how much: vCPU, memory, memory per vCPU, CPU architecture, local storage, network. A similarity percentage, and a named caveat whenever the match is not a true peer.',
+          'Where the equivalent differs and by how much — vCPU, memory, memory per vCPU, CPU architecture, local storage, network — as a similarity percentage, with a named caveat whenever the match is not a true peer.',
         learnMore: { label: 'Reading the numbers', target: 'markers' },
       },
       {
-        lead: 'The cost delta.',
+        lead: 'The cost delta across commitment terms:',
         body:
-          'What the equivalent costs against what you run today, across pay-as-you-go and one- and three-year commitments, per region and over time.',
+          'What the equivalent costs against what runs today, on pay-as-you-go and on one- and three-year commitments, per region and over time.',
         learnMore: { label: 'How pricing is calculated', target: 'pricing' },
       },
       {
-        lead: 'The market gaps.',
+        lead: 'The gaps no provider fills:',
         body:
-          'Where no provider has an acceptable answer — a metro one cloud does not reach, a category with no peer, a line of demand nothing matches. Reported as a result, never dropped from a total.',
+          'A metro one cloud does not reach, a category with no peer, a line of demand nothing matches. Reported as a result rather than dropped from a total.',
         learnMore: { label: 'How region availability works', target: 'region' },
       },
     ],
     assumptions: [
       {
-        lead: 'Matching is computed from catalog specifications, not curated.',
+        lead: 'Matching is computed from catalog specifications:',
         body: 'Two sizes must first sit in the same product category — memory-optimised only ever matches memory-optimised — and within that gate the closest size wins on vCPU count, memory, and memory per vCPU, with the same CPU architecture and matching accelerators preferred. Because nothing is asserted from a hand-kept table, matches stay correct as new SKUs ship.',
         learnMore: { label: 'How matching works', target: 'similarity' },
       },
       {
-        lead: 'A match is scored, not declared.',
+        lead: 'A match is scored, not declared:',
         body: 'Whatever difference remains is blended into one similarity percentage, measured proportionally — a 4-vs-8 vCPU gap counts the same as 64 vs 128 — and anything short of a true peer carries a named caveat. Read the percentage as a distance, not a guarantee.',
         learnMore: { label: 'How matching works', target: 'similarity' },
       },
       {
-        lead: 'Prices are public list rates.',
+        lead: 'Prices are public list rates:',
         body: 'Enterprise agreements, committed-use discounts and private pricing are not modelled, and any of them would move every number here.',
         learnMore: { label: 'How pricing is calculated', target: 'pricing' },
       },
       {
-        lead: 'Region equivalency is a distance rule, not a vendor mapping.',
+        lead: 'Region equivalency is a distance rule, not a vendor mapping:',
         body: 'Two regions line up on the same row when they are in the same country, share the same sovereign or commercial class, and sit within 400 km of each other by great-circle distance. Country leads because data residency usually binds harder than latency. Grouping is by proximity rather than by matching city names, which is why AWS us-west-2 and GCP us-west1 — roughly 180 km apart in Oregon — correctly land together.',
         learnMore: { label: 'How region equivalency works', target: 'region' },
       },
       {
-        lead: 'Every rate carries the date it was pulled.',
+        lead: 'Every rate carries the date it was pulled:',
         body: 'When a refresh has gone stale it is shown as stale, rather than quietly served as current.',
         learnMore: { label: 'Where the data comes from', target: 'data' },
       },
@@ -588,18 +588,18 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
     ],
     honesty: [
       {
-        lead: 'A value the vendor does not publish stays empty.',
+        lead: 'Unpublished values stay empty:',
         body: 'Nothing is interpolated to fill a gap, and a dash never silently means zero.',
       },
       {
-        lead: 'Anything estimated is labelled wherever it appears.',
+        lead: 'Estimates labelled wherever they appear:',
         body:
           'The markers survive into the exported deck as footnotes, because caveats that live only in the app and vanish in the slide are the ones that get someone burned in a review.',
       },
       {
-        lead: 'A saving is only claimed when both sides are fully priced.',
+        lead: 'Savings claimed only when both sides are fully priced:',
         body:
-          'If either side has an unmatched or unpriced line, no saving is stated and the incomplete side is named. A favourable answer gets the same scrutiny as an unfavourable one.',
+          'If either side carries an unmatched or unpriced line, no saving is stated and the incomplete side is named. A favourable answer gets the same scrutiny as an unfavourable one.',
       },
     ],
     demoCta: 'See it work',
