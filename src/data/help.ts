@@ -363,7 +363,7 @@ export const TOOL_SPLIT: Record<'simulator' | 'cma', { title: string; when: stri
   cma: {
     title: 'Cloud Market Analytics — capacity you would rent',
     when:
-      'Use it to price the sourcing decision the simulator hands you: what the closest equivalent is on each cloud, where the market has gaps, and what the switch would cost you.',
+      'Use it to compare clouds on published data: the closest equivalent for a size or a whole demand, what it costs, where each provider can actually run it, and what a switch would give up.',
   },
 };
 
@@ -375,26 +375,25 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       'Not “do we have enough memory,” and not “what is our average utilization.” The real question is whether every VM in a committed bill of materials finds a node where memory, vCPU, network bandwidth and storage throughput all clear at the same time — and when one does not, exactly which of those four blocked it, on which node, by how much.',
     problem: [
       {
-        lead: 'Usable capacity is set by whichever resource becomes constrained first.',
+        lead: 'Nobody publishes a cross-reference.',
         body:
-          'Memory, vCPU, network bandwidth and storage throughput deplete at different rates, so the first one to run short caps what the fleet can hold — however much of the other three is still sitting there unused. A fleet-level average cannot see that, and neither can a spreadsheet dividing total demand by total capacity.',
+          'There is no canonical mapping between an Azure size, an AWS instance and a GCP machine type, and the shapes genuinely differ. The equivalent has to be computed before anything can be compared, let alone priced.',
       },
       {
-        lead: 'Real allocators follow rules, not arithmetic.',
+        lead: 'Price alone does not tell you what you are buying.',
         body:
-          'Placement is shaped by zone, by which VM families are permitted on which hardware and in what order, by isolation requirements, and by buffer withheld before packing starts. This simulates that logic under the rules you set, rather than assuming demand lands wherever there happens to be room.',
-        learnMore: { label: 'Fungibility — Home vs Spillover', target: 'fungibility' },
+          'A cheaper size with fewer vCPUs, a different CPU architecture or no local NVMe is not the same product. Comparing rates without comparing shape produces a saving that does not survive contact with the workload.',
       },
       {
-        lead: 'It locates where the fleet is over- or under-provisioned for the demand you are placing.',
+        lead: 'Coverage is part of the answer.',
         body:
-          'Not a verdict on a past decision — a measurement, taken against a specific deployment and scoped to whichever slice you are looking at: fleet, region, zone or cluster. Where the fleet falls short, the demand that could not land is named and priced. Where it exceeds what the deployment needs, the capacity sitting idle is named and priced too. Both come out of the same run, in dollars.',
-        learnMore: { label: 'Pricing basis (PAYG / RI)', target: 'pricing-basis' },
+          'A cloud that does not serve the metro is not an option at any price. Where each provider can actually run the equivalent is a constraint on the decision, not a footnote to it.',
       },
       {
-        lead: 'It runs on your fleet, not a reference one.',
+        lead: 'The rates are real and public.',
         body:
-          'Define your own hardware down to the node shape, place it into regions and zones, load the bill of materials you actually committed to, and price the result against published vendor rates. Nothing here assumes a stock fleet you do not own.',
+          'Every price comes from published vendor list pricing, dated in the app so it can be checked, rather than from an estimate or a stale internal sheet.',
+        learnMore: { label: 'Where the data comes from', target: 'data' },
       },
     ],
     answers: [
@@ -495,9 +494,9 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
   },
   cma: {
     question:
-      'What should run where, on which cloud, in which region, at what cost — and what do we give up by moving it?',
+      'What are the closest equivalents across clouds, how do they compare, and what is the cost delta?',
     lede:
-      'The simulator answers whether demand lands on the fleet you own. This half answers the sourcing question that follows: demand that will not fit has to go somewhere, and somewhere carries a price, a region footprint and a spec compromise. Answering feasibility without answering sourcing leaves you where you started.',
+      'Cross-cloud comparison on published data. No vendor publishes a mapping between an Azure size, an AWS instance and a GCP machine type, so the equivalent has to be computed before it can be compared or priced at all. This half does that for a single VM or an entire bill of materials: the nearest real size on each cloud, how it differs, what it costs across commitment terms, and which metros a cloud cannot reach.',
     problem: [
       {
         lead: 'Demand that will not fit has to go somewhere.',
@@ -568,7 +567,7 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       },
     ],
     answersFootnote:
-      'Which workload to move here is not decided on this side — the simulator determines what will not fit, and this prices the alternatives for it.',
+      'One common way in is from the simulator: whatever it could not place is a list of workloads to price here. Nothing requires that route, though — the comparison stands on its own.',
     dataNote:
       'Vendor specs and list rates ship pre-loaded and dated. Your own equivalencies and demand can be loaded from a spreadsheet, and everything runs in your browser: no account, nothing uploaded.',
     pages: [
