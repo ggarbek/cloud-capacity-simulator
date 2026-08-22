@@ -25,7 +25,7 @@ The app has two halves. The **Capacity Simulator** packs committed demand onto o
 
 **Real allocators follow rules, not arithmetic.** Placement is shaped by zone, by which VM families are permitted on which hardware and in what order, by isolation requirements, and by buffer withheld before packing begins. This simulates that logic under the rules you set, rather than assuming demand lands wherever there happens to be room.
 
-**Being wrong costs money in both directions, and the tool quantifies both.** Demand you cannot place is revenue you cannot serve. Capacity you never fill is depreciation on hardware that ages whether or not it earns. A single run reports the blocked side and the stranded side, in dollars.
+**It locates where the fleet is over- or under-provisioned for the demand you are placing.** Not a verdict on a past decision — a measurement, taken against a specific deployment and scoped to whichever slice you are looking at: fleet, region, zone or cluster. Where the fleet falls short, the demand that could not land is named and priced. Where it exceeds what the deployment needs, the capacity sitting idle is named and priced too. Both come out of the same run, in dollars.
 
 **It runs on your fleet, not a reference one.** Define your own hardware down to the node shape, place it into regions and availability zones, load the bill of materials you actually committed to, and price the result against published vendor list rates. Nothing here assumes a stock fleet you don't own.
 

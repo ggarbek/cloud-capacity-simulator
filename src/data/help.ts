@@ -386,9 +386,9 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
         learnMore: { label: 'Fungibility — Home vs Spillover', target: 'fungibility' },
       },
       {
-        lead: 'Being wrong costs money in both directions, and both get quantified.',
+        lead: 'It locates where the fleet is over- or under-provisioned for the demand you are placing.',
         body:
-          'Demand you cannot place is a commitment you cannot serve — revenue if the fleet sells capacity, a missed internal promise if it does not. Capacity you never fill is depreciation on hardware that ages whether or not it earns. The same run reports the blocked side and the stranded side, in dollars.',
+          'Not a verdict on a past decision — a measurement, taken against a specific deployment and scoped to whichever slice you are looking at: fleet, region, zone or cluster. Where the fleet falls short, the demand that could not land is named and priced. Where it exceeds what the deployment needs, the capacity sitting idle is named and priced too. Both come out of the same run, in dollars.',
         learnMore: { label: 'Pricing basis (PAYG / RI)', target: 'pricing-basis' },
       },
       {
