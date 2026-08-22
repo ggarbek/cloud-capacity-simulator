@@ -376,7 +376,7 @@ export const TOOL_SPLIT: Record<'simulator' | 'cma', { title: string; when: stri
 export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
   simulator: {
     question:
-      'Will this deployment actually land on the fleet we own — and if not, which resource is stopping it?',
+      'Will this deployment actually land on this fleet — and if not, which resource is stopping it?',
     lede:
       'Not “do we have enough memory,” and not “what is our average utilization.” The real question is whether every VM in a committed bill of materials finds a node where memory, vCPU, network bandwidth and storage throughput all clear at the same time — and when one does not, exactly which of those four blocked it, on which node, by how much.',
     problem: [
@@ -398,28 +398,27 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
     ],
     answers: [
       {
-        lead: 'The closest equivalent.',
+        lead: 'Does this fleet investment make sense?',
         body:
-          'For one VM size or a whole bill of materials, the nearest real size each other cloud offers — derived from published specifications, not a hand-kept mapping, so it stays correct as new SKUs ship.',
-        learnMore: { label: 'How matching works', target: 'similarity' },
+          'What the fleet costs to run against what it earns — depreciation and operating cost, gross margin against the target you set, and whether payback lands inside the usable life of the hardware rather than after it retires.',
+        learnMore: { label: 'Pricing basis (PAYG / RI)', target: 'pricing-basis' },
       },
       {
-        lead: 'How they compare.',
+        lead: 'Is this deployment supportable on current capacity?',
         body:
-          'Where the equivalent differs and by how much: vCPU, memory, memory per vCPU, CPU architecture, local storage, network. A similarity percentage, and a named caveat whenever the match is not a true peer.',
-        learnMore: { label: 'Reading the numbers', target: 'markers' },
+          'Whether every VM in the committed demand finds a node, at what utilisation, and with how much capacity left stranded.',
       },
       {
-        lead: 'The cost delta.',
+        lead: 'Where are we blocked, and why?',
         body:
-          'What the equivalent costs against what you run today, across pay-as-you-go and one- and three-year commitments, per region and over time.',
-        learnMore: { label: 'How pricing is calculated', target: 'pricing' },
+          'For every VM that fails to place: which of the four constraints stopped it, on which node, and by how much — including the difference between "this cluster cannot take it" and "no node anywhere ever could", because those are different decisions.',
+        learnMore: { label: 'Hardware, nodes & racks', target: 'hardware-nodes-racks' },
       },
       {
-        lead: 'The market gaps.',
+        lead: 'How much more can we sell on this fleet?',
         body:
-          'Where no provider has an acceptable answer — a metro one cloud does not reach, a category with no peer, a line of demand nothing matches. Reported as a result, never dropped from a total.',
-        learnMore: { label: 'How region availability works', target: 'region' },
+          'A defensible ceiling on the capacity still unused — what else would fit alongside what is already running, and what it would be worth.',
+        learnMore: { label: 'Sellable capacity & headroom', target: 'sellable-headroom' },
       },
     ],
     assumptions: [
@@ -478,14 +477,15 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
         body: 'Nothing is interpolated to fill a gap, and a dash never silently means zero.',
       },
       {
-        lead: 'Anything estimated is labelled wherever it appears.',
+        lead: 'Headroom options are alternatives, not a sum.',
         body:
-          'The markers survive into the exported deck as footnotes, because caveats that live only in the app and vanish in the slide are the ones that get someone burned in a review.',
+          'The sizes that would fit the spare capacity compete for the same nodes, so they are listed as a menu and never added together. Totalling them would invent capacity the fleet does not have.',
+        learnMore: { label: 'Sellable capacity & headroom', target: 'sellable-headroom' },
       },
       {
-        lead: 'A saving is only claimed when both sides are fully priced.',
+        lead: 'A number the inputs cannot support is not shown.',
         body:
-          'If either side has an unmatched or unpriced line, no saving is stated and the incomplete side is named. A favourable answer gets the same scrutiny as an unfavourable one.',
+          'Where a rate, a spec or a cost is missing, the result says so and names what is missing rather than producing a confident figure from a gap.',
       },
     ],
     demoCta: 'See it work',
@@ -522,22 +522,28 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
     ],
     answers: [
       {
-        lead: 'The closest equivalent, and how it really compares.',
+        lead: 'The closest equivalent.',
         body:
-          'For a VM size or a whole bill of materials, the nearest real size on each of the other clouds — computed from published specifications on vCPU, memory, memory-per-vCPU, architecture and accelerators — carrying a similarity percentage rather than an assertion, plus the cost delta against what you run today.',
+          'For one VM size or a whole bill of materials, the nearest real size each other cloud offers — derived from published specifications, not a hand-kept mapping, so it stays correct as new SKUs ship.',
         learnMore: { label: 'How matching works', target: 'similarity' },
       },
       {
-        lead: 'Where the market has gaps.',
+        lead: 'How they compare.',
         body:
-          'Which metros one cloud serves and another simply does not reach, and which lines of your demand have no acceptable equivalent anywhere. A gap is an answer, and it is reported rather than quietly dropped from a total.',
-        learnMore: { label: 'How region availability works', target: 'region' },
+          'Where the equivalent differs and by how much: vCPU, memory, memory per vCPU, CPU architecture, local storage, network. A similarity percentage, and a named caveat whenever the match is not a true peer.',
+        learnMore: { label: 'Reading the numbers', target: 'markers' },
       },
       {
-        lead: 'What the switch would actually cost you.',
+        lead: 'The cost delta.',
         body:
-          'If you moved this exact workload and ran the equivalent elsewhere: how much you would save across pay-as-you-go and one- and three-year commitments, set against what you would give up — fewer vCPUs, a different architecture, less local NVMe, an unpublished GPU spec. Both halves of the trade, stated together, because a saving that hides what it cost is not a saving.',
+          'What the equivalent costs against what you run today, across pay-as-you-go and one- and three-year commitments, per region and over time.',
         learnMore: { label: 'How pricing is calculated', target: 'pricing' },
+      },
+      {
+        lead: 'The market gaps.',
+        body:
+          'Where no provider has an acceptable answer — a metro one cloud does not reach, a category with no peer, a line of demand nothing matches. Reported as a result, never dropped from a total.',
+        learnMore: { label: 'How region availability works', target: 'region' },
       },
     ],
     assumptions: [
