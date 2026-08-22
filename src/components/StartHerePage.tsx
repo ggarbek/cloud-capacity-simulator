@@ -293,6 +293,21 @@ export function StartHerePage({
         {/* Why a planner would care, before what the tool is. The README
             opens the reader's half this way and the ordering is deliberate:
             the problem earns the rest of the page. */}
+        {/* Answered where the decision is made. A reader weighing "Build your
+            own" wants to know how their fleet gets in and where it goes before
+            they click, not in a footnote below the page map. */}
+        <div
+          style={{
+            marginTop: 14,
+            fontSize: 12,
+            color: 'var(--text-muted)',
+            lineHeight: 1.55,
+            maxWidth: 640,
+          }}
+        >
+          {c.dataNote}
+        </div>
+
         <SectionLabel>The problem it solves</SectionLabel>
         <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
           {c.problem.map((d) => (
@@ -326,6 +341,18 @@ export function StartHerePage({
             </li>
           ))}
         </ul>
+
+        <div
+          style={{
+            marginTop: 4,
+            fontSize: 12.5,
+            color: 'var(--text-muted)',
+            lineHeight: 1.6,
+            maxWidth: 720,
+          }}
+        >
+          {c.answersFootnote}
+        </div>
 
         <SectionLabel>What each page is for</SectionLabel>
         <div

@@ -243,7 +243,7 @@ const GLOSSARY_ITEM: { tab: SetupTab; item: NavItem } = {
   tab: 'glossary',
   item: {
     icon: IconGlossary,
-    label: 'Glossary',
+    label: 'FAQ & Glossary',
     hint: 'Every concept the tool uses, plus the common questions',
   },
 };

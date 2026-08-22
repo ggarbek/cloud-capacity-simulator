@@ -314,6 +314,14 @@ export interface StartHereContent {
    *  on the front page rather than buried, because a capacity answer read
    *  without its assumptions is worse than no answer. Planner language. */
   assumptions: StartHereBullet[];
+  /** One line under the four answers. The simulator produces a fifth thing it
+   *  cannot itself resolve — the demand that did not fit — and that hand-off
+   *  is a simulator output, not a Cloud Market Analytics feature. */
+  answersFootnote: string;
+  /** Answered at the moment the reader decides whether to try it with real
+   *  data: how their fleet gets in, and where it goes. Kept to one sentence —
+   *  the mechanics belong in the demo and the FAQ, not the front door. */
+  dataNote: string;
   /** Map of the rail: the gap the README never fills. */
   pages: StartHerePageRow[];
   /** Why the numbers can be trusted — condensed from the README's "It refuses
@@ -358,7 +366,7 @@ export const TOOL_SPLIT: Record<'simulator' | 'cma', { title: string; when: stri
   cma: {
     title: 'Cloud Market Analytics — capacity you would rent',
     when:
-      'Use it when the answer is to place work somewhere else: what the closest equivalent is on each cloud, where the market has gaps, and what the switch would cost you.',
+      'Use it to price the sourcing decision the simulator hands you: what the closest equivalent is on each cloud, where the market has gaps, and what the switch would cost you.',
   },
 };
 
@@ -378,13 +386,13 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
         lead: 'Real allocators follow rules, not arithmetic.',
         body:
           'Placement is shaped by zone, by which VM families are permitted on which hardware and in what order, by isolation requirements, and by buffer withheld before packing starts. This simulates that logic under the rules you set, rather than assuming demand lands wherever there happens to be room.',
-        learnMore: { label: 'How routing rules work', target: 'fungibility' },
+        learnMore: { label: 'Fungibility — Home vs Spillover', target: 'fungibility' },
       },
       {
         lead: 'Being wrong costs money in both directions, and both get quantified.',
         body:
           'Demand you cannot place is a commitment you cannot serve — revenue if the fleet sells capacity, a missed internal promise if it does not. Capacity you never fill is depreciation on hardware that ages whether or not it earns. The same run reports the blocked side and the stranded side, in dollars.',
-        learnMore: { label: 'How the economics are calculated', target: 'pricing-basis' },
+        learnMore: { label: 'Pricing basis (PAYG / RI)', target: 'pricing-basis' },
       },
       {
         lead: 'It runs on your fleet, not a reference one.',
@@ -397,7 +405,7 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
         lead: 'Does this fleet investment make sense?',
         body:
           'What the fleet costs to run against what it earns — depreciation and operating cost, gross margin against the target you set, and whether payback lands inside the usable life of the hardware rather than after it retires.',
-        learnMore: { label: 'How the economics are calculated', target: 'pricing-basis' },
+        learnMore: { label: 'Pricing basis (PAYG / RI)', target: 'pricing-basis' },
       },
       {
         lead: 'Is this deployment supportable on current capacity?',
@@ -408,13 +416,13 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
         lead: 'Where are we blocked, and why?',
         body:
           'For every VM that fails to place: which of the four constraints stopped it, on which node, and by how much — including the difference between "this cluster cannot take it" and "no node anywhere ever could", because those are different decisions.',
-        learnMore: { label: 'What the four constraints are', target: 'hardware-nodes-racks' },
+        learnMore: { label: 'Hardware, nodes & racks', target: 'hardware-nodes-racks' },
       },
       {
         lead: 'How much more can we sell on this fleet?',
         body:
           'A defensible ceiling on the capacity still unused — what else would fit alongside what is already running, and what it would be worth.',
-        learnMore: { label: 'How sellable headroom is measured', target: 'sellable-headroom' },
+        learnMore: { label: 'Sellable capacity & headroom', target: 'sellable-headroom' },
       },
     ],
     assumptions: [
@@ -451,6 +459,10 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
         learnMore: { label: 'Pricing basis (PAYG / RI)', target: 'pricing-basis' },
       },
     ],
+    answersFootnote:
+      'And the demand that did not fit is the fifth thing this produces — a sourcing list. The simulator decides what has to go elsewhere; pricing that move is what the other half is for.',
+    dataNote:
+      'Your fleet, VM catalog and demand can be typed in or loaded from a spreadsheet. Everything runs in your browser: no account, and nothing you load is uploaded anywhere.',
     pages: [
       { label: 'Quick Start', answers: 'Stand up a whole fleet from one form, then run it.' },
       { label: 'Cluster Builder', answers: 'Define the server types your fleet runs on.' },
@@ -460,7 +472,8 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       { label: 'Run Results', answers: 'The four questions answered in plain English, investment first.' },
       { label: 'Fleet Map', answers: 'The rack picture, with per-node and per-zone drill-down.' },
       { label: 'Scenario Analysis', answers: 'What else would fit on the fleet as it stands today.' },
-      { label: 'Glossary', answers: 'Every concept the tool uses, plus the common questions.' },
+      { label: 'VM Catalog', answers: 'The VM sizes available to place, and their published specs and rates.' },
+      { label: 'FAQ & Glossary', answers: 'Every concept the tool uses, plus the common questions.' },
     ],
     honesty: [
       {
@@ -534,12 +547,12 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       {
         lead: 'Matching is computed from catalog specifications, not curated.',
         body: 'Two sizes must first sit in the same product category — memory-optimised only ever matches memory-optimised — and within that gate the closest size wins on vCPU count, memory, and memory per vCPU, with the same CPU architecture and matching accelerators preferred. Because nothing is asserted from a hand-kept table, matches stay correct as new SKUs ship.',
-        learnMore: { label: 'How matching works, in full', target: 'similarity' },
+        learnMore: { label: 'How matching works', target: 'similarity' },
       },
       {
         lead: 'A match is scored, not declared.',
         body: 'Whatever difference remains is blended into one similarity percentage, measured proportionally — a 4-vs-8 vCPU gap counts the same as 64 vs 128 — and anything short of a true peer carries a named caveat. Read the percentage as a distance, not a guarantee.',
-        learnMore: { label: 'What the percentage means', target: 'similarity' },
+        learnMore: { label: 'How matching works', target: 'similarity' },
       },
       {
         lead: 'Prices are public list rates.',
@@ -557,6 +570,10 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
         learnMore: { label: 'Where the data comes from', target: 'data' },
       },
     ],
+    answersFootnote:
+      'Which workload to move here is not decided on this side — the simulator determines what will not fit, and this prices the alternatives for it.',
+    dataNote:
+      'Vendor specs and list rates ship pre-loaded and dated. Your own equivalencies and demand can be loaded from a spreadsheet, and everything runs in your browser: no account, nothing uploaded.',
     pages: [
       { label: 'Comparison Setup', answers: 'Set the base cloud and pick what to compare. Drives every other page.' },
       { label: 'Executive Summary', answers: 'The verdict first — cheapest viable target, the delta, the gaps.' },

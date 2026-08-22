@@ -12,7 +12,8 @@
  *
  * Section ids are a CONTRACT — `start` / `specs` / `exec` / `pricing` / `region`
  * / `similarity` / `markers` / `data` / `health` are deep-linked from Start Here
- * and from the public-data pill (`focusSection`). Add sections and items freely;
+ * and from the public-data pill (`focusSection`). `design` (10) is additive and
+ * not deep-linked. Add sections and items freely;
  * never rename or remove an existing id. Altitude rule: explain what a thing
  * MEANS, why it matters to a decision, and how to read it — algorithm internals
  * belong in the engine's own comments, not here.
@@ -109,6 +110,19 @@ const GLOSSARY: { term: string; def: string }[] = [
   { term: 'Burstable', def: 'A shared-core, credit-based size (Azure B, AWS T, GCP E2/shared) whose sustained CPU is throttled by an earned credit balance. Comparing one to a dedicated-vCPU size raises a caveat.' },
   { term: 'Bare metal', def: 'A whole physical server with no hypervisor. Matching one against a virtualized size raises a caveat because the operating model, not just the spec sheet, differs.' },
   { term: 'Match caveat', def: 'A short amber (warn) or grey (info) chip stating a specific reason a pairing is not a clean swap. The one-sentence explanation is on hover; all nine kinds are listed in section 06.' },
+  { term: 'Caveat severity (warn / info)', def: 'Amber "warn" means the two machines differ in a way that can change your plan. Grey "info" means a dimension simply could not be checked. Warn caveats sort first, so the top chip is always the one that matters most.' },
+  { term: 'Worst caveat', def: 'The single most important asterisk on a pairing — the highest-severity caveat, tie-broken by a fixed order. It is what a tight space (a chip row, an exported line) shows when there is only room for one.' },
+  { term: 'Different category (caveat)', def: 'The analog is filed under a different product class than your base pick and was only surfaced by the cross-category fallback. Read it as "the closest thing that exists, in a different aisle."' },
+  { term: 'Confidential peer (caveat)', def: 'One side is a purpose-built confidential family (Azure DC-series / EC-series); the other is a family that merely SUPPORTS confidential compute as an opt-in on capable silicon. Similar capability on paper, a different product to buy and operate.' },
+  { term: 'Burstable vs standard (caveat)', def: 'One side earns CPU credits and throttles when they run out; the other holds its vCPUs outright. A high ≈% here is comparing a machine that can sustain your load with one that may not.' },
+  { term: 'CPU architecture (caveat)', def: 'The two sides run different CPU architectures. Arm↔x86 is amber because it usually means a recompile or a new image; Intel↔AMD is grey because it usually does not.' },
+  { term: 'GPU unverified (caveat)', def: 'One side is a GPU size with no curated accelerator entry, so model, VRAM and interconnect could not be compared. The score reflects accelerator count and machine size only.' },
+  { term: 'Local disk unknown (caveat)', def: 'A Storage-Optimized size arrived with no local-disk figure, so the defining dimension of that whole category sat out of the comparison.' },
+  { term: 'CPU gen unknown (caveat)', def: 'Information-only: the CPU generation could not be read on one side, so that refinement was skipped. It lowers how INFORMED the score is, not how good the match is.' },
+  { term: 'Stretch match (caveat)', def: 'The caveat form of a stretch: below 40% overall, or one side roughly 4× the other on vCPU or memory. The closest thing on that cloud, not a comparable size.' },
+  { term: 'Bare metal (caveat)', def: 'One side is a whole physical server and the other is virtualized. The operating model differs even where the spec sheet lines up.' },
+  { term: 'SEV-SNP vs TDX', def: 'The two confidential-compute technologies the tool distinguishes: AMD SEV-SNP (Azure DCa / ECa families) and Intel TDX (DCe / ECe). Both encrypt memory from the host; they are not interchangeable if your attestation tooling targets one of them.' },
+  { term: 'Confidential-capable (opt-in)', def: 'A general-purpose family that CAN run confidential compute as an option on capable silicon, as distinct from a dedicated confidential SKU. Pairing one with the other raises the Confidential peer caveat.' },
   { term: 'Equivalency seed', def: 'The shipped set of widely-accepted cross-cloud mappings used to pre-fill picks. It is a starting opinion, not vendor doctrine, and anything you author overrides it.' },
   { term: 'Equivalency template', def: 'The downloadable Excel sheet (Azure SKU · AWS SKU · GCP SKU · Notes) for hand-authoring the mappings. Re-uploading it REPLACES the whole table rather than merging into it.' },
   // Region
@@ -124,6 +138,9 @@ const GLOSSARY: { term: string; def: string }[] = [
   { term: 'Footprint boxes', def: 'The per-cloud Coverage breakdown into Equivalent (cities a competitor also holds), Exclusive (only this cloud) and Market gaps (cities competitors hold and this one does not).' },
   { term: 'Reconciliation line', def: 'The arithmetic printed under the overlap cards — served-by-all plus shared plus exclusive equals the base cloud’s total regions — so you can check the buckets add up rather than trust them.' },
   { term: 'Region availability matrix', def: 'The location-by-cloud grid where a cell reads "✓ N VMs" when that cloud offers something in your current filter there, and "·" when it offers nothing. One row per metro.' },
+  { term: 'Availability-only row', def: 'A (region, family) the vendor publishes but the rate feed has not priced yet. It counts as available, with its price left empty — availability is answered from the vendor’s published coverage, never inferred from whether a price happened to arrive.' },
+  { term: 'Published availability table', def: 'The per-region family list parsed from each vendor’s own coverage documentation. It is what the availability answers are built from, and a build-time check fails the build if it drifts from the vendor doc.' },
+  { term: 'Great-circle distance', def: 'Straight-line distance across the surface of the Earth between two regions’ datacenter cities — the measure used, after country, to decide whether two regions cluster as equivalents.' },
   { term: 'Why equivalent', def: 'The rationale column on the line-by-line region equivalency table, stating in words why regions were clustered (same country, distance apart, which cloud is missing). Scan it to spot a mismatch.' },
   { term: 'Muted cloud', def: 'A cloud hidden from the Region page only. Muting is a page-local view change; your Comparison setup keeps the cloud, unlike deselecting it in setup.' },
   { term: 'Pinned region', def: 'A map marker you clicked to keep open, with its exact coordinates and super-geo below the map. Cmd/Ctrl or Shift-click pins several at once.' },
@@ -144,6 +161,7 @@ const GLOSSARY: { term: string; def: string }[] = [
   { term: 'Unpriced line', def: 'A BoM line that DID find an equivalent, but no rate resolves for that SKU, region and term. Also excluded from the total — a different failure from "no analog".' },
   { term: 'Fully priced', def: 'A cloud whose total includes every line of the BoM. A savings figure is only stated when both the base and the winner are fully priced.' },
   { term: 'Suppressed savings', def: 'The deliberate withholding of a savings number when the two totals are not comparable. The screen names the reason and lists the excluded lines instead of showing a smaller-looking figure.' },
+  { term: 'Applied rate label', def: 'The small "3y RI" / "1y RI" / "PAYG" tag on a normalized or horizon figure, naming which rate tier actually produced it. When a cloud publishes no rate at your chosen term, the figure falls back to PAYG and says so rather than reading as a committed price.' },
   { term: '★ lowest', def: 'The tag on the cheapest cloud in a cost panel; the others read "+$X (Y%) more than" it. It ranks only the clouds that actually priced.' },
   // Data
   { term: 'Region-exploded catalog', def: 'One catalog row per provider × region × size (~96k rows), because pricing is per-region; deduped to ~3.2k distinct specs for matching.' },
@@ -156,6 +174,26 @@ const GLOSSARY: { term: string; def: string }[] = [
   { term: 'Priced SKUs awaiting specs', def: 'Rate rows that arrived before their matching spec row. They are counted honestly in Data health and kept OUT of the catalog until both halves are present.' },
   { term: 'Curated processor map', def: 'The source-cited table that fills Azure’s missing processor strings by series. It is why Azure reports high processor coverage instead of 0%, and why those values carry "(assumed)".' },
   { term: 'Coverage guard', def: 'A build-time check that diffs the vendor docs against the curated region/family tables and fails the build when they drift. It runs in CI, not on screen.' },
+  { term: 'Integrity gate (shard validator)', def: 'The check that runs between a fresh weekly pull and the moment it would be published. If the new data is worse than the data already shipped, the gate fails the refresh and the last known-good data stays live.' },
+  { term: 'Row-shrink check', def: 'One of the integrity gates: a cloud’s spec, network or rate row count may not fall more than 5% against the previous good pull. It catches a vendor API returning a truncated set.' },
+  { term: 'Coverage-drop check', def: 'One of the integrity gates: processor or network coverage may not fall more than one percentage point against the previous good pull. It catches a quiet regression in what the feed carries.' },
+  { term: 'Unjoined-rate ceiling', def: 'One of the integrity gates: a cap on the share of priced SKUs still awaiting a spec. Crossing it means the two halves of the feed have drifted apart, and the refresh fails rather than shipping a half-joined catalog.' },
+  { term: 'Schema check', def: 'One of the integrity gates: a sample of fresh records is checked field by field, so a vendor changing a field name fails the refresh instead of silently emptying a column.' },
+  { term: 'Keyed shard', def: 'A data pull that needs a credential (Azure specs, GCP rates). When the credential is absent the refresh SKIPS that pull and keeps the last good shard, so the build never breaks — it just ages.' },
+  { term: 'Staleness warning (30 days)', def: 'A warning raised when a keyed shard has gone more than 30 days without a refresh because its credential is missing. It warns, never fails — the gate is a separate thing.' },
+  { term: 'Last known-good data', def: 'The data already committed and shipping. Every integrity gate is written to preserve it: a bad pull is discarded, not merged, so the worst outcome of a failed refresh is data that is old rather than data that is wrong.' },
+  // Family knowledge / education
+  { term: 'Family profile', def: 'The short write-up under a family: what it is, a few spec-derived key points, what it is best for, when to pick it, its cross-cloud analogs, and a link to the vendor’s own page.' },
+  { term: 'When to pick', def: 'The accented line in a family profile giving the practical selection rule for that family, sourced from the vendor’s own documentation. It appears only for families that carry a curated entry.' },
+  { term: 'Analogs line', def: 'The "≈ Azure … · GCP …" line in a family profile — a hand-authored, widely-accepted cross-cloud reading of that family. Editorial context; it does not feed the computed ≈% score.' },
+  { term: 'Curated family entry', def: 'One of roughly sixty families with a sourced write-up attached. Families without one still get a profile derived from their own specs — they simply carry no "when to pick" line and no vendor link.' },
+  // Exports
+  { term: 'Export brief', def: 'The Executive Summary’s download control. It writes a .pptx deck or a .docx document, in whichever mode you are in, from the same computed values the page is displaying.' },
+  { term: 'Leadership arc', def: 'The fixed seven-part order every exported brief follows — verdict, recommendation, cost story, get vs give up, evidence, coverage, risks and methodology — identical in both modes so a reader always knows where to look.' },
+  { term: 'Risks & methodology page', def: 'The last part of every exported brief: every estimate, assumption, caveat, excluded line and withheld savings figure gathered in one place, so nothing the screen disclosed goes missing in the deck.' },
+  // Scope of the tool
+  { term: 'Client-side', def: 'Computed in your own browser. The comparison engines, the pricing math and the export generators all run locally; the app fetches only its own shipped data files.' },
+  { term: 'Proof of concept', def: 'What this tool is: a demonstration of a method for quantifying and managing capacity, built on real public data. It is deliberately a decision aid, not a billing system, and never a quote.' },
 ];
 
 // ── Small presentational helpers (CSS tokens only) ───────────────────────────
@@ -632,6 +670,34 @@ const SECTIONS: FaqSection[] = [
         ),
       },
       {
+        id: 'specs-family-knowledge',
+        q: 'Where does the family write-up — "When to pick", the analogs line — come from?',
+        text: 'family profile knowledge curated entries sixty families when to pick analogs vendor source link editorial not scored degrades gracefully what it is key points best for',
+        body: (
+          <>
+            <P>
+              A family profile is built in two layers, and it is worth knowing which layer you are reading:
+            </P>
+            <UL>
+              <li><Strong>Derived from the specs</Strong> — the vCPU and memory span, the memory-per-vCPU profile, the key points. These are computed from the sizes in the family and are as current as the catalog.</li>
+              <li><Strong>Curated and sourced</Strong> — the opening &quot;what it is&quot; sentence, the <Strong>When to pick</Strong> line and the <Strong>≈ analogs</Strong> line. These are hand-written against the vendor&apos;s own current documentation, and the <Strong>Source ↗</Strong> link goes to the exact page they came from.</li>
+            </UL>
+            <P>
+              Roughly <Strong>sixty families</Strong> carry a curated entry, concentrated on current-generation
+              lines and on the categories where the choice is least obvious (storage, HPC, burstable,
+              confidential, GPU). A family without one still gets a full profile from its own specs — it simply
+              shows no &quot;When to pick&quot; line and no vendor link, which is the honest signal that nobody has
+              written one yet.
+            </P>
+            <P>
+              The curated layer is <Strong>additive only</Strong>. It never contradicts a spec-derived fact and it
+              never moves a ≈% score — read it as informed editorial context to weigh against the numbers, not as
+              part of them.
+            </P>
+          </>
+        ),
+      },
+      {
         id: 'specs-pct',
         q: 'What is the "≈ % match" on each cloud?',
         text: 'percent match similarity to base spec distance how like for like swap matchPct',
@@ -898,6 +964,45 @@ const SECTIONS: FaqSection[] = [
               <Mono>(est.)</Mono> / <Mono>(assumed)</Mono> markers, names any excluded lines, and states plainly
               when a savings figure was withheld — so the document can&apos;t claim more than the screen did.
             </P>
+            <P>
+              Both formats work in <Strong>both modes</Strong> — a single-comparison brief and a whole-BoM brief
+              follow the same running order, only the data changes. The file is written{' '}
+              <Strong>in your browser</Strong>: nothing is uploaded, no server renders it, and it works with the
+              tab offline.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'exec-export-arc',
+        q: 'What is in the exported brief, in order?',
+        text: 'export contents slide order seven parts arc verdict recommendation cost story get vs give up evidence spec differences coverage gaps risks methodology same numbers as screen cannot disagree deck docx',
+        body: (
+          <>
+            <P>
+              One fixed <Strong>seven-part arc</Strong>, in the same order every time and in both modes, so a
+              reader who has seen one brief knows where to look in the next:
+            </P>
+            <UL>
+              <li><Strong>1 · Verdict</Strong> — the one-sentence money answer, what was compared, and the date.</li>
+              <li><Strong>2 · Recommendation</Strong> — adopt / stay / validate / watch, stated as a call rather than a chart.</li>
+              <li><Strong>3 · The cost story</Strong> — the cost table, the comparison bars, the commitment economics, and any non-comparable disclosure.</li>
+              <li><Strong>4 · What you get vs what you give up</Strong> — the per-cloud trade-offs (per-portfolio in BoM mode).</li>
+              <li><Strong>5 · Evidence</Strong> — the size-for-size table and the situational best-at calls (in BoM mode, the top cost-driver lines), plus the spec deltas where there are any.</li>
+              <li><Strong>6 · Coverage &amp; gaps</Strong> — regions per cloud and the metros your base cloud is missing.</li>
+              <li><Strong>7 · Risks &amp; methodology</Strong> — every asterisk in one place.</li>
+            </UL>
+            <P>
+              The reason the order is frozen matters more than the order itself: an executive artifact that
+              rearranges itself per run cannot be reviewed, and the seventh part exists so the honest caveats are
+              never the thing that got cut for space.
+            </P>
+            <P>
+              Every figure in the brief is the <Strong>same computed value the page rendered</Strong>, formatted
+              through the same rules — the export doesn&apos;t recalculate anything of its own. That is
+              deliberate: a slide that disagrees with the screen destroys trust in both, and the only reliable way
+              to prevent it is to give them one source rather than two.
+            </P>
           </>
         ),
       },
@@ -1119,16 +1224,31 @@ const SECTIONS: FaqSection[] = [
       {
         id: 'price-normalized',
         q: 'What are the normalized $/vCPU/mo and $/GiB/mo rates?',
-        text: 'normalized unit rate price performance dollars per vcpu per month per gib lowest wins shapes dont line up honest comparison basis',
+        text: 'normalized unit rate price performance dollars per vcpu per month per gib lowest wins shapes dont line up honest comparison basis when to read instead of headline price applied rate label payg fallback null divisor',
         body: (
-          <P>
-            Cost restated <Strong>per unit of capacity</Strong> rather than per machine, so different-sized
-            options can be compared fairly. When the compared sizes are the same shape, the monthly total is the
-            simpler read. When they <Strong>aren&apos;t</Strong> — one cloud&apos;s closest analog has 25% more
-            memory, say — the raw total is comparing two different amounts of machine, and the page says so:{' '}
-            <Strong>&quot;shapes don&apos;t line up — normalized unit rates are the honest comparison
-            basis.&quot;</Strong> When you see that note, read the normalized row, not the headline.
-          </P>
+          <>
+            <P>
+              Cost restated <Strong>per unit of capacity</Strong> rather than per machine, so different-sized
+              options can be compared fairly. When the compared sizes are the same shape, the monthly total is the
+              simpler read. When they <Strong>aren&apos;t</Strong> — one cloud&apos;s closest analog has 25% more
+              memory, say — the raw total is comparing two different amounts of machine, and the page says so:{' '}
+              <Strong>&quot;shapes don&apos;t line up — normalized unit rates are the honest comparison
+              basis.&quot;</Strong> When you see that note, read the normalized row, not the headline.
+            </P>
+            <P>Read the normalized rates instead of the headline price whenever:</P>
+            <UL>
+              <li>The equivalents differ in <Strong>vCPU or memory</Strong> — the usual case, since the closest analog on another cloud rarely lands on the exact same shape.</li>
+              <li>You are choosing between <Strong>different sizes of the same thing</Strong>, where the bigger machine is obviously more expensive and that tells you nothing.</li>
+              <li>Someone has quoted you a total and you want to know whether it is cheap <em>per unit of what you actually get</em>.</li>
+            </UL>
+            <P>
+              Each unit rate carries the <Strong>rate tier it was computed from</Strong> (<Mono>3y RI</Mono> /{' '}
+              <Mono>1y RI</Mono> / <Mono>PAYG</Mono>), because a cloud with no published rate at your chosen term
+              falls back to pay-as-you-go and would otherwise look expensive for the wrong reason. And a unit rate
+              is left <Strong>blank</Strong> whenever the rate is missing or the vCPU / memory divisor is —
+              never divided into a fabricated number.
+            </P>
+          </>
         ),
       },
       {
@@ -1202,16 +1322,24 @@ const SECTIONS: FaqSection[] = [
         text: 'region equivalent same country gov class within 400 km union find cluster rule data residency',
         body: (
           <>
-            <P>Two regions are equivalent when all three hold (<Mono>buildRegionEquivalents</Mono>):</P>
+            <P>Two regions are equivalent when all three hold:</P>
             <UL>
               <li><Strong>Same country.</Strong> Data residency dominates — Azure &quot;West Europe&quot; (Netherlands) ≠ AWS &quot;eu-west-1&quot; (Ireland).</li>
               <li><Strong>Same sovereignty class.</Strong> Government regions only cluster with other gov regions.</li>
               <li><Strong>Within 400 km</Strong> (<Mono>REGION_CLUSTER_KM</Mono>) by great-circle distance.</li>
             </UL>
             <P>
-              The clustering is <Strong>union-find with single linkage</Strong>: a region joins a cluster if
-              it&apos;s within 400 km of <em>any</em> member. Edge locations (AWS Local Zones / Wavelength) are
-              skipped — they have no cross-cloud peer.
+              A region joins a cluster if it&apos;s within 400 km of <em>any</em> member, so a chain of nearby
+              sites merges into one metro group. Edge locations (AWS Local Zones / Wavelength) are skipped — they
+              have no cross-cloud peer.
+            </P>
+            <P>
+              The order of those tests is the whole opinion in this feature. <Strong>Country is tested
+              first</Strong>, sovereignty class second, and only then <Strong>distance</Strong> — because for a
+              capacity plan, <Strong>data residency binds harder than latency</Strong>. Two datacenters 200 km
+              apart across a border are not substitutes if your data can&apos;t cross it, while two 350 km apart
+              inside one country usually are. A tool that ranked purely by kilometres would confidently offer you
+              regions you are not allowed to use.
             </P>
           </>
         ),
@@ -1415,6 +1543,34 @@ const SECTIONS: FaqSection[] = [
         ),
       },
       {
+        id: 'reg-unpriced',
+        q: 'A region shows a family as available but has no price for it — which one is wrong?',
+        text: 'availability decoupled from pricing family available no rate price null not in feed vendor publishes coverage docs china sovereign mac c2d c3d c4a t2d availability only row never fabricated',
+        body: (
+          <>
+            <P>
+              Neither. <Strong>Availability and pricing are answered separately, on purpose.</Strong> Whether a
+              cloud offers a family in a region comes from the vendor&apos;s own published coverage
+              documentation. Whether we hold a rate for it comes from the vendor&apos;s pricing feed. Those two
+              sources do not always agree, and the honest answer is to report each one for what it is.
+            </P>
+            <P>
+              So a family the vendor lists in a region but the rate feed hasn&apos;t priced still shows as{' '}
+              <Strong>available there</Strong>, with its price left <Strong>empty</Strong> — never filled with a
+              placeholder, never $0, and never quietly dropped. When the rate arrives on a later refresh it simply
+              replaces the blank.
+            </P>
+            <P>
+              The alternative — treating &quot;we have no price&quot; as &quot;the cloud doesn&apos;t offer
+              it&quot; — is the failure mode this exists to prevent: whole families showing as available nowhere,
+              and a coverage answer that was really a pricing answer wearing a disguise. If a region matters to
+              you and the price is blank, that is a prompt to check the vendor&apos;s pricing page, not evidence
+              that you can&apos;t deploy there.
+            </P>
+          </>
+        ),
+      },
+      {
         id: 'reg-coverage-vs',
         q: 'What is the Coverage view vs Region availability?',
         text: 'coverage view executive footprint partition exclusive market gap metros editable chips availability map first',
@@ -1524,9 +1680,9 @@ const SECTIONS: FaqSection[] = [
             <P>
               Before this, GPUs matched on <em>count alone</em>, so an <Strong>8×H100 read ≈100% like an
               8×L4</Strong>. Now that pair reads <Strong>≈37%</Strong> while 8×H100 ↔ 8×H200 stays high. These
-              model/VRAM/link terms are <Strong>inert unless both sizes resolve a curated spec</Strong>{' '}
-              (<Mono>acceleratorSpecs.ts</Mono>, ~23 GPU families) — unknown accelerators fall back to count +
-              size with no fabrication.
+              model/VRAM/link terms are <Strong>inert unless both sizes resolve a curated accelerator
+              spec</Strong> — unknown accelerators fall back to count + size with no fabrication, and say so
+              through a <Strong>GPU unverified</Strong> caveat.
             </P>
           </>
         ),
@@ -1559,7 +1715,7 @@ const SECTIONS: FaqSection[] = [
           <>
             <P>
               Same category is a <Strong>hard gate</Strong> — different categories return an infinite distance
-              (0%). Matching uses an <em>effective</em> category (<Mono>matchCategory</Mono>), which can differ
+              (0%). Matching uses an <em>effective</em> <Strong>match category</Strong>, which can differ
               from the display label: GCP <Mono>-highmem</Mono> shows as General Purpose but matches as Memory
               Optimized, so it correctly pairs with Azure E / AWS r.
             </P>
@@ -1620,7 +1776,7 @@ const SECTIONS: FaqSection[] = [
             <UL>
               <li><Strong>Different category</Strong> — the analog was surfaced via the cross-category fallback (a &quot;via «Category»&quot; match); the vendor labels it as a different product class.</li>
               <li><Strong>Stretch match</Strong> — a weak overall score, or a ≥4× vCPU/memory size gap; the closest thing on that cloud, not a like-for-like size.</li>
-              <li><Strong>Confidential peer</Strong> — one side is a purpose-built confidential family, the other only OFFERS opt-in confidential compute, not a dedicated confidential SKU.</li>
+              <li><Strong>Confidential peer</Strong> — one side is a purpose-built confidential family (Azure&apos;s <Mono>DC</Mono>- and <Mono>EC</Mono>-series), the other is a general family bridged to it because its silicon SUPPORTS confidential compute as an opt-in (SEV-SNP or TDX capable) rather than shipping as a dedicated confidential SKU. Similar capability on paper; a different thing to buy, enable and attest.</li>
               <li><Strong>Burstable vs standard</Strong> — one side is a burstable, shared-core, credit-based size; the other a standard dedicated-vCPU size.</li>
               <li><Strong>CPU architecture</Strong> — a known Arm↔x86 (or AMD↔Intel) difference; an Arm↔x86 jump likely needs a recompile / image change.</li>
               <li><Strong>GPU unverified</Strong> — a GPU size lacks a curated accelerator spec, so GPU model / VRAM / interconnect could not be compared.</li>
@@ -1635,6 +1791,39 @@ const SECTIONS: FaqSection[] = [
               no processor string, so silicon comes from a source-cited map — see{' '}
               <Strong>09 · Data health</Strong>). We surface the gap as an honest asterisk instead of letting a
               green percentage imply an apples-to-apples swap.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'sim-caveat-severity',
+        q: 'Are all caveats equally serious, and what do I actually do about each one?',
+        text: 'caveat severity warn info amber grey which matters most order worst caveat what to do next action arch cross recompile burstable credit stretch bare metal gpu unverified local disk unknown gen unknown different category',
+        body: (
+          <>
+            <P>
+              No — they split into two kinds, and the colour tells you which. An <Strong>amber (warn)</Strong>{' '}
+              caveat says the two machines <em>differ</em> in a way that can change your plan. A{' '}
+              <Strong>grey (info)</Strong> caveat says a dimension simply <em>could not be checked</em> — the
+              match may be perfectly fine, but the score behind it is less informed than it looks. Warns sort
+              first, so the top chip is always the one that matters most, and where only one chip fits (a tight
+              row, an exported line) that is the one you see.
+            </P>
+            <P>The practical next step differs by kind:</P>
+            <UL>
+              <li><Strong>Different category</Strong> — decide whether the <em>product class</em> is negotiable at all. If it isn&apos;t, this cloud has no answer for you and the comparison is market intelligence, not a plan.</li>
+              <li><Strong>Confidential peer</Strong> — check whether opt-in confidential compute satisfies your control, and whether your attestation tooling accepts that technology.</li>
+              <li><Strong>Stretch match</Strong> — resize. Look at the neighbouring sizes on that cloud rather than accepting the one the score picked.</li>
+              <li><Strong>Burstable vs standard</Strong> — check sustained CPU, not peak. Model the credit balance under your real duty cycle before treating the cheaper side as cheaper.</li>
+              <li><Strong>CPU architecture</Strong> — for Arm↔x86, budget a rebuild and an image change. For Intel↔AMD, usually just benchmark.</li>
+              <li><Strong>GPU unverified</Strong> — confirm the accelerator model and VRAM on the vendor&apos;s page. This is the caveat most likely to make a match wildly wrong in either direction.</li>
+              <li><Strong>Local disk unknown</Strong> — confirm the local NVMe figure; on a storage size it is the whole point of the machine.</li>
+              <li><Strong>Bare metal</Strong> — check the operating model, not the specs: licensing, provisioning time and blast radius all change.</li>
+              <li><Strong>CPU gen unknown</Strong> — usually nothing. Verify the generation only if it is load-bearing for your decision.</li>
+            </UL>
+            <P>
+              A pairing can carry several at once, and that is the useful signal: one caveat is a thing to check,
+              three is a comparison that has stopped being like-for-like whatever the percentage says.
             </P>
           </>
         ),
@@ -1779,14 +1968,14 @@ const SECTIONS: FaqSection[] = [
       {
         id: 'data-refresh',
         q: 'How fresh is it, and how is it refreshed?',
-        text: 'baked liveCatalog.generated.json build weekly ci action cron monday as-of date offline no runtime fetch',
+        text: 'baked into the build weekly ci action cron monday as-of date offline no third party call ships priced out of the box',
         body: (
           <>
             <P>
-              The joined result is <Strong>baked into the build</Strong> (<Mono>liveCatalog.generated.json</Mono>),
-              so the dashboard is priced out of the box — no runtime fetch, works offline. A{' '}
-              <Strong>weekly CI job</Strong> (Mondays 07:00 UTC, plus a manual button) re-pulls every cloud and
-              ships a fresh build, re-stamping the as-of date.
+              The joined result <Strong>ships with the app</Strong>, so the dashboard is priced out of the box:
+              the only thing it ever loads is its own data files, from the same place the page came from — no
+              call to a vendor API, no key, nothing to configure. A <Strong>weekly job</Strong> (Mondays 07:00
+              UTC, plus a manual button) re-pulls every cloud and ships a fresh build, re-stamping the as-of date.
             </P>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--tint-soft)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '10px 14px', margin: '0 0 4px' }}>
               <span style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>Catalog as of</span>
@@ -1795,6 +1984,40 @@ const SECTIONS: FaqSection[] = [
               </span>
               <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>— shown in the pill on every CMA page</span>
             </div>
+          </>
+        ),
+      },
+      {
+        id: 'data-gates',
+        q: 'What stops a bad weekly refresh from quietly shipping worse data?',
+        text: 'integrity gates validator fails the job row shrink 5 percent coverage drop one point unjoined rate ceiling schema check last known good data stale keyed shard 30 day warning truncated vendor api regression',
+        body: (
+          <>
+            <P>
+              A refresh that runs unattended every week is only trustworthy if it can{' '}
+              <Strong>refuse to publish itself</Strong>. Between the fresh pull and the moment it would go live,
+              the new data is compared against the data already shipping, and the job <Strong>fails</Strong>{' '}
+              rather than replacing good data with worse:
+            </P>
+            <UL>
+              <li><Strong>Row shrink</Strong> — a cloud&apos;s spec, network or rate counts may not fall more than 5% against the last good pull. This catches a vendor API returning a truncated set.</li>
+              <li><Strong>Coverage drop</Strong> — processor and network coverage may not fall more than one percentage point. This catches a feed quietly carrying less than it did.</li>
+              <li><Strong>Unjoined rates</Strong> — the share of priced SKUs still waiting on a spec has a ceiling. Crossing it means the two halves of the feed have drifted apart.</li>
+              <li><Strong>Schema</Strong> — fresh records are checked field by field, so a vendor renaming a field fails the refresh instead of silently emptying a column.</li>
+            </UL>
+            <P>
+              When a gate trips, <Strong>the last known-good data stays live</Strong> and someone gets told. That
+              is the trade the whole pipeline is built around: <Strong>old data with a visible date beats fresh
+              data that is silently wrong</Strong>, because you can reason about the first and cannot about the
+              second.
+            </P>
+            <P>
+              Two pulls need a credential (Azure specs, GCP rates). When a credential is absent the job{' '}
+              <Strong>skips that pull and keeps the last good copy</Strong> rather than breaking — but that copy
+              then ages, so a separate check warns once it passes <Strong>30 days</Strong>. It warns and never
+              fails, because a stale shard is a thing to notice, not a reason to stop shipping. You see the
+              consequence directly as the per-cloud shard age in <Strong>09 · Data health</Strong>.
+            </P>
           </>
         ),
       },
@@ -1958,6 +2181,139 @@ const SECTIONS: FaqSection[] = [
       },
     ],
   },
+  // ───────────────────────────────────────────────────────────────────────
+  {
+    id: 'design',
+    num: '10',
+    title: 'Why the tool behaves this way',
+    items: [
+      {
+        id: 'why-poc',
+        q: 'What is this, exactly — and what is it not?',
+        text: 'what is this proof of concept demonstration method quantifying managing capacity not a billing system not a quote not a procurement tool scope purpose why it exists',
+        body: (
+          <>
+            <P>
+              It is a <Strong>proof of concept</Strong>: a working demonstration of a method for{' '}
+              <Strong>quantifying capacity and managing it</Strong>, built end-to-end on real published vendor
+              data so the method can be judged on real answers rather than on a diagram.
+            </P>
+            <P>The method it is arguing for, in four moves:</P>
+            <UL>
+              <li><Strong>Make capacity comparable.</Strong> &quot;Which machine on cloud B is this machine on cloud A?&quot; is answerable from published specs, repeatably, instead of by opinion or by a table someone maintained once.</li>
+              <li><Strong>Score the comparison, then say how good it is.</Strong> A number is only useful next to a statement of how much to trust it — hence the ≈%, the bands and the caveats.</li>
+              <li><Strong>Scale from one machine to a fleet</Strong> without changing the question. The same grammar answers &quot;this VM&quot; and &quot;this whole bill of materials&quot;.</li>
+              <li><Strong>Refuse to fabricate.</Strong> Every gap in the data shows up as a gap on screen, and every modelled figure says so.</li>
+            </UL>
+            <P>
+              What it is <Strong>not</Strong>: a billing system, a quote, a procurement tool, or a substitute for
+              your vendor&apos;s pricing page. It prices at list, covers compute only, and knows nothing about
+              your contract. Use it to narrow the field and to understand the shape of a decision — then confirm
+              the two or three numbers you are about to commit money against.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'why-no-winner',
+        q: 'Why won’t it just tell me which cloud is best?',
+        text: 'no overall winner no top pick why refuses ranking weights are yours situational best at cheapest closest different questions single index',
+        body: (
+          <>
+            <P>
+              Because &quot;best&quot; is a weighting, and the weighting is <Strong>yours</Strong>. To crown a
+              winner the tool would have to decide how much a dollar is worth against a gigabyte, against a
+              region you need, against a rebuild you&apos;d have to fund. Any single ranked answer would be that
+              hidden opinion wearing the costume of a computed fact — and it would be wrong for most readers
+              while looking authoritative to all of them.
+            </P>
+            <P>
+              So instead of a <Strong>Top pick</Strong>, contenders carry <Strong>★ Best at X</Strong> tags for
+              the dimensions they actually lead — <Strong>Best price, Most vCPU, Most memory, Highest
+              network</Strong> — and a card only ever gets a tag it genuinely wins. Nothing is graded on a curve
+              and nothing is awarded for coming close.
+            </P>
+            <P>
+              You will notice the same refusal elsewhere: the KPI tiles are deliberately not summed into one
+              index, because cheapest and closest are different questions that routinely point at different
+              clouds. Where a single balance figure does appear — the <Strong>overall score /100</Strong> — it
+              exists only to explain why a card carries no ★ tag at all, and it says so.
+            </P>
+            <P>
+              The honest verdict this tool <em>can</em> give is narrower and more useful: here is what each option
+              wins on, here is what it costs, here is how comparable it really is, and here is what you give up.
+              The last judgement is the one you were hired to make.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'why-private',
+        q: 'Does anything I type or upload leave my browser?',
+        text: 'private client side no account no login no telemetry no analytics nothing uploaded bill of materials contract pricing stays local exports generated locally offline safe to paste real data',
+        body: (
+          <>
+            <P>
+              <Strong>No.</Strong> Everything runs in the browser tab: the matching engine, the pricing math, the
+              region clustering and the export generators are all local code. There is{' '}
+              <Strong>no account, no sign-in and no telemetry</Strong> — nothing measures what you look at or
+              reports it anywhere.
+            </P>
+            <UL>
+              <li>A <Strong>bill of materials</Strong> you author or upload stays in your browser. It is never transmitted.</li>
+              <li><Strong>Contract pricing, internal SKUs and proprietary specs</Strong> you upload override the public data locally and are never shipped in the public build.</li>
+              <li><Strong>Exports</Strong> are written by the page itself. No server renders your deck and no copy of it exists anywhere but your download folder.</li>
+              <li>The only thing the app fetches is <Strong>its own shipped data files</Strong> — the public vendor catalog — from the same place the page was served from.</li>
+            </UL>
+            <P>
+              The one exception, and it is opt-in and obvious: if the in-dashboard{' '}
+              <Strong>Terminal assistant</Strong> is enabled, the question you type there — with the page context
+              it needs to answer — is sent to a language model to be answered. Nothing else on any page does that.
+            </P>
+            <P>
+              This is stated plainly because of what the tool is <em>for</em>. A capacity planner&apos;s real
+              bill of materials is commercially sensitive, and a tool that wants it pasted in owes a
+              straight answer about where it goes.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'why-honesty',
+        q: 'Why does it so often refuse to show a number?',
+        text: 'why refuse to show number blank dash suppressed savings unpriced excluded honesty over completeness fabrication silent failure trust design principle',
+        body: (
+          <>
+            <P>
+              A blank is the most common thing you will meet here that other tools don&apos;t show you, so it is
+              worth naming the rule behind all of them: <Strong>a figure appears only when it can be
+              defended.</Strong> Everywhere the alternative would be a plausible-looking number, the tool shows
+              the gap instead:
+            </P>
+            <UL>
+              <li>A missing rate is a <Mono>—</Mono>, never a $0 that would drag a total down and make an incomplete comparison look cheap.</li>
+              <li>A <Strong>savings figure is withheld</Strong> when the two totals aren&apos;t comparable, and the reason and the excluded lines are named in its place.</li>
+              <li>An <Strong>unpriced but available</Strong> family shows as available with no price, rather than being dropped from the map.</li>
+              <li>A <Strong>modelled</Strong> figure carries <Mono>(est.)</Mono>; an <Strong>inferred</Strong> one carries <Mono>(assumed)</Mono>; neither ever silently replaces a published value.</li>
+              <li>A dimension that couldn&apos;t be compared raises a <Strong>caveat</Strong> instead of being scored as if it had been.</li>
+            </UL>
+            <P>
+              The reasoning is simple enough to state in one line: <Strong>a wrong number is more expensive than
+              a missing one</Strong>. A missing number sends you to the vendor&apos;s page for ten minutes. A
+              fabricated one gets into a business case, survives review because it looked like all the other
+              numbers, and is discovered after the commitment is signed.
+            </P>
+            <P>
+              The cost of this choice is real and worth accepting on purpose: the screens look less complete than
+              they could, and some questions come back as &quot;we can&apos;t say&quot;. That is the intended
+              trade. Every blank here is a place the underlying data was genuinely absent, which makes the
+              filled-in figures worth something.
+            </P>
+          </>
+        ),
+      },
+    ],
+  },
 ];
 
 const SEARCH_BLOBS = SECTIONS.flatMap((s) =>
@@ -2056,9 +2412,10 @@ export function CmaFaqPage({
           A complete guide to Cloud Market Analytics: every page (Setup, Specs, Executive Summary, Pricing,
           Region availability), both comparison modes, and the engines behind them — how a VM or region on one
           cloud maps to its closest equivalents on the others, how each match is scored, how costs are estimated,
-          how to read the confidence markers, and where the data comes from. Every score is computed from the
-          published specs, not a hand-curated opinion, and every figure we had to model is marked as such. Search
-          below, or browse the sections; the glossary defines every term you meet on screen.
+          how to read the confidence markers, where the data comes from, and why the tool makes the calls it
+          makes. Every score is computed from the published specs, not a hand-curated opinion, and every figure we
+          had to model is marked as such. Search below, or browse the sections; the glossary defines every term
+          you meet on screen.
         </p>
 
         {/* Search */}
