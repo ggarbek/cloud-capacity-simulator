@@ -9,6 +9,13 @@
  * penalties quote `vmCategory.ts` + `crossCloudEquivalency.ts`, and the as-of
  * date is read from `liveCatalog.ts`. Colours are CSS custom properties so it
  * themes in light + dark.
+ *
+ * Section ids are a CONTRACT — `start` / `specs` / `exec` / `pricing` / `region`
+ * / `similarity` / `markers` / `data` / `health` are deep-linked from Start Here
+ * and from the public-data pill (`focusSection`). Add sections and items freely;
+ * never rename or remove an existing id. Altitude rule: explain what a thing
+ * MEANS, why it matters to a decision, and how to read it — algorithm internals
+ * belong in the engine's own comments, not here.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { LIVE_CATALOG_AS_OF } from '../data/liveCatalog';
@@ -42,6 +49,16 @@ const GLOSSARY: { term: string; def: string }[] = [
   { term: 'Category', def: 'The canonical cross-cloud product class — General Purpose, Compute Optimized, Memory Optimized, Storage Optimized, GPU, High Performance Computing, Confidential, plus Previous Generation and Custom. Matching is gated to the same category by default.' },
   { term: 'VM family (series)', def: 'A vendor-named line within a category (Azure Esv5, AWS r7iz, GCP n2). A family rolls up many sizes that share a silicon + shape lineage.' },
   { term: 'VM size (SKU)', def: 'A single purchasable SKU (Standard_E16s_v5, r7iz.16xlarge) with concrete vCPU / memory — the atomic unit the engine compares.' },
+  { term: 'Focus (setup)', def: 'The last setup card — Compare VMs / Compare pricing / Explore regions / Executive Summary. It only decides where the Continue button lands; it changes no numbers.' },
+  { term: 'Skip (setup step)', def: 'Leaves a step unfiltered rather than empty. Skipping Category or VM family means "any", which widens the candidate pool instead of blocking the comparison.' },
+  { term: 'Best match (toggle)', def: 'On the Category and VM family steps: auto-picks each non-base cloud’s closest analog to your base pick and locks those pickers so the comparison can’t drift onto a worse-matching family. Switching it off returns the pickers and removes the rows it added.' },
+  { term: 'Auto-fill', def: 'Picking a size, family or region on one cloud fills the other clouds’ EMPTY slots with their closest equivalent. It never overwrites something you chose yourself.' },
+  { term: 'Comparison row', def: 'One line of the comparison table: row N pairs the Nth pick from every cloud, with the base cell as the reference and the others carrying a ≈% against it. Drag a cell to re-pair it, or ✕ to remove it.' },
+  { term: 'Compare dock', def: 'The comparison strip that follows you across Specs, Pricing and Executive Summary. It holds the mode switch and the row/line selector, and shrinks to a corner bubble as you scroll.' },
+  { term: 'Comparison mode', def: 'The dock mode in which every page answers questions about the sizes you picked in setup — one comparison row at a time.' },
+  { term: 'VM BoM mode', def: 'The dock mode in which every page answers questions about your whole committed Bill of Materials, each line ported to its best-match SKU on each cloud.' },
+  { term: 'VIEW ROW / VIEW LINE / All', def: 'The dock’s scope stepper. VIEW ROW picks a comparison row, VIEW LINE picks one BoM line, and All (BoM only) totals every line at once.' },
+  { term: 'Anchor VM', def: 'The single base-cloud size the one-VM views point at (Pricing rate bars, Rate library, the reference tables) — the base pick on the active row.' },
   // Specs / Exec
   { term: '≈% / similarity match', def: 'A 0–100 strength score for an equivalence: 100 = identical spec, lower = more different. Derived from the weighted spec distance, not a curated opinion.' },
   { term: '★ leader (Specs bar)', def: 'The cloud holding the highest value in a single Specs metric row; its bar is full-opacity and its value bold. A per-row fact, not an overall verdict.' },
@@ -51,17 +68,49 @@ const GLOSSARY: { term: string; def: string }[] = [
   { term: 'Coarse processor (Azure)', def: 'An approximate CPU label shown for Azure sizes whose exact generation can’t be pinned (Azure’s catalog carries no processor string); display-only, never affects matching.' },
   { term: 'Unverified vendor claim', def: 'A vendor "up to X%" marketing figure that failed independent verification; shown as an honest amber caveat, attributed and linked to the vendor’s page, not corroborated by us.' },
   { term: 'Spec delta (vs base)', def: 'A plain-language per-dimension difference between an equivalent and the base pick, with ↑ (better) / ↓ (worse) direction.' },
+  { term: 'Spec showdown', def: 'The Specs table that puts the base column first and one column per equivalent, one row per spec. The best value in each row is bolded and tinted; the base column has no delta because it is the reference.' },
+  { term: 'GiB / vCPU', def: 'Memory per vCPU — the shape of the machine rather than its size. It is what separates a standard size from a high-memory or high-CPU one at the same vCPU count.' },
+  { term: 'Delta vs base (±%)', def: 'The small "+25% vs base" line under a Spec-showdown cell: how much more or less of that spec you get compared with the base pick.' },
+  { term: 'How we match', def: 'The short methodology strip on Specs. It states the whole pipeline in one line — same-category gate, then weighted spec distance, then a 0–100 similarity — and expands into the per-pairing detail.' },
+  { term: 'Match driver chip', def: 'A chip like "memory 41%" inside How we match: roughly how much of the total spec gap between two sizes that one dimension accounts for. It tells you where a match is weak, not just that it is.' },
+  { term: '▼ Trails on', def: 'The amber counterpart of ★ Stands out — the dimension a pick is clearly weakest on in this comparison. Both are per-comparison facts, not product judgements.' },
+  { term: 'Best for', def: 'A one-line statement of the workload shape a family is built for (in-memory databases, batch compute, inference…). Editorial context, not a computed score.' },
+  { term: 'Nuance chip', def: 'A short label on a per-cloud education column flagging something worth knowing about the family (credit-based CPU, host-dependent silicon, no local disk). The full sentence is on hover.' },
+  { term: 'Comparison caveats', def: 'The amber box on Specs listing, per cloud, where the picks differ in KIND rather than in size. Read it before treating a high ≈% as a drop-in swap.' },
+  { term: 'Closest alternative', def: 'The label for a pick that is the nearest thing on that cloud but not a like-for-like equivalent. It is a warning about the comparison, not about the VM.' },
+  { term: 'Overall score (/100)', def: 'The number in a contender card’s "why pick this" line: an equal-weighted blend of vCPU, memory and network (each against the leader) and price (against the cheapest). A rough balance indicator, deliberately not a verdict.' },
+  { term: 'Cheapest option / Cheapest total', def: 'The lowest monthly cost among the clouds that actually priced, at your commitment term. "Cheapest option" is one size in Comparison mode; "Cheapest total" is the whole BoM in VM BoM mode.' },
+  { term: 'Savings vs base', def: 'Monthly dollars (and percent) you would save by moving from the base cloud to the cheapest one. It reads "—" whenever the two totals are not comparable — see suppressed savings.' },
+  { term: 'Avg spec match', def: 'The mean ≈% of the compared picks against the base. In VM BoM mode it is quantity-weighted, so a 500-VM line counts more than a 2-VM line.' },
+  { term: 'Regions covered', def: 'In Comparison mode, how many distinct regions the compared clouds run in. In VM BoM mode, how many distinct regions your BoM actually deploys into — the same label, two different questions.' },
+  { term: 'Market posture', def: 'The Executive-Summary strip naming metros each rival serves that your base cloud does not. Counted market-wide across all sizes, so it will not match the size-scoped figure on Region availability.' },
+  { term: 'Commitment savings (step-down)', def: 'The compact chart showing what each cloud’s rate steps down to at 1-year and 3-year commitment versus PAYG. It answers "is committing worth it here?" without leaving the briefing.' },
+  { term: 'What you get vs what you give up', def: 'The per-cloud trade-off column: up to three signature traits you gain (+) and one thing you give up (−) relative to the base. The base column never shows a give-up line.' },
+  { term: 'Assumptions footer', def: 'The amber one-liner under the briefing naming every assumption in play (estimated rates, assumed processors, stretch analogs, excluded lines). It renders nothing when the comparison is clean.' },
+  { term: 'Line-port', def: 'One BoM line evaluated on one cloud. A 20-line BoM across three clouds is 60 line-ports, which is why "N of M line-ports matched" uses a bigger denominator than the line count.' },
+  { term: 'Qty-weighted match', def: 'A BoM-level average ≈% in which each line counts in proportion to its VM quantity, so the score reflects your real fleet rather than your line count.' },
+  { term: 'Lines matched', def: 'How many BoM lines found an in-category equivalent on every cloud in scope. Anything short of the full count means some lines are excluded from some totals.' },
+  { term: 'Cost composition', def: 'The BoM view of where the money is: which lines and which clouds make up the monthly total, rather than a single headline figure.' },
+  { term: 'Per-line best-at', def: 'A per-BoM-line list of which cloud prices that line lowest. Useful when the whole-BoM winner is not the winner on the lines you care most about.' },
+  { term: 'Exec brief export', def: 'The Executive Summary’s "Export brief" control, which writes the same verdict, evidence, coverage and assumptions into a .pptx deck or a .docx document.' },
   // Matching engine
   { term: 'Weighted distance', def: 'The blended spec gap between two sizes: each dimension’s difference times its weight, summed over up to 12 dimensions.' },
   { term: 'Log-ratio distance', def: 'Measuring a spec gap as |log₂(a/b)| so proportional steps (4↔8, 64↔128) cost the same regardless of absolute size.' },
   { term: 'Active-weight normalization', def: 'Dividing the raw distance by the weights of only the dimensions both sides could compare, so scores stay comparable even when data (e.g. Azure’s missing processor string) is absent.' },
   { term: 'Category gate', def: 'The hard rule that two sizes must share a (match) category to match; different categories return 0%.' },
   { term: 'Match category', def: 'The effective category used for matching (e.g. GCP -highmem upgraded to Memory Optimized), which can differ from the vendor label shown in the UI.' },
-  { term: 'Cross-category fallback (≠ / "via «Category»")', def: 'An opt-in mode allowing a different-category substitute at a penalty (0.25, plus 0.30 across product groups) when a cloud was scoped away from the base’s category.' },
+  { term: 'Cross-category fallback (≠ / "via «Category»")', def: 'An opt-in mode allowing a different-category substitute when a cloud was scoped away from the base’s category. The match is marked down, and marked down further the further apart the two product classes are.' },
   { term: 'Soft-penalty term', def: 'A distance term (GPU model/VRAM/interconnect, TEE) gated to its category and inert unless both sides carry curated data — it refines rather than gates.' },
   { term: 'TEE (Trusted Execution Environment)', def: 'Hardware confidential compute — AMD SEV-SNP or Intel TDX; the TEE term distinguishes the two within the Confidential category.' },
   { term: 'Best size-pair', def: 'A family’s score = the single strongest size-to-size match into the candidate pool, not a median or averaged profile.' },
   { term: 'Decay constant (k = 1.157)', def: 'The exponent in match% = 100·exp(−k·d) that converts a normalized distance to a percentage.' },
+  { term: 'Match bands (85 / 65)', def: 'How every ≈% pill is coloured: 85 and above reads green (treat as like-for-like), 65–84 amber (usable, check the deltas), below 65 red (materially different machine).' },
+  { term: 'Stretch match', def: 'A caveat raised when a match scores below 40% or one side is 4× the other on vCPU or memory. It is the closest thing on that cloud, not a comparable size.' },
+  { term: 'Burstable', def: 'A shared-core, credit-based size (Azure B, AWS T, GCP E2/shared) whose sustained CPU is throttled by an earned credit balance. Comparing one to a dedicated-vCPU size raises a caveat.' },
+  { term: 'Bare metal', def: 'A whole physical server with no hypervisor. Matching one against a virtualized size raises a caveat because the operating model, not just the spec sheet, differs.' },
+  { term: 'Match caveat', def: 'A short amber (warn) or grey (info) chip stating a specific reason a pairing is not a clean swap. The one-sentence explanation is on hover; all nine kinds are listed in section 06.' },
+  { term: 'Equivalency seed', def: 'The shipped set of widely-accepted cross-cloud mappings used to pre-fill picks. It is a starting opinion, not vendor doctrine, and anything you author overrides it.' },
+  { term: 'Equivalency template', def: 'The downloadable Excel sheet (Azure SKU · AWS SKU · GCP SKU · Notes) for hand-authoring the mappings. Re-uploading it REPLACES the whole table rather than merging into it.' },
   // Region
   { term: 'Region equivalency', def: 'Two regions treated as analogs because they’re in the same country, same sovereignty class, and within 400 km of each other; lets cross-cloud peers line up on one row.' },
   { term: 'Geo-cluster', def: 'A group of regions merged by union-find (same country + gov class + ≤ 400 km). Picking any region scopes the page to its whole cluster across clouds.' },
@@ -70,6 +119,15 @@ const GLOSSARY: { term: string; def: string }[] = [
   { term: 'Edge region / Local Zone', def: 'AWS satellite sites (us-east-1-bos-1, …-wl1-…) attached to a parent region; excluded from region counts because they aren’t full regions and have no cross-cloud peer.' },
   { term: 'Market gap', def: 'A metro where at least one compared cloud has a region but not every compared cloud does — the unique-reach / missing-coverage signal.' },
   { term: 'Metro', def: 'A region collapsed to its datacenter city + country (N. Virginia, Sydney); the unit for overlap math, since one metro can host several regions on one cloud.' },
+  { term: 'Government (sovereign) region', def: 'A region restricted to public-sector workloads. Gov regions only ever cluster with other gov regions, so a commercial region is never offered as their equivalent.' },
+  { term: 'Overlap buckets', def: 'The three ways a metro can be held: Served by all (every selected cloud), Shared by two+ (at least two), and Exclusive (only one). Colour-coded green / purple / that cloud’s own brand colour.' },
+  { term: 'Footprint boxes', def: 'The per-cloud Coverage breakdown into Equivalent (cities a competitor also holds), Exclusive (only this cloud) and Market gaps (cities competitors hold and this one does not).' },
+  { term: 'Reconciliation line', def: 'The arithmetic printed under the overlap cards — served-by-all plus shared plus exclusive equals the base cloud’s total regions — so you can check the buckets add up rather than trust them.' },
+  { term: 'Region availability matrix', def: 'The location-by-cloud grid where a cell reads "✓ N VMs" when that cloud offers something in your current filter there, and "·" when it offers nothing. One row per metro.' },
+  { term: 'Why equivalent', def: 'The rationale column on the line-by-line region equivalency table, stating in words why regions were clustered (same country, distance apart, which cloud is missing). Scan it to spot a mismatch.' },
+  { term: 'Muted cloud', def: 'A cloud hidden from the Region page only. Muting is a page-local view change; your Comparison setup keeps the cloud, unlike deselecting it in setup.' },
+  { term: 'Pinned region', def: 'A map marker you clicked to keep open, with its exact coordinates and super-geo below the map. Cmd/Ctrl or Shift-click pins several at once.' },
+  { term: 'Scope (filter chips)', def: 'The category / family / size chips that narrow every count on the Region page. Chips of the same kind widen the scope (OR); chips of different kinds narrow it (AND).' },
   // Pricing
   { term: 'PAYG', def: 'Pay-as-you-go on-demand pricing with no commitment — the published hourly rate. Always a real figure, never estimated.' },
   { term: 'Reserved / committed term (1-yr, 3-yr)', def: 'A discounted rate in exchange for a 1- or 3-year usage commitment; deeper discount for the longer term.' },
@@ -77,9 +135,27 @@ const GLOSSARY: { term: string; def: string }[] = [
   { term: 'Region auto-match (~1000 km)', def: 'On Pricing, the other clouds’ region is auto-resolved to the nearest equivalent of the base region — same country or within ~1000 km (REGION_MATCH_KM), else excluded with an alert.' },
   { term: 'Estimated rate ("est.")', def: 'A reserved rate modeled from PAYG × the provider’s measured median RI/PAYG discount when no published reserved rate exists; always badged, never overwrites a real rate.' },
   { term: 'Rate library', def: 'The per-region published PAYG / 1-yr / 3-yr rate card for a single anchor VM, sorted cheapest-region-first.' },
+  { term: 'List price', def: 'The vendor’s published rate. Everything priced here is list — no negotiated discount, enterprise agreement, spot or savings-plan pricing is applied.' },
+  { term: 'Term labels', def: 'Three spellings of the same three tiers: PAYG / 1-yr / 3-yr on controls, PAYG / 1y RI / 3y RI on chips, pay-as-you-go / 1-year reserved / 3-year reserved in prose.' },
+  { term: 'Run duration', def: 'How long you intend to run the VMs — the multiplier that turns an hourly rate into a total. It can be set in months or hours; switching the unit resets the value to that unit’s default.' },
+  { term: 'Horizon (1 mo / 1 yr / 3 yr)', def: 'A fixed look-ahead window used by the cost tables, independent of your run duration: what the same rate accumulates to over one month, one year and three years.' },
+  { term: 'Normalized unit rate', def: 'Cost restated as $/vCPU/month and $/GiB/month. When the compared sizes are not the same shape, this is the honest comparison basis — the raw monthly total is not.' },
+  { term: 'Unmatched line ("no analog")', def: 'A BoM line with no in-category equivalent on a cloud. That cloud cannot price it at all, so the line is excluded from that cloud’s total.' },
+  { term: 'Unpriced line', def: 'A BoM line that DID find an equivalent, but no rate resolves for that SKU, region and term. Also excluded from the total — a different failure from "no analog".' },
+  { term: 'Fully priced', def: 'A cloud whose total includes every line of the BoM. A savings figure is only stated when both the base and the winner are fully priced.' },
+  { term: 'Suppressed savings', def: 'The deliberate withholding of a savings number when the two totals are not comparable. The screen names the reason and lists the excluded lines instead of showing a smaller-looking figure.' },
+  { term: '★ lowest', def: 'The tag on the cheapest cloud in a cost panel; the others read "+$X (Y%) more than" it. It ranks only the clouds that actually priced.' },
   // Data
   { term: 'Region-exploded catalog', def: 'One catalog row per provider × region × size (~96k rows), because pricing is per-region; deduped to ~3.2k distinct specs for matching.' },
   { term: 'As-of date', def: `The date the baked public pricing + specs were last pulled and shipped in the build. Currently as of ${LIVE_CATALOG_AS_OF}; refreshed weekly by CI.` },
+  { term: '(est.) marker', def: 'Marks a figure we modelled rather than read from the vendor: a reserved rate derived from PAYG, or a network throughput taken from a curated fallback. Treat it as directional.' },
+  { term: '(assumed) marker', def: 'Marks a processor filled in from a source-cited curated map or inferred from the SKU name, because the vendor publishes no processor string. Display-only; it never changes a match score.' },
+  { term: '(inferred) generation', def: 'A CPU generation deduced from the SKU naming rather than read from a published processor string. Shown so you know the generation line is a deduction.' },
+  { term: 'host-dependent', def: 'Marks a family scheduled across two silicon options — the cloud decides which host you land on, you do not. Both options rank as the same generation.' },
+  { term: 'Shard', def: 'One cloud’s slice of the baked catalog. Each shard carries its own pull date, which is what the Data-health section reports as "days old".' },
+  { term: 'Priced SKUs awaiting specs', def: 'Rate rows that arrived before their matching spec row. They are counted honestly in Data health and kept OUT of the catalog until both halves are present.' },
+  { term: 'Curated processor map', def: 'The source-cited table that fills Azure’s missing processor strings by series. It is why Azure reports high processor coverage instead of 0%, and why those values carry "(assumed)".' },
+  { term: 'Coverage guard', def: 'A build-time check that diffs the vendor docs against the curated region/family tables and fails the build when they drift. It runs in CI, not on screen.' },
 ];
 
 // ── Small presentational helpers (CSS tokens only) ───────────────────────────
@@ -221,7 +297,7 @@ const SECTIONS: FaqSection[] = [
   {
     id: 'start',
     num: '01',
-    title: 'Getting started: the Comparison setup',
+    title: 'Getting started: setup, modes & navigation',
     items: [
       {
         id: 'start-what',
@@ -241,6 +317,64 @@ const SECTIONS: FaqSection[] = [
             <P>
               Everything is computed from the live catalog, not a hand-curated &quot;X equals Y&quot; table, so
               it stays correct as new SKUs ship and every result is explainable.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'start-where',
+        q: 'Which page answers which question?',
+        text: 'which page navigation rail start here setup executive summary specs pricing region availability coverage rate library faq map of the tool where do i go',
+        body: (
+          <>
+            <P>Each page answers one question. Pick the page by the question you have:</P>
+            <UL>
+              <li><Strong>Start Here</Strong> — &quot;what is this half of the tool, and can I see a worked example?&quot;</li>
+              <li><Strong>Comparison Setup</Strong> — &quot;what am I comparing?&quot; Everything downstream reads from here.</li>
+              <li><Strong>Executive Summary</Strong> — &quot;what should I do?&quot; The verdict, in one screen, exportable.</li>
+              <li><Strong>Specs</Strong> — &quot;what actually differs?&quot; The hardware evidence behind the verdict.</li>
+              <li><Strong>Pricing</Strong> — &quot;what does it cost, and is committing worth it?&quot;</li>
+              <li><Strong>Region availability</Strong> — &quot;where can I run it, and where can&apos;t I?&quot;</li>
+              <li><Strong>Coverage</Strong> — the same footprint data read as an executive breakdown rather than a map.</li>
+              <li><Strong>Rate library</Strong> — &quot;where is this one VM cheapest?&quot;</li>
+              <li><Strong>FAQ &amp; Glossary</Strong> — this page.</li>
+            </UL>
+            <P>
+              The rough order of work is <Strong>Setup → Executive Summary → Specs / Pricing / Region</Strong>:
+              get the verdict first, then drill into whichever evidence you doubt.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'start-modes',
+        q: 'What is the difference between Comparison mode and VM BoM mode?',
+        text: 'comparison mode vm bom mode dock toggle one size vs whole fleet bill of materials view row view line all scope switch',
+        body: (
+          <>
+            <P>
+              Two ways to ask the same questions, switched on the{' '}
+              <Strong>compare dock</Strong> — the strip that follows you across Specs, Pricing and the
+              Executive Summary.
+            </P>
+            <UL>
+              <li>
+                <Strong>Comparison</Strong> — the pages answer for the <Strong>sizes you picked in setup</Strong>,
+                one comparison row at a time. Use it when you have a machine in mind
+                (&quot;is there a better home for this size?&quot;).
+              </li>
+              <li>
+                <Strong>VM BoM</Strong> — the pages answer for your <Strong>whole committed Bill of
+                Materials</Strong>, every line ported to its best-match SKU on each cloud. Use it when the
+                question is portfolio-scale (&quot;what would re-platforming this fleet cost?&quot;).
+              </li>
+            </UL>
+            <P>
+              The dock&apos;s stepper reads <Mono>VIEW ROW</Mono> in Comparison mode and{' '}
+              <Mono>VIEW LINE</Mono> (plus <Mono>All</Mono>) in BoM mode. A mode pill is{' '}
+              <Strong>greyed out</Strong> when the data behind it doesn&apos;t exist — no comparison rows, or no
+              committed BoM. Switching modes resets the active row, and BoM mode is only offered when the
+              objective is <em>Compare VM sizes</em>.
             </P>
           </>
         ),
@@ -322,6 +456,57 @@ const SECTIONS: FaqSection[] = [
         ),
       },
       {
+        id: 'start-bestmatch',
+        q: 'What does the "Best match" toggle do, and why did my pickers lock?',
+        text: 'best match toggle auto select closest analog locks pickers read only chips auto rows disappear turn off',
+        body: (
+          <>
+            <P>
+              <Strong>Best match</Strong> (on the Category and VM family steps) auto-picks each non-base
+              cloud&apos;s <Strong>closest analog to your base pick</Strong> and shows it as a read-only chip with
+              its ≈%. The pickers lock on purpose: with the toggle on, the tool is asserting &quot;this is the
+              fairest comparison available&quot;, and letting you hand-pick a worse-matching family would quietly
+              undermine every number downstream.
+            </P>
+            <P>
+              Turn it <Strong>off</Strong> to get the dropdowns back and choose freely. Note that the comparison
+              rows Best match added are tagged as automatic and are <Strong>removed when you switch it
+              off</Strong> — rows you picked yourself always survive. A <Mono>⚠</Mono> on an auto chip means the
+              closest analog is still a stretch; hover it for the reason.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'start-autofill',
+        q: 'I picked one VM and three appeared — why?',
+        text: 'auto fill prefill picked one vm three appeared other clouds populated equivalency seed empty slots never overwrite region family',
+        body: (
+          <P>
+            That is <Strong>auto-fill</Strong>. Picking a size, family or region on one cloud fills the other
+            clouds&apos; <Strong>empty</Strong> slots with their closest equivalent — from the shipped equivalency
+            seed first, then from a computed closest-spec match — so a comparison exists the moment you make one
+            choice. It <Strong>never overwrites a pick you made yourself</Strong>: clear or change any auto-filled
+            cell and your choice stands. If you would rather see nothing until you choose it, remove the filled
+            cells; they will not come back unless the base pick changes.
+          </P>
+        ),
+      },
+      {
+        id: 'start-rows',
+        q: 'How does the comparison table decide which VMs sit on the same row?',
+        text: 'comparison table rows pair nth pick each cloud zip drag re-pair remove x base cell reference numbered rows',
+        body: (
+          <P>
+            By position: <Strong>row N pairs the Nth pick from every cloud</Strong>. The base cloud&apos;s cell is
+            the reference for that row, and the other cells show their ≈% against it — so pairing determines what
+            gets compared to what. If the automatic pairing lines up the wrong two machines,{' '}
+            <Strong>drag a cell onto another row</Strong> to re-pair it, or use <Mono>✕</Mono> to drop it. Every
+            downstream page reads the <em>active</em> row, which you choose on the dock.
+          </P>
+        ),
+      },
+      {
         id: 'start-no-match',
         q: 'Why might a cloud show "no match" for my pick?',
         text: 'no match zero percent category gate cloud not selected missing specs no close peer loosen filter',
@@ -376,6 +561,74 @@ const SECTIONS: FaqSection[] = [
             rows together to see the shape of each option, then let the Executive Summary turn that into a
             decision.
           </P>
+        ),
+      },
+      {
+        id: 'specs-showdown',
+        q: 'How do I read the Spec showdown table?',
+        text: 'spec showdown table rows vcpu memory gib per vcpu network local nvme processor gpu dollars per month best value highlighted delta vs base rows disappear',
+        body: (
+          <>
+            <P>
+              The showdown puts the <Strong>base column first</Strong> and one column per equivalent, with one row
+              per spec: <Strong>vCPU, Memory, GiB / vCPU, Network, Local NVMe, Processor, GPU</Strong> and{' '}
+              <Strong>$/mo</Strong> at your commitment term. The <Strong>best value in each row</Strong> is bolded
+              and tinted, and every non-base cell carries a small <Mono>+25% vs base</Mono> line — how much more
+              or less of that spec you get if you switch.
+            </P>
+            <P>
+              <Strong>GiB / vCPU</Strong> is the row people skip and shouldn&apos;t: it describes the machine&apos;s{' '}
+              <em>shape</em> rather than its size, and it is what separates a standard size from a high-memory one
+              at the same vCPU count. A row is <Strong>omitted entirely</Strong> when no cloud reports a value —
+              so a missing GPU or $/mo row means &quot;nobody has this&quot;, not &quot;zero&quot;.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'specs-howmatch',
+        q: 'What is the "How we match" strip and what do the driver chips tell me?',
+        text: 'how we match strip methodology three stages category gate weighted spec distance percent similarity driver chips dimension accounts for percent of the gap pairings',
+        body: (
+          <>
+            <P>
+              A short, always-visible statement of the method so a number never arrives unexplained. It states the
+              whole pipeline in one line — <Strong>same-category gate → weighted spec distance → 0–100
+              similarity</Strong> — and expands into one entry per pairing.
+            </P>
+            <P>
+              The most useful part is the <Strong>driver chips</Strong>: each names a dimension and roughly what
+              share of the total spec gap it accounts for (&quot;memory 41%&quot;). That turns &quot;this is a
+              71% match&quot; into something actionable — if memory drives the gap and your workload is
+              memory-bound, the swap is riskier than the number looks; if the gap is mostly network on a workload
+              that never saturates the NIC, it matters less. The base is not listed against itself, so you see one
+              fewer pairing than you have clouds.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'specs-education',
+        q: 'What are the per-cloud "Stands out / Trails on / Best for" columns?',
+        text: 'education columns stands out trails on best for nuance chips vendor source link what you are comparing family story balanced',
+        body: (
+          <>
+            <P>
+              Under the numbers, each cloud gets a short prose column explaining <em>what</em> its pick is, rather
+              than only how it measures:
+            </P>
+            <UL>
+              <li><Strong>★ Stands out</Strong> — the one dimension this pick clearly leads on in this comparison.</li>
+              <li><Strong>▼ Trails on</Strong> — its clearest weakness here. Both are comparison facts, not product judgements: the same size would stand out against different company.</li>
+              <li><Strong>Best for</Strong> — the workload shape the family is built for. Editorial context, not a computed score.</li>
+              <li><Strong>Nuance chips</Strong> — short flags worth knowing (credit-based CPU, host-dependent silicon, no local disk); the full sentence is on hover.</li>
+              <li><Strong>Source ↗</Strong> — a link to the vendor&apos;s own documentation for the family.</li>
+            </UL>
+            <P>
+              A balanced size with no clear lead or lag shows neither chip, and reads &quot;a balanced size with no
+              standout trait&quot; — which is itself useful information.
+            </P>
+          </>
         ),
       },
       {
@@ -510,6 +763,145 @@ const SECTIONS: FaqSection[] = [
         ),
       },
       {
+        id: 'exec-kpis',
+        q: 'What does each KPI tile mean?',
+        text: 'kpi tiles cheapest option savings vs base avg spec match regions covered market gaps meaning read each tile dash',
+        body: (
+          <>
+            <P>Five tiles, read left to right as &quot;how much, how much less, how faithful, how reachable&quot;:</P>
+            <UL>
+              <li><Strong>Cheapest option</Strong> — the lowest monthly cost among the clouds that actually priced, at your term. Clouds with no rate drop out of the race rather than counting as $0.</li>
+              <li><Strong>Savings vs base</Strong> — dollars per month you&apos;d save by moving, plus the percent. It can read <em>Base is cheapest</em>, <em>Base unpriced</em>, or <Mono>—</Mono> when the totals aren&apos;t comparable.</li>
+              <li><Strong>Avg spec match</Strong> — the mean ≈% of the compared picks against the base. Below 65% it turns amber, because a cheap option you can&apos;t actually swap into isn&apos;t a saving.</li>
+              <li><Strong>Regions covered</Strong> — how many distinct regions the compared clouds run in (in BoM mode: how many regions your BoM deploys into — same label, different question).</li>
+              <li><Strong>Market gaps</Strong> — metros a rival serves that your base cloud doesn&apos;t.</li>
+            </UL>
+            <P>
+              Read the first two <em>together with</em> the third. The tiles are deliberately not summed into a
+              single index: cheapest and closest are different questions and can point at different clouds.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'exec-commitment',
+        q: 'What is the "Commitment savings" chart?',
+        text: 'commitment savings step down chart payg 1 year 3 year reserved discount worth committing lever see pricing full breakdown',
+        body: (
+          <P>
+            One compact chart showing what each cloud&apos;s rate <Strong>steps down to</Strong> at 1-year and
+            3-year commitment versus PAYG — the &quot;is committing worth it here?&quot; answer without leaving
+            the briefing. The step-down is often larger than the gap between clouds, which is the point: switching
+            commitment term can beat switching cloud, and it&apos;s a much smaller change to make. The full
+            per-region and per-horizon breakdown lives on <Strong>Pricing</Strong>.
+          </P>
+        ),
+      },
+      {
+        id: 'exec-tradeoffs',
+        q: 'What is "What you get vs what you give up"?',
+        text: 'what you get vs what you give up tradeoffs plus traits minus give up per cloud column base no give up line family category via',
+        body: (
+          <>
+            <P>
+              One column per cloud, base first. Each target column names up to three things you{' '}
+              <Strong>gain</Strong> (<Mono>+</Mono>) and one thing you <Strong>give up</Strong> (<Mono>−</Mono>)
+              relative to the base — the honest other half of a savings headline. The base column shows no
+              give-up line because it is the thing being compared against.
+            </P>
+            <P>
+              A category line reading <Mono>Memory Optimized · via General Purpose</Mono> means we{' '}
+              <em>matched</em> it as Memory Optimized even though the vendor files it under General Purpose (see{' '}
+              <Strong>match category</Strong> in 06). In VM BoM mode the same column summarizes the portfolio
+              instead: how many lines matched, what the shape change is across them, and which lines are excluded.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'exec-posture',
+        q: 'What is "Market posture", and why doesn’t its gap count match the Region page?',
+        text: 'market posture metros rival serves base lacks competitor only market wide all sizes differs from region availability size scoped why numbers differ',
+        body: (
+          <>
+            <P>
+              <Strong>Market posture</Strong> names the metros each rival serves that your base cloud doesn&apos;t
+              — the coverage risk sitting behind a cost verdict. If the cheapest cloud is also the only one in a
+              metro you need, that is a reason to move; if your base cloud is the only one there, that is a reason
+              to stay.
+            </P>
+            <P>
+              It is counted <Strong>market-wide, across all sizes</Strong> — &quot;does this cloud have a
+              datacenter here at all&quot;. The gap figure on <Strong>Region availability</Strong> is{' '}
+              <Strong>scoped to whatever you filtered to</Strong> — &quot;does this cloud offer <em>this
+              family</em> here&quot;. The two answer different questions, so they will usually differ; the
+              briefing labels its own figure &quot;market-wide, all sizes&quot; so you know which one you&apos;re
+              reading.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'exec-score',
+        q: 'What is the "overall score /100" in a contender’s "why pick this" line?',
+        text: 'overall score 100 balance indicator why pick this all rounder middle of the pack trails equal weighted vcpu memory network price not a verdict',
+        body: (
+          <P>
+            A rough <Strong>balance indicator</Strong> for a pick that wins no single dimension. It averages four
+            things equally — vCPU, memory and network (each measured against the leader in this comparison) and
+            price (measured against the cheapest) — so a size that&apos;s decent at everything scores well and a
+            size that&apos;s excellent at one thing and poor at three doesn&apos;t. It exists to explain{' '}
+            <em>why a card has no ★ tag</em>, not to crown a winner: it ignores generation, architecture, region
+            availability and every caveat, so never let it override the evidence pages.
+          </P>
+        ),
+      },
+      {
+        id: 'exec-bom',
+        q: 'How does the Executive Summary change in VM BoM mode?',
+        text: 'exec summary bom mode whole bill of materials cheapest total lines matched qty weighted line ports cost composition per line best at',
+        body: (
+          <>
+            <P>
+              The grammar is identical; the unit becomes your whole fleet. The verdict prices the{' '}
+              <Strong>whole BoM</Strong> on each cloud, and the tiles change to match:
+            </P>
+            <UL>
+              <li><Strong>Cheapest total</Strong> — the lowest whole-BoM monthly total, not a single size.</li>
+              <li><Strong>Avg spec match</Strong> — <Strong>quantity-weighted</Strong>, so a 500-VM line counts more than a 2-VM line.</li>
+              <li><Strong>Lines matched</Strong> — how many lines found an equivalent on every cloud in scope. Short of the full count means some lines are excluded from some totals.</li>
+              <li><Strong>Regions covered</Strong> — the distinct regions your BoM actually deploys into.</li>
+            </UL>
+            <P>
+              Two extra sections appear: <Strong>Cost composition</Strong> (where the money actually is, by line
+              and cloud) and <Strong>Per-line best-at</Strong> (which cloud prices each line lowest — useful when
+              the whole-BoM winner isn&apos;t the winner on the lines you care about). A support line phrased in{' '}
+              <Strong>line-ports</Strong> is counting lines × clouds, not lines.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'exec-export',
+        q: 'Can I export the briefing?',
+        text: 'export brief slides pptx document docx download deck recommendation cost story coverage risks assumptions methodology bom brief',
+        body: (
+          <>
+            <P>
+              Yes — <Strong>Export brief</Strong> (or <Strong>Export BoM brief</Strong>) writes the same briefing
+              to a <Strong>.pptx</Strong> deck or a <Strong>.docx</Strong> document: recommendation, the cost
+              story, what you get vs what you give up, the size-for-size evidence, market coverage and gaps, and
+              the risks / assumptions / methodology page.
+            </P>
+            <P>
+              The caveats travel with it. The exported artifact carries the same{' '}
+              <Mono>(est.)</Mono> / <Mono>(assumed)</Mono> markers, names any excluded lines, and states plainly
+              when a savings figure was withheld — so the document can&apos;t claim more than the screen did.
+            </P>
+          </>
+        ),
+      },
+      {
         id: 'exec-deltas',
         q: 'What are the spec "deltas vs base"?',
         text: 'spec deltas vs base dimension differences up better down worse arrow per cloud',
@@ -552,16 +944,27 @@ const SECTIONS: FaqSection[] = [
       {
         id: 'price-term',
         q: 'What do "run duration" and "commitment term" mean?',
-        text: 'run duration hours months 730 commitment term payg 1 year 3 year reserved discount hourly rate',
+        text: 'run duration hours months 730 commitment term payg 1 year 3 year reserved discount hourly rate unit toggle resets naming 1y ri pay as you go',
         body: (
-          <P>
-            <Strong>Run duration</Strong> is how long you&apos;ll run the VMs — the multiplier that turns an
-            hourly rate into a total (months convert at <Mono>730 h/month</Mono>). <Strong>Commitment term</Strong>{' '}
-            is the pricing tier: <Strong>PAYG</Strong> (on-demand), <Strong>1-yr</Strong> or <Strong>3-yr</Strong>{' '}
-            reserved (steeper discounts for longer). Both knobs apply to every cloud at once so the comparison
-            stays apples-to-apples. The verdict also flags a term-switch opportunity (&quot;a 3-yr RI would cut
-            GCP ~$X&quot;) when it&apos;s material.
-          </P>
+          <>
+            <P>
+              <Strong>Run duration</Strong> is how long you&apos;ll run the VMs — the multiplier that turns an
+              hourly rate into a total (months convert at <Mono>730 h/month</Mono>, the standard billing month).
+              You can set it in <Strong>months or hours</Strong>; switching the unit resets the value to that
+              unit&apos;s default rather than converting it, so re-check the number after you flip it.
+            </P>
+            <P>
+              <Strong>Commitment term</Strong> is the pricing tier: <Strong>PAYG</Strong> (on-demand),{' '}
+              <Strong>1-yr</Strong> or <Strong>3-yr</Strong> reserved (steeper discounts for longer). Both knobs
+              apply to every cloud at once so the comparison stays apples-to-apples, and the verdict flags a
+              term-switch opportunity (&quot;a 3-yr RI would cut GCP ~$X&quot;) when it&apos;s material.
+            </P>
+            <P>
+              The same three tiers are spelled three ways depending on the space available —{' '}
+              <Mono>PAYG / 1-yr / 3-yr</Mono> on controls, <Mono>PAYG / 1y RI / 3y RI</Mono> on chips, and{' '}
+              <em>pay-as-you-go / 1-year reserved / 3-year reserved</em> in prose. They mean the same thing.
+            </P>
+          </>
         ),
       },
       {
@@ -641,6 +1044,106 @@ const SECTIONS: FaqSection[] = [
               estimates are always badged and never overwrite a real rate.
             </P>
           </>
+        ),
+      },
+      {
+        id: 'price-suppressed',
+        q: 'Why does the savings number say "—" when one cloud is clearly cheaper?',
+        text: 'savings suppressed not stated no delta claimed base unpriced partially priced cheapest undercounted excluded lines honesty gate what to do fix',
+        body: (
+          <>
+            <P>
+              Because a savings figure is only honest when <Strong>both sides priced the same work</Strong>. If
+              some lines are missing from one cloud&apos;s total, that cloud looks cheaper than it is — so instead
+              of printing a flattering number, the tool withholds it and tells you why. Three reasons, each named
+              on screen:
+            </P>
+            <UL>
+              <li><Strong>The base has no priced lines at this term.</Strong> There is no baseline to measure against, so the cheapest priced cloud is named without a &quot;below base&quot; claim.</li>
+              <li><Strong>The base total is undercounted.</Strong> Some of your lines didn&apos;t price on the base cloud, so its total is smaller than your real bill and any delta would be overstated.</li>
+              <li><Strong>The winner&apos;s total is undercounted.</Strong> The cheapest cloud is missing lines, so its total isn&apos;t the full cost of running your fleet there.</li>
+            </UL>
+            <P>
+              The <Strong>cheapest cloud is still named</Strong> — only the delta is withheld — and the excluded
+              lines are listed by SKU underneath. To get the number back:{' '}
+              <Strong>fix the excluded lines</Strong>. A line with <em>no analog</em> needs a wider category
+              filter or an authored equivalency; a line that&apos;s <em>unpriced</em> needs a rate for that SKU,
+              region and term — try PAYG, or add the rate via the VM Library. Every surface (the briefing, the
+              price band, the exports) applies the same gate, so they never disagree.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'price-unmatched',
+        q: '"No analog" vs "unpriced" — what is the difference?',
+        text: 'no analog unmatched line vs unpriced line excluded from total two different failures matched but no rate what to do',
+        body: (
+          <>
+            <P>
+              Two different failures with two different fixes, both of which exclude a line from a cloud&apos;s
+              total:
+            </P>
+            <UL>
+              <li><Strong>No analog</Strong> (unmatched) — that cloud has <em>nothing</em> in the same category to map the line to. Widen the category filter, allow the cross-category fallback, or author an equivalency for it.</li>
+              <li><Strong>Unpriced</Strong> — the line <em>did</em> find an equivalent, but no rate resolves for that SKU + region + term. Try PAYG (always real where published), a different region, or upload the rate.</li>
+            </UL>
+            <P>
+              Neither is ever filled with a zero. An excluded line is disclosed by count and by SKU so a partial
+              total is never mistaken for a complete one.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'price-horizons',
+        q: 'What are the 1 Month / 1 Year / 3 Year columns and "−N% vs PAYG"?',
+        text: 'horizon matrix one month one year three year columns totals cumulative minus percent vs payg commitment step down run duration difference',
+        body: (
+          <>
+            <P>
+              The <Strong>horizon</Strong> columns are fixed look-ahead windows — what the same rate accumulates
+              to over one month, one year and three years — and they are independent of your{' '}
+              <Strong>run duration</Strong>, which is your own intended runtime. Use horizons to compare clouds on
+              a common yardstick; use run duration to price your actual plan.
+            </P>
+            <P>
+              <Mono>−N% vs PAYG</Mono> under a cell is the discount that commitment term buys on that cloud, shown
+              only when it&apos;s material. It is the single most useful number on the page for a workload
+              you&apos;re confident about, and the single most dangerous one for a workload you aren&apos;t — a
+              3-year commitment is a 3-year commitment.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'price-normalized',
+        q: 'What are the normalized $/vCPU/mo and $/GiB/mo rates?',
+        text: 'normalized unit rate price performance dollars per vcpu per month per gib lowest wins shapes dont line up honest comparison basis',
+        body: (
+          <P>
+            Cost restated <Strong>per unit of capacity</Strong> rather than per machine, so different-sized
+            options can be compared fairly. When the compared sizes are the same shape, the monthly total is the
+            simpler read. When they <Strong>aren&apos;t</Strong> — one cloud&apos;s closest analog has 25% more
+            memory, say — the raw total is comparing two different amounts of machine, and the page says so:{' '}
+            <Strong>&quot;shapes don&apos;t line up — normalized unit rates are the honest comparison
+            basis.&quot;</Strong> When you see that note, read the normalized row, not the headline.
+          </P>
+        ),
+      },
+      {
+        id: 'price-reference',
+        q: 'What is in "Reference tables", and why do they price only one VM in BoM mode?',
+        text: 'reference tables disclosure rate bars commitment step down horizon totals full unit rates anchor vm only bom mode caveat',
+        body: (
+          <P>
+            A collapsed drawer holding the detail behind the headline: the <Strong>rate bars</Strong>, the{' '}
+            <Strong>commitment step-down</Strong>, the <Strong>horizon totals</Strong> and the full{' '}
+            <Strong>unit-rate</Strong> table. In <Strong>VM BoM mode</Strong> these tables still describe the{' '}
+            <Strong>anchor VM only</Strong> — one size, not the fleet — and the page states that explicitly rather
+            than letting a single-SKU rate be misread as a BoM total. The whole-BoM figures are the verdict, the
+            composition chart and the per-line table above it.
+          </P>
         ),
       },
       {
@@ -746,15 +1249,22 @@ const SECTIONS: FaqSection[] = [
       {
         id: 'reg-overlap',
         q: 'What do "Served by all", "Shared by two+" and "exclusive" mean?',
-        text: 'served by all clouds shared by two exclusive metro overlap tinted unique reach gap',
+        text: 'served by all clouds shared by two exclusive metro overlap tinted unique reach gap reconciliation line adds up buckets total',
         body: (
-          <P>
-            These are <Strong>metro-level</Strong> overlap (each cloud&apos;s regions collapsed to city+country,
-            so Azure &quot;East US&quot; and AWS &quot;us-east-1&quot; both count as N. Virginia).{' '}
-            <Strong>Served by all</Strong> = every selected cloud is present (deploy-anywhere);{' '}
-            <Strong>Shared by two+</Strong> = at least two; <Strong>X exclusive</Strong> = only that one cloud —
-            its unique reach, and a competitor&apos;s gap. Tinted by ownership (brand color / purple / green).
-          </P>
+          <>
+            <P>
+              These are <Strong>metro-level</Strong> overlap (each cloud&apos;s regions collapsed to city+country,
+              so Azure &quot;East US&quot; and AWS &quot;us-east-1&quot; both count as N. Virginia).{' '}
+              <Strong>Served by all</Strong> = every selected cloud is present (deploy-anywhere);{' '}
+              <Strong>Shared by two+</Strong> = at least two; <Strong>X exclusive</Strong> = only that one cloud —
+              its unique reach, and a competitor&apos;s gap. Tinted by ownership (brand color / purple / green).
+            </P>
+            <P>
+              Underneath, a <Strong>reconciliation line</Strong> prints the arithmetic — served-by-all + shared +
+              exclusive = the base cloud&apos;s total regions — so you can check the buckets add up instead of
+              taking them on trust.
+            </P>
+          </>
         ),
       },
       {
@@ -773,6 +1283,133 @@ const SECTIONS: FaqSection[] = [
               <Strong>AWS Local Zones / Wavelength</Strong> are excluded everywhere because they&apos;re{' '}
               <Strong>edge locations, not regions</Strong> — counting them would inflate AWS from ~36 to ~105 and
               create phantom one-cloud gaps with no Azure/GCP peer.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'reg-scope',
+        q: 'How do the category / family / size filter chips combine?',
+        text: 'filter chips category family size multi select within a kind or across kinds and scoped to counts reflect regions offering selection',
+        body: (
+          <P>
+            <Strong>Within a kind they widen; across kinds they narrow.</Strong> Two category chips mean
+            &quot;either category&quot;; a category chip <em>and</em> a family chip mean &quot;this category{' '}
+            <em>and</em> this family&quot;. Category is canonical and cross-cloud; family and size chips belong to
+            one cloud. With any chip active the tiles switch from counting <em>all</em> regions to counting only
+            the regions that actually offer your selection, and the header reads <Strong>&quot;Scoped
+            to…&quot;</Strong> — which is why a region count can drop sharply the moment you pick a family. That
+            drop is the answer, not a bug: it&apos;s where that family is genuinely available.
+          </P>
+        ),
+      },
+      {
+        id: 'reg-mute',
+        q: 'What is the difference between muting a cloud here and deselecting it in setup?',
+        text: 'mute cloud page local view versus deselect setup keeps base star shown muted last cloud cannot',
+        body: (
+          <P>
+            <Strong>Muting</Strong> hides a cloud on this page only — your Comparison setup keeps it, and
+            un-muting restores it instantly. <Strong>Deselecting</Strong> in setup removes the cloud from the
+            whole comparison and clears its picks. Use mute to check &quot;what does this look like without
+            AWS?&quot; without losing your setup. Either way you cannot remove the last visible cloud, and the
+            base cloud must be one of the visible ones.
+          </P>
+        ),
+      },
+      {
+        id: 'reg-map',
+        q: 'How do I use the map — views, the cloud legend, and pinning?',
+        text: 'map view tabs global americas emea apac cloud legend hide show markers pin region cmd ctrl shift click coordinates list roster expand all',
+        body: (
+          <>
+            <P>
+              The <Strong>View</Strong> tabs zoom between Global and a single super-geo. The{' '}
+              <Strong>Cloud</Strong> legend hides or shows a cloud&apos;s markers. Clicking a marker{' '}
+              <Strong>pins</Strong> it, opening a detail card with its exact coordinates and super-geo below the
+              map; Cmd/Ctrl or Shift-click pins several at once, and <Strong>Clear all</Strong> releases them.
+            </P>
+            <P>
+              Two things worth knowing. Markers that land on nearly the same spot are{' '}
+              <Strong>fanned slightly apart</Strong> so each stays clickable — the pinned card always shows the
+              true coordinates, so trust the card over the dot for exact position. And the{' '}
+              <Strong>list</Strong> toggle is the same data as a roster of metro cards, grouped by super-geo and{' '}
+              <Strong>collapsed by default</Strong> — use <Strong>Expand all</Strong> if it looks empty.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'reg-footprint',
+        q: 'What are the three footprint boxes (Equivalent / Exclusive / Market gaps)?',
+        text: 'footprint boxes equivalent exclusive market gaps per cloud point of view partition cities colour coded competitor losing city to',
+        body: (
+          <>
+            <P>
+              One box per cloud, each partitioning every city in scope from <em>that cloud&apos;s</em> point of
+              view:
+            </P>
+            <UL>
+              <li><Strong>Equivalent</Strong> — cities it holds that at least one competitor also holds. Contested ground; the dots name who else is there.</li>
+              <li><Strong>Exclusive</Strong> — cities only it holds. Painted in its own brand colour: its unique reach.</li>
+              <li><Strong>Market gaps</Strong> — cities competitors hold and it doesn&apos;t. Painted in the <em>competitor&apos;s</em> colour — the cloud you&apos;re losing that city to.</li>
+            </UL>
+            <P>
+              These are the same three questions the scoreboard answers, but read per cloud rather than from the
+              base cloud&apos;s perspective — so the numbers here and on the scoreboard tile answer different
+              questions and needn&apos;t match. Counting is by <Strong>city</Strong>, so two regions of one cloud
+              in one metro count once.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'reg-gap-count',
+        q: 'What exactly is counted in the "market gaps" tile?',
+        text: 'market gaps tile counted base point of view competitor only metro not in count both competitors context reveal panel buckets',
+        body: (
+          <P>
+            The tile counts, <Strong>from the base cloud&apos;s point of view</Strong>, metros where a competitor
+            has a region and the base doesn&apos;t. Open it and the gaps are bucketed by <em>which</em> competitor
+            is there. Metros that <Strong>both</Strong> competitors serve are shown for context but carry a{' '}
+            <Mono>not in count</Mono> badge — they&apos;re a broader strategic gap rather than a
+            single-competitor one, and the tile says so rather than quietly folding them in. Counting is by metro,
+            so two competitor regions in one city are one gap.
+          </P>
+        ),
+      },
+      {
+        id: 'reg-matrix',
+        q: 'How do I read the region availability matrix?',
+        text: 'region availability matrix rows locations super geo columns clouds check mark n vms dot empty offers nothing metros not regions',
+        body: (
+          <P>
+            One row per <Strong>location</Strong> (a metro, not a region), grouped by super-geo, one column per
+            cloud. A cell reads <Mono>✓ N VMs</Mono> when that cloud offers something matching your current filter
+            there — the count is how many sizes, so it also tells you how <em>deep</em> the offering is, not just
+            whether it exists. A <Mono>·</Mono> means that cloud offers nothing there under the current filter,
+            which may mean no region at all, or a region without that family. The{' '}
+            <Strong>Coverage</Strong> boxes tell you which.
+          </P>
+        ),
+      },
+      {
+        id: 'reg-why',
+        q: 'What is the "why equivalent" column, and where do government regions fit?',
+        text: 'why equivalent column rationale same country km apart metros no nearby region market gap government cloud gov regions only match gov only show gaps',
+        body: (
+          <>
+            <P>
+              The line-by-line equivalency table shows its reasoning in words, so you can audit a row instead of
+              trusting it: <em>&quot;Same country (Germany) — all within 32 km of each other&quot;</em>,{' '}
+              <em>&quot;AWS + GCP are equivalent … Azure has no nearby region here&quot;</em>, or{' '}
+              <em>&quot;Only Azure serves Norway … a market gap&quot;</em>. Filter by country, or tick{' '}
+              <Strong>Only show gaps</Strong> to jump straight to the rows where the clouds don&apos;t line up.
+            </P>
+            <P>
+              <Strong>Government regions cluster only with other government regions</Strong>, flagged in the same
+              column. A sovereign region is never offered as the equivalent of a commercial one, however close it
+              sits — the whole point of it is that the workload can&apos;t move there.
             </P>
           </>
         ),
@@ -843,10 +1480,11 @@ const SECTIONS: FaqSection[] = [
             </P>
             <WeightsTable />
             <P>
-              The key trick is <Strong>active-weight normalization</Strong>: the raw distance is divided by the
-              sum of the weights that were <em>actually comparable</em> (both sides had the data). So an
-              Azure↔AWS pair where Azure carries no processor string still lands on the same 0–1 scale as a
-              fully-specced pair — percentages stay comparable instead of being deflated by missing data.
+              Dimensions marked <Mono>opt</Mono> only count when <em>both</em> sides carry the data, and the score
+              is rescaled to the dimensions that were actually comparable. That matters for reading the number: a
+              pair scored on fewer dimensions isn&apos;t penalized for the missing ones, so its percentage stays
+              on the same scale — but it is also a <em>less informed</em> percentage, which is why the caveat
+              chips tell you when a dimension was skipped.
             </P>
           </>
         ),
@@ -857,13 +1495,15 @@ const SECTIONS: FaqSection[] = [
         text: 'exponential mapping matchPct formula 1.157 floor anchors identical cross arch 2x step never flattens',
         body: (
           <>
-            <P>The normalized distance <Mono>d</Mono> becomes a percentage through an exponential mapping:</P>
+            <P>The spec distance becomes a percentage through a calibrated decay curve:</P>
             <FormulaAndAnchors />
             <P>
-              The constant <Mono>k = 1.157</Mono> is calibrated. It floors at 1% for any finite distance, and is
-              only ever 0% for a category-gated pair. Exponential decay (not linear) was chosen so a
-              perfectly-sized analog in a slightly different family doesn&apos;t collapse to a misleadingly low
-              percent, and ranked runners-up stay in true order down the tail.
+              The practical consequence is that the scale is <Strong>steep near the top and gentle at the
+              bottom</Strong>. Small real differences move the number a lot — one 2× size step already costs most
+              of it — while everything genuinely far away lands in a low band and stays correctly ranked against
+              its peers. So treat the high end as precise and the low end as ordinal: 96% vs 91% is a meaningful
+              difference; 14% vs 9% just means &quot;both are the wrong machine.&quot; Only a category-gated pair
+              ever reads 0%.
             </P>
           </>
         ),
@@ -925,10 +1565,11 @@ const SECTIONS: FaqSection[] = [
             </P>
             <P>
               When a cloud was scoped to a different category than the base, the UI can <Strong>fall back</Strong>{' '}
-              at a penalty and flag it <Strong>≠ / &quot;via «Category»&quot;</Strong>. The penalty is{' '}
-              <Mono>0.25</Mono> for crossing the gate, plus an extra <Mono>0.30</Mono> when the categories also
-              sit in different product groups (accelerated {'{'}GPU, HPC{'}'} · data {'{'}Memory, Storage{'}'} ·
-              general {'{'}the rest{'}'}). So Memory↔Storage (same group) reads closer than Memory↔GPU.
+              to the nearest thing anyway and flag it <Strong>≠ / &quot;via «Category»&quot;</Strong>. Such a match
+              is deliberately marked down, and marked down <em>further</em> the further apart the two categories
+              really are — so Memory↔Storage reads closer than Memory↔GPU. Read a &quot;via&quot; match as
+              &quot;the closest thing that exists, in a different product class&quot;, and check the specs before
+              treating it as a substitute.
             </P>
           </>
         ),
@@ -992,7 +1633,7 @@ const SECTIONS: FaqSection[] = [
               lack curated accelerator specs; some <Strong>storage SKUs</Strong> ship without a local-disk figure
               in the feed; and <Strong>Azure processors are curated assumptions</Strong> (the Azure API publishes
               no processor string, so silicon comes from a source-cited map — see{' '}
-              <Strong>08 · Data health</Strong>). We surface the gap as an honest asterisk instead of letting a
+              <Strong>09 · Data health</Strong>). We surface the gap as an honest asterisk instead of letting a
               green percentage imply an apples-to-apples swap.
             </P>
           </>
@@ -1002,8 +1643,123 @@ const SECTIONS: FaqSection[] = [
   },
   // ───────────────────────────────────────────────────────────────────────
   {
-    id: 'data',
+    id: 'markers',
     num: '07',
+    title: 'Reading the numbers: markers, bands & missing values',
+    items: [
+      {
+        id: 'mark-pct',
+        q: 'What does a 96% match mean versus a 62% one — practically?',
+        text: 'how to read match percentage bands green amber red 85 65 40 stretch decision what does 62 percent mean 96 percent like for like',
+        body: (
+          <>
+            <P>
+              The colour of the ≈% pill is the fastest read. Three bands, and each implies a different amount of
+              work before you can act on it:
+            </P>
+            <UL>
+              <li><Strong>85% and above (green)</Strong> — treat it as like-for-like. The sizes line up; a swap is a sizing decision, not a re-architecture. Still read the caveat chips: a 96% match can carry an Arm↔x86 flag that costs you a rebuild.</li>
+              <li><Strong>65–84% (amber)</Strong> — usable, but not a drop-in. Something real differs — usually one size step, a shape change, or a generation gap. Open the driver chips to see <em>which</em> dimension, and decide whether that dimension matters to your workload.</li>
+              <li><Strong>Below 65% (red)</Strong> — a materially different machine. Fine as market intelligence (&quot;this is the closest thing that cloud has&quot;), not as a migration plan.</li>
+            </UL>
+            <P>
+              Below <Strong>40%</Strong> — or whenever one side is roughly 4× the other on vCPU or memory — the
+              pick is additionally flagged a <Strong>Stretch match</Strong>. So a 62% is &quot;check this
+              carefully&quot;, and a 96% is &quot;check the caveats, then proceed&quot;. Neither number says
+              anything about which machine is <em>better</em>; it only says how comparable they are.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'mark-est',
+        q: 'What do the "(est.)" and "(assumed)" markers mean?',
+        text: 'est marker assumed marker estimated rate network figure curated processor inferred host dependent directional not vendor published',
+        body: (
+          <>
+            <P>
+              Both mean &quot;we filled this in; the vendor didn&apos;t publish it.&quot; They are never applied
+              silently and never overwrite a real value.
+            </P>
+            <UL>
+              <li><Strong><Mono>(est.)</Mono></Strong> — a modelled figure. On a price, a reserved rate derived from PAYG (see 04). On a network row, a throughput taken from a curated fallback because the primary feed carried none. Treat either as <em>directional</em>: right order of magnitude, not a billing quote.</li>
+              <li><Strong><Mono>(assumed)</Mono></Strong> — a processor filled in from a source-cited curated map, or inferred from the SKU name, because the vendor publishes no processor string. It is display-only and <Strong>never affects a match score</Strong>.</li>
+              <li><Strong><Mono>host-dependent</Mono></Strong> — not an estimate at all. The family genuinely runs on either of two silicon options and the cloud decides which host you land on.</li>
+              <li><Strong><Mono>(inferred)</Mono></Strong> on a generation — deduced from the SKU naming rather than read from a published string.</li>
+            </UL>
+            <P>
+              If a marker changes your decision, that is the signal to verify with the vendor before committing.
+              The markers exist so you know exactly which figures deserve that call.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'mark-missing',
+        q: 'Why is a value a dash instead of a number?',
+        text: 'dash em dash missing value never zero excluded from totals no fabrication row disappears empty section',
+        body: (
+          <>
+            <P>
+              A <Mono>—</Mono> means <Strong>no value resolved</Strong>, and it is deliberately not a zero. A
+              fabricated $0 would drag a total down and make an incomplete comparison look like a cheap one, so an
+              unresolvable figure is left blank and any total that depends on it is either excluded or disclosed.
+            </P>
+            <P>
+              For the same reason, whole rows and sections <Strong>disappear rather than render empty</Strong>: no
+              GPU row means no compared cloud has an accelerator; no assumptions footer means there are no
+              assumptions in play. Absence here is information, not an error — but if you expected a number and
+              got a dash, the usual causes are a SKU with no rate in that region at that term, a spec the vendor
+              feed hasn&apos;t published, or a filter that left the cloud with nothing to price.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'mark-caveats',
+        q: 'What is an amber caveat chip, and what is the "Assumptions" footer?',
+        text: 'amber caveat chip warn info hover detail assumptions footer one liner estimated rates assumed processors stretch analogs excluded lines capped',
+        body: (
+          <>
+            <P>
+              A <Strong>caveat chip</Strong> is a short amber (or grey, for information-only) label stating one
+              specific reason a pairing isn&apos;t a clean swap — &quot;Stretch match&quot;, &quot;CPU
+              architecture&quot;, &quot;GPU unverified&quot;. The one-sentence explanation is on hover; all nine
+              kinds are listed in <Strong>06 · &quot;When is a match a closest alternative?&quot;</Strong>.
+            </P>
+            <P>
+              The <Strong>Assumptions footer</Strong> is the same idea at briefing altitude: a single amber line
+              naming everything the verdict rests on — estimated rates, assumed processors, stretch analogs,
+              excluded lines. It renders <em>nothing</em> when the comparison is clean, so an empty space there is
+              a good sign. It shows the most load-bearing assumptions first and caps the list, so treat it as the
+              headline rather than the complete audit — the per-cloud chips and the excluded-line lists are the
+              full detail.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'mark-rounding',
+        q: 'Why does the same figure look slightly different on two screens?',
+        text: 'rounding verdict kpi tile abbreviated 12k exact dollars tables percent whole number differ same number formatting',
+        body: (
+          <P>
+            Because verdicts and KPI tiles are meant to be read at a glance and{' '}
+            <Strong>abbreviate</Strong> (<Mono>$12k</Mono>, <Mono>$1.2M</Mono>, whole percents), while the tables
+            underneath carry <Strong>exact dollars</Strong>. The underlying figure is the same one — every surface
+            computes the cheapest cloud and the savings through a single shared calculation precisely so they
+            can&apos;t disagree — but two totals a few hundred dollars apart can both display as{' '}
+            <Mono>$12k</Mono>. When a difference is close enough to matter, read the tables, not the tiles. And
+            when the cheapest-to-runner-up gap is under 8%, the verdict says so explicitly.
+          </P>
+        ),
+      },
+    ],
+  },
+  // ───────────────────────────────────────────────────────────────────────
+  {
+    id: 'data',
+    num: '08',
     title: 'Where the data comes from',
     items: [
       {
@@ -1057,6 +1813,64 @@ const SECTIONS: FaqSection[] = [
         ),
       },
       {
+        id: 'data-list-price',
+        q: 'Are these the prices I will actually pay?',
+        text: 'list price published rate no negotiated discount enterprise agreement spot savings plan committed use credits egress support tax excluded compute only',
+        body: (
+          <>
+            <P>
+              They are <Strong>list prices</Strong> — each vendor&apos;s published rate for the SKU, region and
+              term. What is <Strong>not</Strong> applied: your negotiated or enterprise-agreement discount, spot /
+              preemptible pricing, savings plans and committed-use discounts beyond the standard reserved tiers,
+              and any credits.
+            </P>
+            <P>
+              The figures also cover <Strong>compute only</Strong> — no storage, egress, licensing, support tier
+              or tax. So read the cross-cloud <em>gap</em> as the reliable signal and the absolute totals as a
+              floor. If you hold real contract pricing, upload it: your rates override the public ones and every
+              verdict recomputes against them.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'data-stale',
+        q: 'What should I do when a rate is missing or looks stale?',
+        text: 'missing rate stale out of date what to do check as of date data health shard age try payg different region upload own rates vm library refresh',
+        body: (
+          <>
+            <P>Work down this list — the first three cost you nothing:</P>
+            <UL>
+              <li><Strong>Check the as-of date</Strong> in the Public Data pill, and the per-cloud shard age in <Strong>09 · Data health</Strong>. If a cloud&apos;s shard is old, its rates are old.</li>
+              <li><Strong>Try PAYG.</Strong> Pay-as-you-go is published far more completely than the reserved tiers; a missing figure is very often a missing <em>reserved</em> rate, not a missing SKU.</li>
+              <li><Strong>Try another region.</Strong> Rates are per-region, and a brand-new region often prices before or after its neighbours.</li>
+              <li><Strong>Upload your own rates</Strong> via the VM Library. Uploaded values override the baked catalog and are never overwritten by a refresh.</li>
+            </UL>
+            <P>
+              For anything you are about to commit money to, confirm the figure against the vendor&apos;s own
+              pricing page. This tool is built to narrow the field and show you the shape of the decision, not to
+              serve as a quote.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'data-template',
+        q: 'Can I author the cross-cloud equivalency mappings myself?',
+        text: 'equivalency template excel download upload replaces table azure sku aws sku gcp sku notes hand authored curated opinion overrides computed',
+        body: (
+          <P>
+            Yes. Cross-cloud equivalency is an <em>opinion</em> — no vendor publishes &quot;the AWS analog of this
+            Azure SKU&quot; — so the tool ships a seed of widely-accepted mappings and lets you replace it.{' '}
+            <Strong>Template</Strong> downloads the current table as an Excel sheet (Azure SKU · AWS SKU · GCP SKU
+            · Notes); edit it and <Strong>Upload</Strong> it back. Note that an upload{' '}
+            <Strong>replaces the whole table rather than merging into it</Strong>, so start from the downloaded
+            template rather than a blank sheet. Where you&apos;ve authored a mapping, your pick wins; everywhere
+            else the computed best match fills in.
+          </P>
+        ),
+      },
+      {
         id: 'data-upload',
         q: 'Can I use my own data?',
         text: 'public seed proprietary excel upload override edited deleted rows never reset uploads always win byo',
@@ -1074,7 +1888,7 @@ const SECTIONS: FaqSection[] = [
   // ───────────────────────────────────────────────────────────────────────
   {
     id: 'health',
-    num: '08',
+    num: '09',
     title: 'Data health',
     items: [
       {
@@ -1101,6 +1915,43 @@ const SECTIONS: FaqSection[] = [
               &quot;Priced SKUs awaiting specs&quot; are rate rows the feed prices but whose spec hasn&apos;t landed
               yet (mostly Azure, whose keyless rate feed runs ahead of the keyed spec pull). They are counted here,
               never faked into the catalog — a row appears only once both its spec and rate are present.
+            </P>
+          </>
+        ),
+      },
+      {
+        id: 'health-guard',
+        q: 'How do you know the catalog isn’t quietly missing regions or families?',
+        text: 'coverage guard build time check vendor docs diff curated tables fails build ci not on screen drift silent gap detection',
+        body: (
+          <P>
+            A <Strong>build-time guard</Strong> diffs the vendor&apos;s own published region and family
+            documentation against the curated tables and <Strong>fails the build</Strong> when they drift, so a
+            missing region or a family that quietly launched somewhere new is caught before the build ships rather
+            than showing up as a silently short list. It runs in CI, not on screen — there is nothing here for you
+            to check. Its practical meaning for you is that a &quot;— none&quot; cell should be read as a real
+            coverage gap rather than as a stale table.
+          </P>
+        ),
+      },
+      {
+        id: 'health-trust',
+        q: 'Which numbers should I trust least?',
+        text: 'trust least confidence ranking what to verify before committing reserved rates azure processors gpu specs storage local disk absolute totals gaps',
+        body: (
+          <>
+            <P>Roughly in order, most trustworthy first:</P>
+            <UL>
+              <li><Strong>vCPU, memory and PAYG rates</Strong> — vendor-published on all three clouds and refreshed weekly. Safe to quote.</li>
+              <li><Strong>Region presence</Strong> — published and cross-checked by the build-time guard.</li>
+              <li><Strong>Network throughput</Strong> — published, but occasionally from a curated fallback; the <Mono>(est.)</Mono> marker tells you which.</li>
+              <li><Strong>Reserved (1-yr / 3-yr) rates</Strong> — real where published, modelled from PAYG where not. An <Mono>est.</Mono> badge marks every modelled one.</li>
+              <li><Strong>Azure processor / generation</Strong> — a curated assumption everywhere, because Azure publishes no processor string. Marked <Mono>(assumed)</Mono>, and never used to rank a match.</li>
+              <li><Strong>GPU model detail and local-disk figures on newer families</Strong> — the most likely to be simply absent, which raises a &quot;GPU unverified&quot; or &quot;Local disk unknown&quot; caveat.</li>
+            </UL>
+            <P>
+              Across all of it, the <Strong>gap between clouds</Strong> is a more reliable signal than any
+              absolute total, because the same method and the same list prices are applied to every side.
             </P>
           </>
         ),
@@ -1203,10 +2054,11 @@ export function CmaFaqPage({
       <div style={{ maxWidth: 860, margin: '0 auto', padding: '20px 24px 64px' }}>
         <p style={{ fontSize: 13.5, lineHeight: 1.6, color: 'var(--text-secondary)', margin: '0 0 16px 0' }}>
           A complete guide to Cloud Market Analytics: every page (Setup, Specs, Executive Summary, Pricing,
-          Region availability) and the engines behind them — how a VM or region on one cloud maps to its closest
-          equivalents on the others, how each match is scored, how costs are estimated, and where the data comes
-          from. Every score is computed from the published specs, not a hand-curated opinion. Search below, or
-          browse the sections; the glossary defines every term.
+          Region availability), both comparison modes, and the engines behind them — how a VM or region on one
+          cloud maps to its closest equivalents on the others, how each match is scored, how costs are estimated,
+          how to read the confidence markers, and where the data comes from. Every score is computed from the
+          published specs, not a hand-curated opinion, and every figure we had to model is marked as such. Search
+          below, or browse the sections; the glossary defines every term you meet on screen.
         </p>
 
         {/* Search */}
