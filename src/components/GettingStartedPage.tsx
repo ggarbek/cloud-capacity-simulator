@@ -50,7 +50,7 @@ export function GettingStartedPage() {
               className="font-semibold"
               style={{ fontSize: 26, letterSpacing: '-0.02em', color: 'var(--text-primary)', lineHeight: 1.1 }}
             >
-              Glossary
+              FAQ & Glossary
             </h1>
             <div className="text-[12.5px]" style={{ color: 'var(--text-muted)', marginTop: 3 }}>
               Every concept the simulator uses, and the questions that come up most.

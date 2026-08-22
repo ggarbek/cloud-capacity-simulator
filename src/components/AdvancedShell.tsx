@@ -140,7 +140,7 @@ function SetupIntro({ tab }: { tab: string }) {
           padding: '2px 0',
           whiteSpace: 'nowrap',
         }}
-        title={`Open Glossary → Concepts → ${intro.conceptLabel}`}
+        title={`Open FAQ & Glossary → Concepts → ${intro.conceptLabel}`}
       >
         Learn: {intro.conceptLabel} →
       </button>

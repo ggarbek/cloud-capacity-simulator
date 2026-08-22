@@ -200,44 +200,34 @@ export function StartHerePage({
           support={c.lede}
         />
 
-        {/* Project status. Sits under the headline and above the actions so it
-            is read before anything is clicked, and cannot be mistaken for a
-            footnote. Amber, not red — this is scope, not a warning. */}
+        {/* Project status. One line: unmissable but not a wall. The full
+            statement of what this is and is not lives in the FAQ; repeating it
+            here cost a third of the first screen. */}
         <div
+          className="flex items-baseline gap-2 flex-wrap"
           style={{
-            marginTop: 14,
-            padding: '11px 14px',
+            marginTop: 12,
+            padding: '7px 11px',
             border: '1px solid var(--status-warn)',
             borderRadius: 'var(--radius-md)',
-            background: 'color-mix(in srgb, var(--status-warn) 8%, transparent)',
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: 10,
+            background: 'color-mix(in srgb, var(--status-warn) 7%, transparent)',
+            fontSize: 12,
+            lineHeight: 1.5,
           }}
         >
           <span
-            aria-hidden="true"
-            style={{ color: 'var(--status-warn)', fontSize: 13, lineHeight: 1.5, flexShrink: 0 }}
+            style={{
+              fontSize: 10.5,
+              fontWeight: 700,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: 'var(--status-warn)',
+              whiteSpace: 'nowrap',
+            }}
           >
-            ⚠
+            Proof of concept
           </span>
-          <div>
-            <div
-              style={{
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-                color: 'var(--status-warn)',
-                marginBottom: 3,
-              }}
-            >
-              Proof of concept · work in progress
-            </div>
-            <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.55 }}>
-              {PROJECT_STATUS}
-            </div>
-          </div>
+          <span style={{ color: 'var(--text-secondary)' }}>{PROJECT_STATUS}</span>
         </div>
 
         {/* The one action that matters. Kept immediately under the band so it
@@ -290,9 +280,6 @@ export function StartHerePage({
           </span>
         </div>
 
-        {/* Why a planner would care, before what the tool is. The README
-            opens the reader's half this way and the ordering is deliberate:
-            the problem earns the rest of the page. */}
         {/* Answered where the decision is made. A reader weighing "Build your
             own" wants to know how their fleet gets in and where it goes before
             they click, not in a footnote below the page map. */}
@@ -308,6 +295,8 @@ export function StartHerePage({
           {c.dataNote}
         </div>
 
+        {/* Why a planner would care, before what the tool is. The ordering is
+            deliberate: the problem earns the rest of the page. */}
         <SectionLabel>The problem it solves</SectionLabel>
         <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
           {c.problem.map((d) => (

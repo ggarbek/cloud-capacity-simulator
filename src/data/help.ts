@@ -342,11 +342,8 @@ export interface StartHereContent {
  * different levels of maturity. Reads as a statement of scope, not an apology.
  */
 export const PROJECT_STATUS =
-  'This is a proof of concept and an active work in progress — not a finished or ' +
-  'production-ready planning system, and not in production use anywhere. It exists to ' +
-  'show how fleet capacity constraints and their economics can be reasoned about end to ' +
-  'end. The engine rules and the honesty gates are real and tested, but coverage is ' +
-  'partial and several surfaces are still being built.';
+  'Proof of concept, actively being built — not production-ready, and not in use anywhere. ' +
+  'Read the numbers as a demonstration of method.';
 
 /**
  * Which half does this reader need?
@@ -378,9 +375,9 @@ export const START_HERE: Record<'simulator' | 'cma', StartHereContent> = {
       'Not “do we have enough memory,” and not “what is our average utilization.” The real question is whether every VM in a committed bill of materials finds a node where memory, vCPU, network bandwidth and storage throughput all clear at the same time — and when one does not, exactly which of those four blocked it, on which node, by how much.',
     problem: [
       {
-        lead: 'A deployment is not blocked by "capacity" — it is blocked by one resource, on one node.',
+        lead: 'Usable capacity is set by whichever resource becomes constrained first.',
         body:
-          'Memory, vCPU, network bandwidth and storage throughput run out at different rates, and whichever hits zero first is the one that stops you. A fleet-level average cannot see that, and neither can a spreadsheet dividing total demand by total capacity.',
+          'Memory, vCPU, network bandwidth and storage throughput deplete at different rates, so the first one to run short caps what the fleet can hold — however much of the other three is still sitting there unused. A fleet-level average cannot see that, and neither can a spreadsheet dividing total demand by total capacity.',
       },
       {
         lead: 'Real allocators follow rules, not arithmetic.',

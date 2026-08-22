@@ -128,7 +128,7 @@ const GLOSSARY: { term: string; def: string }[] = [
   // Region
   { term: 'Region equivalency', def: 'Two regions treated as analogs because they’re in the same country, same sovereignty class, and within 400 km of each other; lets cross-cloud peers line up on one row.' },
   { term: 'Geo-cluster', def: 'A group of regions merged by union-find (same country + gov class + ≤ 400 km). Picking any region scopes the page to its whole cluster across clouds.' },
-  { term: 'REGION_CLUSTER_KM (400 km)', def: 'The maximum straight-line distance for two same-country regions to count as equivalent / cluster together.' },
+  { term: 'Region cluster radius (400 km)', def: 'The maximum straight-line distance for two same-country regions to count as equivalent and cluster together on one row.' },
   { term: 'Super-geo', def: 'One of three coarse buckets — AMER (Americas), EMEA (Europe · Middle East · Africa), APAC (Asia · Pacific) — used to group regions.' },
   { term: 'Edge region / Local Zone', def: 'AWS satellite sites (us-east-1-bos-1, …-wl1-…) attached to a parent region; excluded from region counts because they aren’t full regions and have no cross-cloud peer.' },
   { term: 'Market gap', def: 'A metro where at least one compared cloud has a region but not every compared cloud does — the unique-reach / missing-coverage signal.' },
@@ -149,7 +149,7 @@ const GLOSSARY: { term: string; def: string }[] = [
   { term: 'PAYG', def: 'Pay-as-you-go on-demand pricing with no commitment — the published hourly rate. Always a real figure, never estimated.' },
   { term: 'Reserved / committed term (1-yr, 3-yr)', def: 'A discounted rate in exchange for a 1- or 3-year usage commitment; deeper discount for the longer term.' },
   { term: 'Bill of Materials (BoM)', def: 'Your committed VM demand — a list of {VM size, quantity, region} lines authored on the VM Demand tab.' },
-  { term: 'Region auto-match (~1000 km)', def: 'On Pricing, the other clouds’ region is auto-resolved to the nearest equivalent of the base region — same country or within ~1000 km (REGION_MATCH_KM), else excluded with an alert.' },
+  { term: 'Region auto-match (~1000 km)', def: 'On Pricing, the other clouds’ region is auto-resolved to the nearest equivalent of the base region — same country or within ~1000 km, else excluded with an alert.' },
   { term: 'Estimated rate ("est.")', def: 'A reserved rate modeled from PAYG × the provider’s measured median RI/PAYG discount when no published reserved rate exists; always badged, never overwrites a real rate.' },
   { term: 'Rate library', def: 'The per-region published PAYG / 1-yr / 3-yr rate card for a single anchor VM, sorted cheapest-region-first.' },
   { term: 'List price', def: 'The vendor’s published rate. Everything priced here is list — no negotiated discount, enterprise agreement, spot or savings-plan pricing is applied.' },
@@ -1080,7 +1080,7 @@ const SECTIONS: FaqSection[] = [
           <P>
             Prices vary by region, so you pick <Strong>one base region</Strong> and the other clouds{' '}
             <Strong>auto-match</Strong> the nearest equivalent — same country first, else nearest by distance,
-            but only if it&apos;s in the same country <Strong>or within ~1000 km</Strong> (<Mono>REGION_MATCH_KM</Mono>).
+            but only if it&apos;s in the same country <Strong>or within ~1000 km</Strong>.
             Beyond that the cloud is <Strong>left blank with a &quot;no comparable region — excluded&quot;</Strong>{' '}
             alert. We don&apos;t guess past 1000 km on purpose: pricing your workload against a region on another
             continent would silently compare different latency, sovereignty and cost regimes — a misleading
@@ -1326,7 +1326,7 @@ const SECTIONS: FaqSection[] = [
             <UL>
               <li><Strong>Same country.</Strong> Data residency dominates — Azure &quot;West Europe&quot; (Netherlands) ≠ AWS &quot;eu-west-1&quot; (Ireland).</li>
               <li><Strong>Same sovereignty class.</Strong> Government regions only cluster with other gov regions.</li>
-              <li><Strong>Within 400 km</Strong> (<Mono>REGION_CLUSTER_KM</Mono>) by great-circle distance.</li>
+              <li><Strong>Within 400 km</Strong> of each other by great-circle distance.</li>
             </UL>
             <P>
               A region joins a cluster if it&apos;s within 400 km of <em>any</em> member, so a chain of nearby
@@ -1667,7 +1667,7 @@ const SECTIONS: FaqSection[] = [
       {
         id: 'sim-gpu',
         q: 'How are GPUs compared?',
-        text: 'gpu count model class vram interconnect nvlink nvswitch 8 h100 l4 37 percent curated specs inert acceleratorSpecs',
+        text: 'gpu count model class vram interconnect nvlink nvswitch 8 h100 l4 37 percent curated accelerator specs inert gpu unverified',
         body: (
           <>
             <P>On four axes, not just count:</P>
