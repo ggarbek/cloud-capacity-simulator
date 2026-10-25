@@ -685,6 +685,56 @@ const SRC = {
   gcpH4d: 'https://cloud.google.com/blog/products/compute/h4d-vms-now-ga',
   gcpAccel: 'https://docs.cloud.google.com/compute/docs/accelerator-optimized-machines',
   awsSevSnp: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/sev-snp.html',
+  // 2026-Q4 quarterly refresh (researcher + 2 independent verifiers, vendor first-party).
+  awsM8i: 'https://aws.amazon.com/ec2/instance-types/m8i/',
+  awsC8i: 'https://docs.aws.amazon.com/ec2/latest/instancetypes/co.html',
+  awsR8i: 'https://aws.amazon.com/ec2/instance-types/r8i/',
+  awsM8a: 'https://aws.amazon.com/ec2/instance-types/m8a/',
+  awsC8a: 'https://aws.amazon.com/ec2/instance-types/c8a/',
+  awsR8a: 'https://aws.amazon.com/ec2/instance-types/r8a/',
+  awsM9g: 'https://aws.amazon.com/ec2/instance-types/m9g/',
+  awsC9g:
+    'https://aws.amazon.com/blogs/aws/amazon-ec2-c9g-and-c9gd-instances-powered-by-aws-graviton5-processors-are-now-available/',
+  awsX8g: 'https://aws.amazon.com/ec2/instance-types/x8g/',
+  awsX8i: 'https://aws.amazon.com/ec2/instance-types/x8i/',
+  awsI8g: 'https://aws.amazon.com/ec2/instance-types/i8g/',
+  awsHpc8a:
+    'https://aws.amazon.com/blogs/aws/amazon-ec2-hpc8a-instances-powered-by-5th-gen-amd-epyc-processors-are-now-available/',
+  awsP4: 'https://aws.amazon.com/ec2/instance-types/p4/',
+  awsP6: 'https://aws.amazon.com/ec2/instance-types/p6/',
+  awsG6: 'https://aws.amazon.com/ec2/instance-types/g6/',
+  awsG6e: 'https://aws.amazon.com/ec2/instance-types/g6e/',
+  awsG7: 'https://aws.amazon.com/ec2/instance-types/g7/',
+  awsG7e: 'https://aws.amazon.com/ec2/instance-types/g7e/',
+  awsTrn1: 'https://aws.amazon.com/ec2/instance-types/trn1/',
+  awsTrn2: 'https://aws.amazon.com/ec2/instance-types/trn2/',
+  awsInf2: 'https://aws.amazon.com/ec2/instance-types/inf2/',
+  azDsv7: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/general-purpose/dsv7-series',
+  azEsv7: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/memory-optimized/esv7-series',
+  azDsv6: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/general-purpose/dsv6-series',
+  azDpsv6: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/general-purpose/dpsv6-series',
+  azDasv7: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/general-purpose/dasv7-series',
+  azEasv7: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/memory-optimized/easv7-series',
+  azFasv7: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/compute-optimized/fasv7-series',
+  azHbv5: 'https://learn.microsoft.com/en-us/azure/virtual-machines/hbv5-series-overview',
+  azHbv2: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/high-performance-compute/hbv2-series',
+  azHc: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/high-performance-compute/hc-series',
+  azHx: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/high-performance-compute/hx-series',
+  azLsv4: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/storage-optimized/lsv4-series',
+  azLasv4: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/storage-optimized/lasv4-series',
+  azLaosv4: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/storage-optimized/laosv4-series',
+  azLsv2: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/lifecycle/retired-sizes-list',
+  azNdGb200: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/gpu-accelerated/nd-gb200-v6-series',
+  azNdGb300: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/gpu-accelerated/nd-gb300-v6-series',
+  azNdH100: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/gpu-accelerated/ndh100v5-series',
+  azNdMi300x: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/gpu-accelerated/ndmi300xv5-series',
+  azNcH100: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/gpu-accelerated/ncadsh100v5-series',
+  azNcA100: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/gpu-accelerated/nca100v4-series',
+  azNcRtxPro:
+    'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/gpu-accelerated/nc-rtxpro6000-bse-v6-series',
+  azNvA10: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/gpu-accelerated/nvadsa10v5-series',
+  azNvV710: 'https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/gpu-accelerated/nvadsv710-v5-series',
+  gcpMem: 'https://docs.cloud.google.com/compute/docs/memory-optimized-machines',
 } as const;
 
 /** Keyed by normalized family token. Strictly additive context — never used to
@@ -724,7 +774,7 @@ const FAMILY_KNOWLEDGE: Record<string, FamilyFact> = {
   },
   // ── AWS — compute ────────────────────────────────────────────────────────
   c7i: {
-    whatItIs: 'AWS C7i — 7th-gen Intel (Sapphire Rapids) compute-optimized (~2 GiB/vCPU) for CPU-bound workloads.',
+    whatItIs: 'AWS C7i — 7th-gen Intel (Sapphire Rapids) compute-optimized (2 GiB/vCPU) for CPU-bound workloads.',
     pickWhen: 'Newer gen than C6i (~15% better price/performance) — default to the newest unless region availability blocks it.',
     analogs: '≈ Azure F-series · GCP C3/C4',
     source: SRC.awsC7i,
@@ -780,7 +830,7 @@ const FAMILY_KNOWLEDGE: Record<string, FamilyFact> = {
   e: { whatItIs: 'Azure E-series — memory-optimized general VMs (~8 GiB/vCPU) for in-memory databases and analytics.', analogs: '≈ AWS R7i/R8g · GCP M3' },
   epsv6: {
     whatItIs:
-      "Azure Epsv6 — Arm memory-optimized on Azure's own Cobalt 100 (Neoverse N2) silicon, 8 GiB/vCPU; relational/large databases, analytics engines, in-memory caches.",
+      "Azure Epsv6 — Arm memory-optimized on Azure's own Cobalt 100 (Neoverse N2) silicon, 8 GiB/vCPU up to 64 vCPU (the top E96ps_v6 is 96 vCPU / 672 GiB); relational/large databases, analytics engines, in-memory caches.",
     pickWhen: 'Arm price/performance for memory-bound scale-out; pick the Intel/AMD E-series for x86-locked databases.',
     analogs: '≈ AWS R8g (Graviton) · GCP M-series',
     source: SRC.azEpsv6,
@@ -812,7 +862,7 @@ const FAMILY_KNOWLEDGE: Record<string, FamilyFact> = {
   },
   c4a: {
     whatItIs:
-      "GCP C4A — flagship Arm general-purpose on Google's Axion (Neoverse V2): up to 72 vCPU / 576 GB, 6 TiB Titanium SSD, up to 100 Gbps; supersedes the Ampere-based T2A.",
+      "GCP C4A — flagship Arm general-purpose on Google's Axion (Neoverse V2): up to 72 vCPU / 576 GB per VM (96-vCPU bare-metal shapes since May 2026), 6 TiB Titanium SSD, 50 Gbps standard / 100 Gbps with Tier_1; a newer Arm option than the Ampere-based T2A.",
     pickWhen: 'Arm price/performance for scale-out, Arm-compatible code; pick C4 (x86) for legacy/AVX-512 or single-thread code.',
     analogs: '≈ AWS M8g/C8g (Graviton4) · Azure Dpsv6 (Cobalt)',
     source: SRC.gcpGp,
@@ -835,7 +885,7 @@ const FAMILY_KNOWLEDGE: Record<string, FamilyFact> = {
     source: SRC.gcpH3,
   },
   m3: { whatItIs: 'GCP M3 — memory-optimized machine type for SAP and large in-memory databases.', analogs: '≈ AWS R8g/X2idn · Azure E/M' },
-  t2a: { whatItIs: 'GCP T2A — Ampere Altra (Arm) cost-optimized scale-out; superseded by Axion-based C4A.', analogs: '≈ AWS M7g · Azure Dpsv5' },
+  t2a: { whatItIs: 'GCP T2A — Ampere Altra (Arm) cost-optimized scale-out; Axion-based C4A/N4A are the newer GCP Arm options.', analogs: '≈ AWS M7g · Azure Dpsv5' },
   e2: {
     whatItIs:
       'GCP E2 — lowest-TCO cost-optimized general-purpose (Intel or AMD, auto-selected) using dynamic resource management (vCPUs scheduled on-demand); the small shapes e2-micro/small/medium are SHARED-CORE burstable (0.25–1.0 vCPU baseline, burst to 2). N1-class performance for less.',
@@ -919,7 +969,7 @@ const FAMILY_KNOWLEDGE: Record<string, FamilyFact> = {
   },
   z3: {
     whatItIs:
-      'GCP Z3 — Intel (Sapphire Rapids) storage-optimized with Titanium Local SSD: up to 36 TiB local NVMe per VM (72 TiB bare-metal), ~8 GiB/vCPU up to 176 vCPU across 11 shapes; scale-out/flash-optimized databases, analytics & warehouses, search, media streaming, parallel file systems.',
+      'GCP Z3 — Intel (Sapphire Rapids) storage-optimized with Titanium Local SSD: up to ~35 TiB (36,000 GiB) local NVMe per VM and ~70 TiB on the 192-vCPU bare-metal shape, ~8 GiB/vCPU up to 176 vCPU per VM; scale-out/flash-optimized databases, analytics & warehouses, search, media streaming, parallel file systems.',
     pickWhen:
       'Pick Z3 when you need dense, fast local NVMe co-located with compute for I/O-intensive scale-out databases and analytics; use a general-purpose family if your data fits on network-attached disk. Local SSD is ephemeral — replicate for durability.',
     analogs: '≈ AWS I7i/I7ie · Azure Lsv3',
@@ -946,15 +996,15 @@ const FAMILY_KNOWLEDGE: Record<string, FamilyFact> = {
     whatItIs:
       'Azure HBv4 — AMD EPYC Genoa-X (3D V-Cache) HPC, up to 176 cores, ~780 GB/s DRAM bandwidth, 400 Gb/s NDR InfiniBand (RDMA); memory-bandwidth-bound CFD, weather, FEA.',
     pickWhen:
-      'Pick HBv4 when memory bandwidth and InfiniBand (NDR 400 Gb/s) drive scaling; the large 3D V-Cache L3 helps cache-sensitive solvers. Pair with the closest AWS/GCP HPC family by interconnect tier.',
+      'Pick HBv4 when memory bandwidth and InfiniBand (NDR 400 Gb/s) drive scaling; the large 3D V-Cache L3 helps cache-sensitive solvers. HBv5 (HBM3) is the newer top tier; HX doubles memory capacity on the same silicon.',
     analogs: '≈ AWS Hpc7a · GCP H3',
     source: SRC.azHb,
   },
   hb: {
     whatItIs:
-      'Azure HB-family — AMD EPYC HPC VMs with InfiniBand RDMA; the flagship HBv4 (Genoa-X, 3D V-Cache, ~780 GB/s DRAM, 400 Gb/s NDR InfiniBand) leads for memory-bandwidth-bound tightly-coupled jobs.',
+      'Azure HB-family — AMD EPYC HPC VMs with InfiniBand RDMA; HBv5 (432 GB HBM3 at 6.7 TB/s, 800 Gb/s InfiniBand) now leads, ahead of HBv4 (Genoa-X, 3D V-Cache, ~780 GB/s DRAM, 400 Gb/s NDR).',
     pickWhen:
-      'Pick the HB-family for memory-bandwidth-bound HPC that needs InfiniBand; HBv4 is the current top tier, HBv3/HBv2 are prior generations.',
+      'Pick the HB-family for memory-bandwidth-bound HPC that needs InfiniBand; HBv5 (HBM3) is the current top tier, HBv4/HBv3 are prior generations, and HBv2 retires May 31, 2027.',
     analogs: '≈ AWS Hpc7a/Hpc7g · GCP H3',
     source: SRC.azHb,
   },
@@ -962,7 +1012,7 @@ const FAMILY_KNOWLEDGE: Record<string, FamilyFact> = {
     whatItIs:
       'Azure HBv3 — prior-gen HPC on AMD EPYC Milan-X (7V73X, 3D V-Cache), up to 120 cores (no SMT), 200 Gbps HDR InfiniBand; the large V-Cache L3 amplifies effective memory bandwidth to ~630 GB/s for cache-sensitive CFD/weather/FEA solvers.',
     pickWhen:
-      'Pick HBv3 when 3D V-Cache helps a cache-bound solver and the newer HBv4 (Genoa-X, NDR 400 Gb/s) is unavailable in your region; HBv4 is the current top tier.',
+      'Pick HBv3 when 3D V-Cache helps a cache-bound solver and the newer HBv4/HBv5 are unavailable in your region.',
     analogs: '≈ AWS Hpc7a · GCP H3/H4D',
     source: SRC.azHb,
   },
@@ -1060,7 +1110,7 @@ const FAMILY_KNOWLEDGE: Record<string, FamilyFact> = {
     whatItIs:
       'GCP N2D — AMD (EPYC) general-purpose, and the basis for GCP Confidential VMs supporting both AMD SEV and SEV-SNP; balanced production workloads, with a confidential-compute option.',
     pickWhen:
-      'Pick N2D for AMD general-purpose; enable Confidential VM (SEV / SEV-SNP) when the workload handles regulated/sensitive data on an untrusted host. SEV-SNP on GCP is currently limited to N2D (C2D/C3D run plain SEV).',
+      'Pick N2D for AMD general-purpose; enable Confidential VM (SEV / SEV-SNP) when the workload handles regulated/sensitive data on an untrusted host. SEV-SNP on GCP is still limited to N2D (C2D/C3D/C4D run plain SEV; Intel TDX is on C3, C4 and A3 High).',
     analogs: '≈ AWS M7a · Azure Dasv6 (and DCasv5/ECasv5 confidential)',
     source: SRC.gcpConf,
   },
@@ -1095,9 +1145,9 @@ const FAMILY_KNOWLEDGE: Record<string, FamilyFact> = {
   // ── GPU / accelerated — S57 deep-research, vendor-verified ──────────────────
   a3: {
     whatItIs:
-      'GCP A3 — flagship GPU: up to 8× NVIDIA H100 (Hopper) per VM on Sapphire Rapids hosts with 2 TB DDR5 and 3.6 TB/s GPU-to-GPU via NVSwitch + NVLink 4.0; A3 Ultra steps up to 8× H200 (1,128 GB HBM3e) with CX-7 RoCE networking. Large-scale ML training and HPC.',
+      'GCP A3 — Hopper GPU family: 1, 2, 4 or 8× NVIDIA H100 per VM on Sapphire Rapids hosts with ~2.9 TB DDR5, NVLink at 450 GB/s per GPU (up to 7.2 TB/s aggregate across 8 GPUs); A3 Ultra steps up to 8× H200 (1,128 GB HBM3e) with CX-7 RoCE networking. Large-scale ML training and HPC.',
     pickWhen:
-      'Pick A3 (H100, NVLink/NVSwitch) for multi-GPU training that needs fast intra-node interconnect; step to A3 Ultra (H200, more HBM3e + RoCE scale-out) when GPU memory or bandwidth is the constraint; G2/L4 is enough for inference.',
+      'Pick A3 (H100, NVLink) for multi-GPU training that needs fast intra-node interconnect; step to A3 Ultra (H200, more HBM3e + RoCE scale-out) when GPU memory or bandwidth is the constraint; G2/L4 is enough for inference.',
     analogs: '≈ AWS P5/P5e · Azure ND-H100/H200 v5',
     source: SRC.gcpAccel,
   },
@@ -1115,6 +1165,467 @@ const FAMILY_KNOWLEDGE: Record<string, FamilyFact> = {
     pickWhen:
       'Pick G2 for inference and video/graphics where single-GPU-class L4 throughput is enough; step up to A3 (H100, NVLink) for large-model training or fast multi-GPU interconnect.',
     analogs: '≈ AWS G6/G6e · Azure NV-series',
+    source: SRC.gcpAccel,
+  },  // ── AWS 8th/9th-gen CPU — 2026-Q4 refresh, vendor-verified 3-0/2-1 ─────────
+  m8i: {
+    whatItIs:
+      'AWS M8i — general-purpose on custom Intel Xeon 6 (Granite Rapids), 4 GiB/vCPU, SMT on, up to 384 vCPU / 1.5 TiB and 100 Gbps; M8i-flex covers large–16xlarge.',
+    pickWhen:
+      'Pick M8i for x86 general-purpose tiers that need Intel ISA features or sizes beyond 192 vCPU; M8i-flex when CPU is rarely saturated; M8g/M9g (Graviton) for Arm-ready code.',
+    analogs: '≈ Azure Dsv7 (Granite Rapids) · GCP C4',
+    source: SRC.awsM8i,
+  },
+  c8i: {
+    whatItIs:
+      'AWS C8i — compute-optimized on custom Intel Xeon 6 (Granite Rapids), 2 GiB/vCPU, SMT on, up to 384 vCPU / 768 GiB and 100 Gbps; C8i-flex covers large–16xlarge.',
+    pickWhen: 'Pick C8i for CPU-bound x86 tiers with light memory needs; C8a when you want a full physical core per vCPU.',
+    analogs: '≈ Azure Fasv7 / Dlsv6 · GCP C4 highcpu',
+    source: SRC.awsC8i,
+  },
+  r8i: {
+    whatItIs:
+      'AWS R8i — memory-optimized on custom Intel Xeon 6 (Granite Rapids), 8 GiB/vCPU, SMT on, up to 384 vCPU / 3 TiB and 100 Gbps; includes SAP-certified sizes, and R8i-flex up to 16xlarge.',
+    pickWhen:
+      'Pick R8i for x86 memory-bound workloads at 8 GiB/vCPU, including the largest sizes or sustained high CPU; X8i when you need 16 GiB/vCPU.',
+    analogs: '≈ Azure Esv7 · GCP C4 highmem',
+    source: SRC.awsR8i,
+  },
+  m8a: {
+    whatItIs:
+      'AWS M8a — general-purpose on 5th-gen AMD EPYC (Turin) up to 4.5 GHz, 4 GiB/vCPU, SMT off (1 vCPU = 1 physical core), up to 192 vCPU / 768 GiB and 75 Gbps, no local disk.',
+    pickWhen: 'Pick M8a for x86 general-purpose workloads that benefit from a full physical core per vCPU; M7a is the prior AMD gen.',
+    analogs: '≈ Azure Dasv7 (Turin) · GCP C4D',
+    source: SRC.awsM8a,
+  },
+  c8a: {
+    whatItIs:
+      'AWS C8a — compute-optimized on 5th-gen AMD EPYC (Turin) up to 4.5 GHz, 2 GiB/vCPU, SMT off, up to 192 vCPU / 384 GiB and 75 Gbps, no local disk.',
+    pickWhen: 'Pick C8a for CPU-bound batch, ad serving, gaming and encoding on AMD with dedicated physical cores.',
+    analogs: '≈ Azure Fasv7 (Turin) · GCP C4D highcpu',
+    source: SRC.awsC8a,
+  },
+  r8a: {
+    whatItIs:
+      'AWS R8a — memory-optimized on 5th-gen AMD EPYC (Turin) up to 4.5 GHz, 8 GiB/vCPU, SMT off, up to 192 vCPU / 1.5 TiB and 75 Gbps, no local disk.',
+    pickWhen: 'Pick R8a for SQL/NoSQL databases, in-memory caches and real-time analytics on x86 with physical-core vCPUs.',
+    analogs: '≈ Azure Easv7 (Turin) · GCP C4D highmem',
+    source: SRC.awsR8a,
+  },
+  m9g: {
+    whatItIs:
+      'AWS M9g — general-purpose on AWS Graviton5 (Arm), 4 GiB/vCPU, one physical core per vCPU, up to 192 vCPU / 768 GiB and 100 Gbps; M9gd adds local NVMe (3× 3.8 TB at the top size).',
+    pickWhen: 'The newest Graviton general-purpose tier for Arm-ready app servers and microservices; M8g (Graviton4) where M9g is not yet in-region.',
+    analogs: '≈ Azure Dpsv6 (Cobalt 100) · GCP C4A (Axion)',
+    source: SRC.awsM9g,
+  },
+  c9g: {
+    whatItIs:
+      'AWS C9g — compute-optimized on AWS Graviton5 (Arm), 2 GiB/vCPU, up to 192 vCPU / 384 GiB and 100 Gbps (EFA on the largest sizes); C9gd adds local NVMe.',
+    pickWhen: 'Pick C9g for Arm-ready CPU-bound work; C8g (Graviton4) where C9g is not yet in-region.',
+    analogs: '≈ Azure Dplsv6 (Cobalt 100) · GCP C4A highcpu (Axion)',
+    source: SRC.awsC9g,
+  },
+  x8g: {
+    whatItIs:
+      'AWS X8g — memory-intensive on AWS Graviton4 (Arm), 16 GiB/vCPU, up to 192 vCPU / 3 TiB and 50 Gbps, EBS-only.',
+    pickWhen: 'Pick X8g for Arm-compatible in-memory databases, caches and EDA that need 16 GiB per vCPU.',
+    analogs: '≈ Azure M-series (x86; no Arm 16:1 equivalent) · GCP M3 (x86)',
+    source: SRC.awsX8g,
+  },
+  x8i: {
+    whatItIs:
+      'AWS X8i — memory-intensive on custom Intel Xeon 6, 16 GiB/vCPU, SMT on, up to 384 vCPU / 6 TiB and 100 Gbps, EBS-only; SAP HANA and large in-memory databases.',
+    pickWhen: 'Pick X8i for multi-TiB in-memory x86 workloads such as SAP HANA; the u7i family for 6–32 TiB single hosts.',
+    analogs: '≈ Azure M-series (Mv3) · GCP M4',
+    source: SRC.awsX8i,
+  },
+  i8g: {
+    whatItIs:
+      'AWS I8g — storage-optimized on AWS Graviton4 with 3rd-gen Nitro SSDs, 8 GiB/vCPU, up to 192 vCPU / 1.5 TiB, 100 Gbps and 45 TB local NVMe (12× 3,750 GB).',
+    pickWhen: 'Pick I8g for I/O-heavy databases and analytics on Arm that need low-latency local NVMe; I7i for x86. Local NVMe is ephemeral.',
+    analogs: '≈ Azure Lsv4/Lasv4 · GCP Z3',
+    source: SRC.awsI8g,
+  },
+  i8ge: {
+    whatItIs:
+      'AWS I8ge — storage-dense Graviton4 sibling of I8g, up to 192 vCPU / 1.5 TiB, 180 Gbps and 120 TB local NVMe (16× 7,500 GB).',
+    pickWhen: 'Pick I8ge when storage capacity per instance is the binding constraint on an Arm-compatible workload; I7ie for x86.',
+    analogs: '≈ Azure Laosv4 · GCP Z3 (highlssd)',
+    source: SRC.awsI8g,
+  },
+  hpc8a: {
+    whatItIs:
+      'AWS Hpc8a — HPC on 5th-gen AMD EPYC (up to 4.5 GHz), a single 96xlarge size: 192 cores, 768 GiB, SMT off, 300 Gbps EFA, no local disk.',
+    pickWhen: 'Pick Hpc8a for tightly-coupled MPI workloads that scale across EFA-connected clusters; Hpc7a is the prior AMD (Genoa) gen.',
+    analogs: '≈ Azure HBv5/HBv4 · GCP H4D (Turin)',
+    source: SRC.awsHpc8a,
+  },
+  // ── AWS accelerated — 2026-Q4 refresh, vendor-verified 3-0/2-1 ─────────────
+  p5en: {
+    whatItIs:
+      'AWS P5en — 8× NVIDIA H200 (1,128 GiB HBM3e) on 900 GB/s NVSwitch, Intel Sapphire Rapids host, 3,200 Gbps EFA, 8× 3.8 TB local NVMe; LLM/diffusion training and HPC.',
+    pickWhen:
+      'Pick P5en over P5 (H100) when per-GPU memory is the constraint; step to P6-B200 for Blackwell.',
+    analogs: '≈ Azure ND H200 v5 · GCP A3 Ultra',
+    source: SRC.awsP5,
+  },
+  p6b200: {
+    whatItIs:
+      'AWS P6-B200 — 8× NVIDIA B200 (1,432 GiB HBM3e) on 5th-gen NVLink (up to 1.8 TB/s per GPU), Intel Emerald Rapids host, 3.2 Tbps EFAv4, ~30 TB local NVMe; medium-to-large-scale training and inference.',
+    pickWhen:
+      'Pick P6-B200 for Blackwell training/inference in a standard x86 8-GPU node; P6-B300 when you need more GPU memory and network per node.',
+    analogs: '≈ Azure ND GB200 v6 (rack-scale, directional) · GCP A4',
+    source: SRC.awsP6,
+  },
+  p6b300: {
+    whatItIs:
+      'AWS P6-B300 — 8× NVIDIA B300 Blackwell Ultra (2,148 GiB GPU memory), 4 TiB host memory, Intel Emerald Rapids host, 6.4 Tbps EFA; large-scale ML training and inference.',
+    pickWhen:
+      'Pick P6-B300 over P6-B200 when the model needs the larger per-node GPU memory and doubled EFA bandwidth.',
+    analogs: '≈ Azure ND GB300 v6 (rack-scale, closest) · GCP A4X Max',
+    source: SRC.awsP6,
+  },
+  p4d: {
+    whatItIs:
+      'AWS P4d/P4de — 8× NVIDIA A100 (40 GB HBM2 on P4d, 80 GB HBM2e on P4de) on 600 GB/s NVSwitch with 400 Gbps EFA; the prior GPU generation to P5.',
+    pickWhen:
+      'Pick P4d/P4de for existing A100-tuned training/inference pipelines that do not need Hopper or Blackwell.',
+    analogs: '≈ Azure ND A100 v4 · GCP A2 / A2 Ultra',
+    source: SRC.awsP4,
+  },
+  g6: {
+    whatItIs:
+      'AWS G6 — up to 8× NVIDIA L4 (24 GB each) on AMD EPYC, including fractional-GPU sizes; inference, video and graphics/virtual-workstation workloads.',
+    pickWhen:
+      'Pick G6 for cost-efficient inference and graphics where a single L4-class GPU is enough; G6e (L40S, 48 GB) for larger models.',
+    analogs: '≈ Azure NVads A10 v5 (closest) · GCP G2 (L4)',
+    source: SRC.awsG6,
+  },
+  g6e: {
+    whatItIs:
+      'AWS G6e — up to 8× NVIDIA L40S (48 GB each, 384 GB total) on AMD EPYC with up to 400 Gbps networking; LLM inference up to ~13B parameters, diffusion models, spatial/Omniverse graphics.',
+    pickWhen:
+      'Pick G6e when an inference model outgrows a 24 GB L4; step to G7e (RTX PRO 6000, 96 GB) for larger single-GPU models.',
+    analogs: '≈ Azure NVads V710 v5 (directional) · GCP G2 (L4, smaller)',
+    source: SRC.awsG6e,
+  },
+  g7: {
+    whatItIs:
+      'AWS G7 — up to 8× NVIDIA RTX PRO 4500 Blackwell Server Edition (32 GB each) on custom Intel Xeon 6 (SMT off), up to 700 Gbps EFA; AI inference, graphics and data analytics.',
+    pickWhen:
+      'Pick G7 for Blackwell inference/graphics at a smaller memory tier; G7e (96 GB per GPU) when the model needs more GPU memory.',
+    analogs: '≈ Azure NVads A10 v5 (directional) · GCP G2 (directional)',
+    source: SRC.awsG7,
+  },
+  g7e: {
+    whatItIs:
+      'AWS G7e — up to 8× NVIDIA RTX PRO 6000 Blackwell Server Edition (96 GB GDDR7 each), GPUDirect P2P over PCIe, up to 1,600 Gbps EFA; LLM, multimodal and physical-AI inference plus spatial graphics.',
+    pickWhen:
+      'Pick G7e when a model fits in 96 GB per GPU and PCIe peer-to-peer is enough; P-family (NVLink) for tightly-coupled multi-GPU training.',
+    analogs: '≈ Azure NC RTX PRO 6000 BSE v6 · GCP G4 (RTX PRO 6000)',
+    source: SRC.awsG7e,
+  },
+  trn1: {
+    whatItIs:
+      'AWS Trn1 — 16× AWS Trainium (512 GB accelerator memory) linked by NeuronLink, 800 Gbps EFA (1,600 Gbps on Trn1n); LLM and diffusion-model training on the Neuron SDK.',
+    pickWhen:
+      'Pick Trainium when the training stack runs on AWS Neuron; a GPU P-family is the portable CUDA choice.',
+    analogs: '≈ Azure: no training-ASIC VM · GCP TPU (directional)',
+    source: SRC.awsTrn1,
+  },
+  trn2: {
+    whatItIs:
+      'AWS Trn2 — 16× Trainium2 (1.5 TB HBM3, 96 GiB per chip), Intel Sapphire Rapids host, 3.2 Tbps EFAv3; Trn2 UltraServers join 64 chips over NeuronLink. Training and serving 100B to 1T+ parameter models.',
+    pickWhen:
+      'Pick Trn2 for very large Neuron-SDK training/inference; the EC2 instance-type table lists 8,192 GiB accelerator memory, which conflicts with the product page and Neuron docs (1.5 TB) — treat 1.5 TB as correct.',
+    analogs: '≈ Azure: no training-ASIC VM · GCP TPU (directional)',
+    source: SRC.awsTrn2,
+  },
+  inf2: {
+    whatItIs:
+      'AWS Inf2 — up to 12× AWS Inferentia2 (32 GB each, 384 GB total), NeuronLink on the 24xlarge/48xlarge sizes, no EFA; generative-AI inference on the Neuron SDK.',
+    pickWhen:
+      'Pick Inf2 for high-throughput inference on Neuron-compiled models, including models sharded across chips; G-family GPUs for CUDA portability.',
+    analogs: '≈ Azure: no inference-ASIC VM · GCP TPU (directional)',
+    source: SRC.awsInf2,
+  },
+  // ── Azure GPU — 2026-Q4 refresh, vendor-verified 3-0 ─────────────────────────
+  ndgb200v6: {
+    whatItIs:
+      'Azure ND GB200 v6 — 4 NVIDIA Blackwell GPUs (192 GB each) + 2 Grace CPUs per VM, joined by 5th-gen NVLink into 72-GPU NVL72 racks of 18 VMs; 4× 400 Gb/s Quantum-2 InfiniBand and 16 TiB local NVMe per VM. Deep-learning training, generative AI, HPC.',
+    pickWhen:
+      'Pick it when training benefits from a 72-GPU NVLink domain rather than 8-GPU nodes; ND H200 v5 for Hopper.',
+    analogs: '≈ AWS P6e-GB200 UltraServer · GCP A4X (GB200 NVL72)',
+    source: SRC.azNdGb200,
+  },
+  ndgb300v6: {
+    whatItIs:
+      'Azure ND GB300 v6 — 4 NVIDIA Blackwell Ultra GPUs (288 GB HBM3E each) + 2 Grace CPUs per VM in GB300 NVL72 racks of 18 VMs over 5th-gen NVLink; 800 Gb/s InfiniBand per GPU, 16 TiB local NVMe per VM.',
+    pickWhen:
+      'Pick it for high-throughput reasoning/agentic inference or long-context models that need more HBM per GPU than GB200.',
+    analogs: '≈ AWS P6e-GB300 UltraServer · GCP A4X Max (GB300 NVL72)',
+    source: SRC.azNdGb300,
+  },
+  ndh100v5: {
+    whatItIs:
+      'Azure ND H100 v5 — 8× NVIDIA H100 80 GB on NVLink 4.0, 96 Sapphire Rapids cores, 1,900 GiB RAM; a dedicated 400 Gb/s Quantum-2 InfiniBand link per GPU (3.2 Tb/s per VM), 28 TiB local NVMe.',
+    pickWhen:
+      'Pick it for tightly-coupled multi-node Hopper training and HPC; ND H200 v5 when per-GPU memory is the constraint.',
+    analogs: '≈ AWS P5 · GCP A3',
+    source: SRC.azNdH100,
+  },
+  ndmi300xv5: {
+    whatItIs:
+      'Azure ND MI300X v5 — 8× AMD Instinct MI300X (192 GB each, ~1.5 TB per VM) on 4th-gen Infinity Fabric (896 GB/s aggregate), 96 Sapphire Rapids cores, 400 Gb/s InfiniBand per GPU (3.2 Tb/s per VM), 28 TiB NVMe.',
+    pickWhen:
+      'Pick it for large-model serving or training on ROCm/RCCL where the 192 GB per-GPU HBM lets a model fit on fewer GPUs.',
+    analogs: '≈ no AWS/GCP MI300X instance (no parity); nearest by memory class AWS P5e · GCP A3 Ultra (H200)',
+    source: SRC.azNdMi300x,
+  },
+  ncadsh100v5: {
+    whatItIs:
+      'Azure NCads H100 v5 — 1 or 2 NVIDIA H100 NVL PCIe GPUs (94 GB each) on 4th-gen AMD EPYC Genoa, up to 640 GiB RAM; no InfiniBand listed. Microsoft\'s current NC line for new capacity.',
+    pickWhen:
+      'Pick it for applied-AI training and batch inference that fit in one or two GPUs; ND-series for multi-node InfiniBand scale-out.',
+    analogs: '≈ AWS P5 single-GPU size (p5.4xlarge) · GCP A3 High (1g/2g)',
+    source: SRC.azNcH100,
+  },
+  ncadsa100v4: {
+    whatItIs:
+      'Azure NC A100 v4 — 1 to 4 NVIDIA A100 PCIe 80 GB on 3rd-gen AMD EPYC 7V13 (Milan), up to 880 GiB RAM; no InfiniBand listed.',
+    pickWhen:
+      'Pick it for existing single-node A100 workloads; Microsoft now deploys new NC capacity only as NCads H100 v5.',
+    analogs: '≈ AWS P4de (8-GPU only) · GCP A2 Ultra',
+    source: SRC.azNcA100,
+  },
+  ncrtxpro6000v6: {
+    whatItIs:
+      'Azure NC RTX PRO 6000 BSE v6 — NVIDIA RTX PRO 6000 Blackwell Server Edition (96 GB GDDR7) as 1/4, 1/2, 1 or 2 GPUs on Intel Granite Rapids, general-purpose and lower-memory sizes, up to 12,800 GiB NVMe.',
+    pickWhen:
+      'Pick it for converged AI + graphics: Omniverse/digital twins, RTX virtual workstations, rendering, and inference/RAG on mid-size models.',
+    analogs: '≈ AWS G7e · GCP G4 (both RTX PRO 6000)',
+    source: SRC.azNcRtxPro,
+  },
+  nvadsa10v5: {
+    whatItIs:
+      'Azure NVads A10 v5 — NVIDIA A10 partitioned from 1/6 GPU (4 GB) up to 2 full GPUs (48 GB) on AMD EPYC 74F3V (Milan), GRID license included; one workstation user or up to 25 concurrent app users per VM.',
+    pickWhen:
+      'Pick it for right-sized GPU virtual desktops and graphics apps where a fractional GPU is enough.',
+    analogs: '≈ AWS G5/G6 (whole or fractional GPU) · GCP G2',
+    source: SRC.azNvA10,
+  },
+  nvadsv710v5: {
+    whatItIs:
+      'Azure NVads V710 v5 — AMD Radeon Pro V710 partitioned from 1/6 GPU (4 GB) to a full GPU (24 GB) on AMD EPYC 9V64 F (Genoa), NVMe local storage, no GPU license fee.',
+    pickWhen:
+      'Pick it for cost-sensitive VDI, cloud gaming/streaming or small-model inference without NVIDIA GRID licensing.',
+    analogs: '≈ AWS G4ad (AMD Radeon Pro V520) · GCP: no AMD GPU instance',
+    source: SRC.azNvV710,
+  },
+  // ── Azure CPU / HPC / storage — 2026-Q4 refresh, vendor-verified 3-0/2-1 ────
+  dsv7: {
+    whatItIs:
+      'Azure Dsv7 — Intel Xeon 6 6973PC (Granite Rapids) general-purpose, 3.6 GHz all-core / 4.2 GHz turbo, 2–372 vCPU at 4 GiB/vCPU (1,488 GiB max), no local disk.',
+    pickWhen:
+      'The newest Intel D-series; pick it for new Intel general-purpose deployments or very large single VMs, and Dsv6 where v7 is not offered in your region.',
+    analogs: '≈ AWS M8i · GCP C4',
+    source: SRC.azDsv7,
+  },
+  esv7: {
+    whatItIs:
+      'Azure Esv7 — Intel Xeon 6 6973PC (Granite Rapids) memory-optimized, 8 GiB/vCPU up to 192 vCPU and up to 372 vCPU / 2,832 GiB at the top size, no local disk.',
+    pickWhen:
+      'Pick it for SQL/NoSQL, SAP and in-memory workloads on current-gen Intel; Easv7 for the AMD equivalent.',
+    analogs: '≈ AWS R8i · GCP C4 highmem',
+    source: SRC.azEsv7,
+  },
+  dsv6: {
+    whatItIs:
+      'Azure Dsv6 — 5th-gen Intel Xeon Platinum 8573C (Emerald Rapids) general-purpose, 2–192 vCPU at 4 GiB/vCPU (768 GiB max), no local disk.',
+    pickWhen: 'The prior Intel D generation to Dsv7; pick it where v7 is unavailable or v6 pricing fits better.',
+    analogs: '≈ AWS M7i · GCP C3',
+    source: SRC.azDsv6,
+  },
+  dpsv6: {
+    whatItIs:
+      'Azure Dpsv6 — Azure Cobalt 100 (Arm Neoverse N2) general-purpose at 3.4 GHz, one physical core per vCPU, 2–96 vCPU at 4 GiB/vCPU (384 GiB max), no local disk.',
+    pickWhen:
+      'Pick it for Arm-ready scale-out services (web/app tiers, small-to-medium databases, caches); D-series x86 for x86-locked code.',
+    analogs: '≈ AWS M8g (Graviton4) · GCP C4A (Axion)',
+    source: SRC.azDpsv6,
+  },
+  dasv7: {
+    whatItIs:
+      'Azure Dasv7 — 5th-gen AMD EPYC 9005 (Turin) general-purpose, up to 4.5 GHz, 2–160 vCPU at 4 GiB/vCPU (640 GiB max), no local disk.',
+    pickWhen: 'The newest AMD D-series; Dasv6 (Genoa) where v7 is not yet offered in your region.',
+    analogs: '≈ AWS M8a · GCP C4D',
+    source: SRC.azDasv7,
+  },
+  easv7: {
+    whatItIs:
+      'Azure Easv7 — 5th-gen AMD EPYC 9005 (Turin) memory-optimized, up to 4.5 GHz, 2–160 vCPU at 8 GiB/vCPU (1,280 GiB max), no local disk.',
+    pickWhen: 'Pick it for memory-intensive enterprise applications on AMD where 8 GiB/vCPU fits.',
+    analogs: '≈ AWS R8a · GCP C4D highmem',
+    source: SRC.azEasv7,
+  },
+  fasv7: {
+    whatItIs:
+      'Azure Fasv7 — 5th-gen AMD EPYC 9005 (Turin) compute-optimized with SMT off (1 vCPU = 1 core), 1–80 cores at 4 GiB/core, up to 4.5 GHz, no local disk.',
+    pickWhen: 'Pick it for CPU-bound work that wants dedicated cores: simulation, risk analysis, game servers, rendering.',
+    analogs: '≈ AWS C8a · GCP C4D highcpu',
+    source: SRC.azFasv7,
+  },
+  hbv5: {
+    whatItIs:
+      'Azure HBv5 — AMD EPYC 9V64H (Zen4) with 432 GB HBM3 at 6.7 TB/s, up to 368 cores with SMT off, 800 Gb/s NDR InfiniBand (4× 200); the current top of the HB-family.',
+    pickWhen:
+      'Pick HBv5 for the most memory-bandwidth-bound MPI codes (CFD, weather, molecular dynamics) whose per-node footprint fits in 432 GB; HX when memory capacity, not bandwidth, is the limit.',
+    analogs: '≈ AWS Hpc8a/Hpc7a (no HBM equivalent) · GCP H4D',
+    source: SRC.azHbv5,
+  },
+  hbv2: {
+    whatItIs:
+      'Azure HBv2 — 120-core AMD EPYC 7V12 (Rome) HPC, SMT off, 456 GB RAM at 350 GB/s, 200 Gb/s HDR InfiniBand. Retiring May 31, 2027.',
+    pickWhen:
+      'Only for existing memory-bandwidth-bound jobs (CFD, FEA, reservoir) pending migration; new work should target HBv5, HBv4 or HX.',
+    analogs: '≈ AWS Hpc6a · GCP H3',
+    source: SRC.azHbv2,
+  },
+  hc: {
+    whatItIs:
+      'Azure HC — 44-core Intel Xeon Platinum 8168 (Skylake) HPC, no hyperthreading, 352 GB RAM (8 GB/core), AVX-512, 100 Gb/s EDR InfiniBand. Retiring May 31, 2027.',
+    pickWhen:
+      'Only for legacy Intel-tuned structural-analysis, molecular or chemistry jobs pending migration; Microsoft points to HBv5 or HX.',
+    analogs: '≈ AWS C5n (EFA) · GCP C2',
+    source: SRC.azHc,
+  },
+  hx: {
+    whatItIs:
+      'Azure HX — up to 176 AMD EPYC 9V33X (Genoa-X, 3D V-Cache) cores, SMT off, 1,408 GB RAM (2× HBv4), 780 GB/s DRAM bandwidth, 400 Gb/s NDR InfiniBand.',
+    pickWhen:
+      'Pick HX for memory-capacity-bound HPC such as large EDA/silicon-design runs that overflow HBv4\'s 768 GB.',
+    analogs: '≈ AWS X2iedn / Hpc7a · GCP H4D highmem',
+    source: SRC.azHx,
+  },
+  lsv4: {
+    whatItIs:
+      'Azure Lsv4 — 5th-gen Intel Xeon Platinum 8573C (Emerald Rapids) storage-optimized, 2–96 vCPU at 8 GiB/vCPU, 240 GB local NVMe per vCPU up to 23 TB (12× 1.92 TB).',
+    pickWhen:
+      'Pick it for NVMe-heavy databases and analytics (Cassandra, MongoDB, Spark, Elastic) on Intel; local NVMe is ephemeral — replicate for durability.',
+    analogs: '≈ AWS I7i · GCP Z3',
+    source: SRC.azLsv4,
+  },
+  lasv4: {
+    whatItIs:
+      'Azure Lasv4 — AMD EPYC 9004 (Genoa) storage-optimized, 2–96 vCPU at 8 GiB/vCPU, 240 GB local NVMe per vCPU up to 23 TB (12× 1.92 TB).',
+    pickWhen: 'The AMD counterpart to Lsv4 for the same NVMe-heavy NoSQL and analytics workloads.',
+    analogs: '≈ AWS I7i/I8g · GCP Z3',
+    source: SRC.azLasv4,
+  },
+  laosv4: {
+    whatItIs:
+      'Azure Laosv4 — AMD EPYC 9004 (Genoa) dense-storage, 2–32 vCPU at 8 GiB/vCPU, 720 GB local NVMe per vCPU up to 23 TB at 32 vCPU.',
+    pickWhen:
+      'Pick it when storage per vCPU matters more than compute: caching tiers, search indexes, distributed file systems.',
+    analogs: '≈ AWS I7ie/I8ge · GCP Z3 (highlssd)',
+    source: SRC.azLaosv4,
+  },
+  lsv2: {
+    whatItIs:
+      'Azure Lsv2 — AMD EPYC 7551 (Naples) storage-optimized, 8 GiB/vCPU, one 1.92 TB NVMe per 8 vCPU up to 19.2 TB. Retirement announced for Nov 15, 2028; capacity-restricted since July 2026 and not deployable on new subscriptions.',
+    pickWhen: 'Legacy only — plan migration of NVMe-heavy NoSQL to the v3/v4 L-series.',
+    analogs: '≈ AWS I3 · GCP N2 + Local SSD',
+    source: SRC.azLsv2,
+  },
+  // ── GCP — 2026-Q4 refresh, vendor-verified 3-0/2-1 ──────────────────────────
+  c4d: {
+    whatItIs:
+      'GCP C4D — 5th-gen AMD EPYC (Turin) on Titanium, up to 384 vCPU / 3,024 GB DDR5, up to 12 TiB Titanium SSD and 200 Gbps (Tier_1); Hyperdisk-only block storage, AMD SEV Confidential VM available.',
+    pickWhen:
+      'Pick C4D for current-gen AMD general-purpose work (databases, web/game servers); C3D is the prior AMD gen, C4 the Intel counterpart.',
+    analogs: '≈ AWS M8a/C8a/R8a · Azure Dasv7/Easv7',
+    source: SRC.gcpGp,
+  },
+  n4d: {
+    whatItIs:
+      'GCP N4D — 5th-gen AMD EPYC (Turin) on Titanium, up to 96 vCPU / 768 GB with custom shapes and 50 Gbps standard networking; no Local SSD or Tier_1.',
+    pickWhen: 'Pick N4D for cost-optimized AMD general-purpose fleets that benefit from custom vCPU:memory shapes; C4D for peak per-core performance.',
+    analogs: '≈ AWS M8a · Azure Dasv7',
+    source: SRC.gcpGp,
+  },
+  n4a: {
+    whatItIs:
+      'GCP N4A — Google Axion (Arm Neoverse N3), up to 64 vCPU / 512 GB with custom shapes and 50 Gbps; no Local SSD, no Confidential VM.',
+    pickWhen: 'Pick N4A for cost-efficient Arm scale-out services; C4A (Axion, Neoverse V2) for higher per-core performance and larger shapes.',
+    analogs: '≈ AWS M8g/M9g (Graviton) · Azure Dpsv6 (Cobalt 100)',
+    source: SRC.gcpGp,
+  },
+  x4: {
+    whatItIs:
+      'GCP X4 — bare-metal Intel Sapphire Rapids, up to 1,920 vCPU with 6–32 TB RAM, Hyperdisk-only, 100 Gbps; single-node scale-up SAP HANA.',
+    pickWhen: 'Pick X4 for single-node scale-up SAP HANA in the 6–32 TB range on bare metal; X5 offers up to 48 TB.',
+    analogs: '≈ AWS u7i/u7in High Memory · Azure M-series (very high memory)',
+    source: SRC.gcpMem,
+  },
+  x5: {
+    whatItIs:
+      'GCP X5 — bare-metal Intel Granite Rapids, 688–2,064 vCPU with 12–48 TB RAM (17.9 or 23.8 GB/vCPU by shape), Hyperdisk-only, 200 Gbps (GA September 2026).',
+    pickWhen: 'Pick X5 for the largest single-node SAP HANA scale-up — its 48 TB shape is the largest GCP memory footprint.',
+    analogs: '≈ AWS u7in-32tb · Azure M-series (very high memory)',
+    source: SRC.gcpMem,
+  },
+  m4: {
+    whatItIs:
+      'GCP M4 — Intel Emerald Rapids memory-optimized, up to 224 vCPU / ~6 TB at up to 26.5 GB/vCPU, Hyperdisk-only, 100 Gbps.',
+    pickWhen: 'Pick M4 for SAP HANA and memory-heavy OLTP/OLAP that fit in ~6 TB; X4/X5 beyond that.',
+    analogs: '≈ AWS X8i · Azure M-series (Mv3 medium memory)',
+    source: SRC.gcpMem,
+  },
+  m2: {
+    whatItIs: 'GCP M2 — Intel Cascade Lake memory-optimized (megamem/ultramem/hypermem), 208–416 vCPU with 6, 9 or 12 TB.',
+    pickWhen: 'Pick M2 for large (6–12 TB) SAP HANA databases; X4/X5 bare metal beyond that.',
+    analogs: '≈ AWS u-6tb1/u-12tb1 · Azure M-series (Mv2)',
+    source: SRC.gcpMem,
+  },
+  m1: {
+    whatItIs: 'GCP M1 — older Intel (Skylake/Broadwell) memory-optimized, up to 160 vCPU / 3.8 TB at 14.9–24 GB/vCPU.',
+    pickWhen: 'The oldest M generation; compare against M3/M4 for the same footprint.',
+    analogs: '≈ AWS X1/X1e · Azure M-series (Mv1)',
+    source: SRC.gcpMem,
+  },
+  n1: {
+    whatItIs:
+      'GCP N1 — first-generation general-purpose on Intel Skylake through Sandy Bridge, up to 96 vCPU / 624 GB; includes the shared-core f1/g1 types.',
+    pickWhen: 'The oldest general-purpose generation; N2/N4 are its newer successors for general-purpose work.',
+    analogs: '≈ AWS M5/M4 · Azure Dv3/Dv2',
+    source: SRC.gcpGp,
+  },
+  t2d: {
+    whatItIs:
+      'GCP Tau T2D — 3rd-gen AMD EPYC (Milan) with SMT off (1 vCPU = 1 core), up to 60 vCPU at 4 GB/vCPU, 32 Gbps; no Local SSD, GPUs or custom shapes.',
+    pickWhen: 'Pick T2D for scale-out web, microservices, transcoding and Java fleets that want whole-core vCPUs; N4D/C4D for newer AMD.',
+    analogs: '≈ AWS M6a/C6a · Azure Dasv5',
+    source: SRC.gcpGp,
+  },
+  a4: {
+    whatItIs:
+      'GCP A4 — 8× NVIDIA B200 (180 GB each) on Intel Emerald Rapids hosts, 14.4 TB/s aggregate NVLink, up to 3,600 Gbps RoCE networking; large-scale foundation-model training and serving.',
+    pickWhen: 'Pick A4 for Blackwell training on standard x86 8-GPU nodes; A4X for a 72-GPU NVLink domain.',
+    analogs: '≈ AWS P6-B200 · Azure ND GB200 v6 (rack-scale, directional)',
+    source: SRC.gcpAccel,
+  },
+  a4x: {
+    whatItIs:
+      'GCP A4X — GB200 NVL72 rack-scale: 4× B200 + 2 Grace (Arm) CPUs per instance in a 72-GPU NVLink domain, up to 2,000 Gbps networking. A4X Max is the GB300 bare-metal successor.',
+    pickWhen: 'Pick A4X when training/serving needs a 72-GPU NVLink domain; A4 for standard 8-GPU nodes.',
+    analogs: '≈ AWS P6e-GB200 UltraServer · Azure ND GB200 v6',
+    source: SRC.gcpAccel,
+  },
+  g4: {
+    whatItIs:
+      'GCP G4 — NVIDIA RTX PRO 6000 Blackwell (96 GB) from 1/8 to 8 GPUs on AMD Turin hosts, up to 384 vCPU, 12 TiB Titanium SSD, 400 Gbps; PCIe peer-to-peer, no NVLink.',
+    pickWhen: 'Pick G4 for graphics, simulation, transcoding, virtual workstations and single-host inference; A-series for NVLink training.',
+    analogs: '≈ AWS G7e · Azure NC RTX PRO 6000 BSE v6 (same GPU)',
     source: SRC.gcpAccel,
   },
 };
@@ -1184,6 +1695,87 @@ const UNVERIFIED_CLAIMS: UnverifiedClaim[] = [
     why: 'Derived from list pricing at one moment; the breakeven moves with region, rate and the chosen M-class.',
     source: SRC.awsT3,
     families: ['t3', 't3a', 't4g'],
+  },
+  // 2026-Q4 refresh — vendor "up to" figures the verifiers kept out of the facts.
+  {
+    id: 'aws-8i-gen',
+    provider: 'aws',
+    claim: 'M8i / C8i / R8i (Intel Xeon 6) claim up to 15% better price/performance and ~20% higher performance than the 7th-gen Intel families.',
+    why: 'Vendor "up to" gen-over-gen claim; realized gains are workload-dependent.',
+    source: SRC.awsM8i,
+    families: ['m8i', 'c8i', 'r8i'],
+  },
+  {
+    id: 'aws-8a-gen',
+    provider: 'aws',
+    claim: 'M8a / C8a / R8a (EPYC Turin) claim up to 30% higher performance than M7a / C7a / R7a.',
+    why: 'Vendor "up to" gen-over-gen claim; not independently reproduced.',
+    source: SRC.awsM8a,
+    families: ['m8a', 'c8a', 'r8a'],
+  },
+  {
+    id: 'graviton5-gen',
+    provider: 'aws',
+    claim: 'M9g / C9g (Graviton5) claim up to 25% better compute performance than the Graviton4 M8g / C8g.',
+    why: 'Vendor "up to" gen-over-gen claim; the realized delta depends on the workload.',
+    source: SRC.awsM9g,
+    families: ['m9g', 'c9g'],
+  },
+  {
+    id: 'hpc8a-perf',
+    provider: 'aws',
+    claim: 'Hpc8a claims up to 40% higher performance and 25% better price/performance than Hpc7a.',
+    why: 'Vendor HPC benchmark figure; solver- and scale-dependent.',
+    source: SRC.awsHpc8a,
+    families: ['hpc8a'],
+  },
+  {
+    id: 'i8g-perf',
+    provider: 'aws',
+    claim: 'I8g claims up to 65% higher real-time storage performance than I4g.',
+    why: 'Vendor "up to" figure; not independently benchmarked.',
+    source: SRC.awsI8g,
+    families: ['i8g', 'i8ge'],
+  },
+  {
+    id: 'trn2-priceperf',
+    provider: 'aws',
+    claim: 'Trn2 claims 30–40% better price/performance than the GPU-based P5e / P5en.',
+    why: 'Vendor comparison at list price; depends on model, framework maturity and commitment term.',
+    source: SRC.awsTrn2,
+    families: ['trn2'],
+  },
+  {
+    id: 'g7e-perf',
+    provider: 'aws',
+    claim: 'G7e claims up to 2.3× the inference performance of G6e.',
+    why: 'Vendor "up to" figure for selected models; not independently reproduced.',
+    source: SRC.awsG7e,
+    families: ['g7e'],
+  },
+  {
+    id: 'gb300-throughput',
+    provider: 'azure',
+    claim: 'ND GB300 v6 claims ~27% higher per-rack LLM inference throughput and ~1.5× the FP4 compute of ND GB200 v6.',
+    why: 'Vendor benchmark on a specific model and configuration; not independently reproduced.',
+    source: SRC.azNdGb300,
+    families: ['ndgb300v6'],
+  },
+  {
+    id: 'hbv5-bandwidth',
+    provider: 'azure',
+    claim: 'HBv5 claims ~9× the memory bandwidth of dual-socket Genoa servers (~7× vs Turin).',
+    why: 'Vendor comparison from a Microsoft HPC blog; the verifiers could not load the post body, only its summary.',
+    source: SRC.azHbv5,
+    families: ['hbv5'],
+  },
+  {
+    id: 'c4d-gen',
+    provider: 'gcp',
+    claim: 'C4D claims ~30% higher estimated SPECrate2017_int performance than C3D, with larger gains on selected MySQL / Redis / web benchmarks.',
+    why: 'Vendor-estimated benchmark figures; workload-dependent.',
+    source: SRC.gcpGp,
+    families: ['c4d'],
   },
   // ── Generalized rules (the cross-cutting Arm / newest-gen caveats) ────────
   // These are SYNTHESIZED contextually per cloud in `unverifiedClaims` (naming

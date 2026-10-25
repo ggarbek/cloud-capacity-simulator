@@ -334,6 +334,30 @@ describe('research enrichment', () => {
     expect(insHb.source).toMatch(/learn\.microsoft\.com/);
   });
 
+  it('2026-Q4 refresh families resolve to sourced curated entries on every cloud', () => {
+    const cases: [string, string, RegExp, RegExp][] = [
+      ['AWS', 'm9g', /graviton5/, /aws\.amazon\.com/],
+      ['AWS', 'p6-b200', /b200/, /aws\.amazon\.com/],
+      ['Azure', 'HBv5', /hbm3/, /learn\.microsoft\.com/],
+      ['Azure', 'ND GB300 v6', /blackwell ultra/, /learn\.microsoft\.com/],
+      ['GCP', 'c4d', /turin/, /cloud\.google\.com/],
+    ];
+    for (const [provider, family, what, src] of cases) {
+      const v = vm({ provider, vmSizeName: `${family}-x`, family, vcpus: 8, memoryGib: 32 });
+      const ins = productInsight([v], 'family', family);
+      expect(ins.whatItIs.toLowerCase()).toMatch(what);
+      expect(ins.source).toMatch(src);
+    }
+  });
+
+  it('2026-Q4 re-verification corrections hold (A3 NVLink figure, C4A no longer "supersedes" T2A)', () => {
+    const a3 = productInsight([vm({ provider: 'GCP', vmSizeName: 'a3-highgpu-8g', family: 'a3', vcpus: 208, memoryGib: 1872 })], 'family', 'a3');
+    expect(a3.whatItIs).toMatch(/7\.2 TB\/s/);
+    expect(a3.whatItIs).not.toMatch(/3\.6 TB\/s/);
+    const c4a = productInsight([vm({ provider: 'GCP', vmSizeName: 'c4a-standard-8', family: 'c4a', vcpus: 8, memoryGib: 32 })], 'family', 'c4a');
+    expect(c4a.whatItIs.toLowerCase()).not.toMatch(/supersedes/);
+  });
+
   it('S55 burstable families (T3 / Bpsv2) carry the credit-model + sustained-load backfire rule', () => {
     const t3 = vm({ provider: 'AWS', vmSizeName: 't3.large', family: 't3', category: 'General Purpose', vcpus: 2, memoryGib: 8 });
     const insT3 = productInsight([t3], 'family', 't3');
